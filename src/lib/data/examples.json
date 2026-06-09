@@ -1,0 +1,1452 @@
+{
+ "default": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "dumb-ap": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      },
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "5G"
+      ]
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "fingerprint": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "ssh",
+     "fingerprint"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "ieee8021x": {
+  "uuid": 2,
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "ssh"
+    ],
+    "ieee8021x-ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   },
+   "ieee8021x": {
+    "radius-server": "local"
+   }
+  }
+ },
+ "initial": {
+  "radios": {},
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "ssh",
+     "cli"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.1.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    }
+   }
+  }
+ },
+ "lldp": {
+  "uuid": 2,
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "lldp",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   },
+   "lldp": {
+    "name": "OpenWrt",
+    "description": "AP"
+   }
+  }
+ },
+ "mesh-batman": {
+  "uuid": 2,
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "mesh": {
+      "template": {
+       "mode": "batman-adv",
+       "key": "meshmesh"
+      },
+      "ssid": "mesh",
+      "wifi-radios": [
+       "5G"
+      ],
+      "bss-mode": "mesh"
+     },
+     "main": {
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      },
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ]
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "multi-psk": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "encryption": {
+       "proto": "psk2",
+       "key": "aaaaaaaa"
+      },
+      "multi-psk": {
+       "blogic": {
+        "mac": [
+         "00:11:22:33:44:55",
+         "aa:bb:cc:dd:ee:ff"
+        ],
+        "key": "bbbbbbbb"
+       },
+       "vlan": {
+        "key": "cccccccc",
+        "vlan-id": 100
+       }
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "owe-ap": {
+  "uuid": 2,
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G"
+      ],
+      "template": {
+       "mode": "opportunistic",
+       "security": "compatibility"
+      }
+     }
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "pppoe": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "ports": {
+     "wan*": "auto"
+    },
+    "vlan": {
+     "id": 7
+    },
+    "broad-band": {
+     "type": "pppoe",
+     "username": "user1",
+     "password": "password1"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "qos": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "quality-of-service": {
+     "bandwidth-up": 1000,
+     "bandwidth-down": 1000
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   },
+   "quality-of-service": {
+    "services": [
+     "zoom",
+     "youtube",
+     "networking"
+    ],
+    "bulk-detection": {
+     "dscp": "CS1",
+     "packets-per-second": 32
+    },
+    "classifier": [
+     {
+      "dscp": "AF41",
+      "ports": [
+       {
+        "protocol": "udp",
+        "port": 5000,
+        "range-end": 5100
+       }
+      ],
+      "dns": [
+       {
+        "fqdn": "example.com",
+        "suffix-matching": true,
+        "reclassify": false
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "radius-builtin": {
+  "uuid": 2,
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "template": {
+       "mode": "enterprise",
+       "security": "maximum"
+      },
+      "ssid": "OpenWrt-wpa2",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ]
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "radius": {
+  "uuid": 2,
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "definitions": {
+   "radius-servers": {
+    "radius": {
+     "authentication": {
+      "host": "192.168.42.78",
+      "port": 1812,
+      "secret": "secret"
+     },
+     "accounting": {
+      "host": "192.168.42.78",
+      "port": 1813,
+      "secret": "secret"
+     }
+    }
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "template": {
+       "mode": "enterprise",
+       "security": "maximum",
+       "radius-server": "radius"
+      },
+      "ssid": "OpenWrt-wpa2",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ]
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "ratelimit": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      },
+      "rate-limit": {
+       "ingress-rate": 10,
+       "egress-rate": 10
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "tailscale": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "tailscale",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "vlan": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   },
+   "wan-vlan100": {
+    "role": "upstream",
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "vlan": {
+     "id": 100
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt-vlan100",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "wds-ap": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "WDS",
+      "wifi-radios": [
+       "5G"
+      ],
+      "bss-mode": "wds-ap",
+      "template": {
+       "mode": "encrypted",
+       "security": "maximum",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "wds-repeater": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "WDS",
+      "wifi-radios": [
+       "5G"
+      ],
+      "bss-mode": "wds-repeater",
+      "template": {
+       "mode": "encrypted",
+       "security": "maximum",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "webui": {
+  "unit": {
+   "timezone": "Europe/Berlin",
+   "hostname": "ap",
+   "leds-active": true
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "main": {
+    "role": "upstream",
+    "services": [
+     "mdns",
+     "ssh",
+     "cli",
+     "uconfig-ui",
+     "fingerprint",
+     "unet"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "main": {
+      "ssid": "OpenWrt",
+      "template": {
+       "mode": "encrypted",
+       "security": "maximum",
+       "key": "aaaaaaaa"
+      },
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "encryption": {
+       "key": "aaaaaaaa"
+      }
+     },
+     "mesh": {
+      "disable": true,
+      "template": {
+       "mode": "batman-adv",
+       "key": "aaaaaaaa"
+      },
+      "wifi-radios": [
+       "5G"
+      ]
+     }
+    }
+   },
+   "guest": {
+    "role": "upstream",
+    "disable": true,
+    "services": [
+     "mdns",
+     "fingerprint"
+    ],
+    "ports": {
+     "wan*": "auto",
+     "lan*": "auto"
+    },
+    "vlan": {
+     "id": 100
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ssids": {
+     "guest": {
+      "ssid": "Guest",
+      "template": {
+       "mode": "encrypted",
+       "security": "maximum",
+       "key": "aaaaaaaa"
+      },
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "isolate-clients": true,
+      "rate-limit": 0
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "wifi-7": {
+  "uuid": 2,
+  "radios": {
+   "2G": {
+    "channel-mode": "EHT",
+    "channel-width": 40
+   },
+   "5G": {
+    "channel-mode": "EHT",
+    "channel-width": 80
+   },
+   "6G": {
+    "channel-mode": "EHT",
+    "channel-width": 160
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "ports": {
+     "wan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "dynamic"
+    },
+    "ipv6": {
+     "addressing": "dynamic"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G",
+       "6G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "maximum",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ },
+ "wwan": {
+  "uuid": 2,
+  "unit": {
+   "timezone": "Europe/Berlin"
+  },
+  "radios": {
+   "2G": {
+    "channel-mode": "HE",
+    "channel-width": 20
+   },
+   "5G": {
+    "channel-mode": "HE",
+    "channel-width": 80,
+    "channel": 36
+   }
+  },
+  "interfaces": {
+   "wan": {
+    "role": "upstream",
+    "broad-band": {
+     "type": "wwan",
+     "device": "/sys/devices/platform/soc/11200000.usb/usb1/1-1/1-1.2",
+     "apn": "internet.telekom",
+     "username": "telekom",
+     "password": "tm",
+     "ip-type": "ipv4v6",
+     "pincode": "9360"
+    }
+   },
+   "lan": {
+    "role": "downstream",
+    "services": [
+     "mdns",
+     "ssh"
+    ],
+    "ports": {
+     "lan*": "auto"
+    },
+    "ipv4": {
+     "addressing": "static",
+     "subnet": "192.168.11.1/24",
+     "dhcp-pool": {
+      "lease-first": 10,
+      "lease-count": 100,
+      "lease-time": "6h"
+     }
+    },
+    "ipv6": {
+     "addressing": "static",
+     "dhcpv6": {
+      "mode": "hybrid"
+     }
+    },
+    "ssids": {
+     "nat": {
+      "purpose": "system-defaults",
+      "ssid": "OpenWrt",
+      "wifi-radios": [
+       "2G",
+       "5G"
+      ],
+      "template": {
+       "mode": "encrypted",
+       "security": "compatibility",
+       "key": "aaaaaaaa"
+      }
+     }
+    }
+   }
+  },
+  "services": {
+   "ssh": {
+    "port": 22
+   }
+  }
+ }
+}

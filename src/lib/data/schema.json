@@ -1,0 +1,1574 @@
+{
+        "$id": "https://uconfig.openwrt.org/uconfig.schema.json",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "description": "OpenWrt uconfig schema",
+        "type": "object",
+        "properties": {
+                "strict": {
+                        "description": "The device will reject any configuration that causes warnings if strict mode is enabled.",
+                        "type": "boolean",
+                        "default": false
+                },
+                "uuid": {
+                        "description": "The unique ID of the configuration. This is the unix timestamp of when the config was created.",
+                        "type": "integer"
+                },
+                "unit": {
+                        "$ref": "#/$defs/unit"
+                },
+                "radios": {
+                        "type": "object",
+                        "patternProperties": {
+                                ".+": {
+                                        "$ref": "#/$defs/radio",
+                                        "additionalProperties": false
+                                }
+                        }
+                },
+                "interfaces": {
+                        "type": "object",
+                        "patternProperties": {
+                                ".+": {
+                                        "$ref": "#/$defs/interface",
+                                        "additionalProperties": false
+                                }
+                        }
+                },
+                "definitions": {
+                        "$ref": "#/$defs/definitions"
+                },
+                "ethernet": {
+                        "$ref": "#/$defs/ethernet"
+                },
+                "offload": {
+                        "$ref": "#/$defs/offload"
+                },
+                "services": {
+                        "$ref": "#/$defs/service"
+                }
+        },
+        "$defs": {
+                "unit": {
+                        "description": "A device has certain properties that describe its identity and location. These properties are described inside this object.",
+                        "type": "object",
+                        "properties": {
+                                "hostname": {
+                                        "description": "The hostname that shall be set on the device. If this field is not set, then the devices serial number is used.",
+                                        "type": "string",
+                                        "format": "hostname"
+                                },
+                                "timezone": {
+                                        "description": "This allows you to change the TZ of the device.",
+                                        "type": "string",
+                                        "examples": [
+                                                "UTC",
+                                                "EST5",
+                                                "CET-1CEST,M3.5.0,M10.5.0/3"
+                                        ]
+                                },
+                                "leds-active": {
+                                        "description": "This allows forcing all LEDs off.",
+                                        "type": "boolean",
+                                        "default": true
+                                },
+                                "password": {
+                                        "description": "The password that shall be set on the device. This needs to be the hash that can be found on /etc/shadow.",
+                                        "type": "string",
+                                        "examples": [
+                                                "$5$W6IguIG.fr6rP8oD$7SE7nHa0gpU7s9klNAOOwR.d4XDlCQDbKWZWW1C1H9A"
+                                        ]
+                                },
+                                "tty-login": {
+                                        "description": "Require username/password login on tty/S ports.",
+                                        "type": "boolean",
+                                        "default": true
+                                }
+                        }
+                },
+                "radio.rates": {
+                        "description": "The rate configuration of this BSS.",
+                        "type": "object",
+                        "properties": {
+                                "beacon": {
+                                        "description": "The beacon rate that shall be used by the BSS. Values are in Mbps.",
+                                        "type": "integer",
+                                        "default": 6000,
+                                        "enum": [
+                                                0,
+                                                1000,
+                                                2000,
+                                                5500,
+                                                6000,
+                                                9000,
+                                                11000,
+                                                12000,
+                                                18000,
+                                                24000,
+                                                36000,
+                                                48000,
+                                                54000
+                                        ]
+                                },
+                                "multicast": {
+                                        "description": "The multicast rate that shall be used by the BSS. Values are in Mbps.",
+                                        "type": "integer",
+                                        "default": 24000,
+                                        "enum": [
+                                                0,
+                                                1000,
+                                                2000,
+                                                5500,
+                                                6000,
+                                                9000,
+                                                11000,
+                                                12000,
+                                                18000,
+                                                24000,
+                                                36000,
+                                                48000,
+                                                54000
+                                        ]
+                                }
+                        }
+                },
+                "radio": {
+                        "description": "Describe a physical radio on the AP. A radio is be parent to several VAPs. They all share the same physical properties.",
+                        "type": "object",
+                        "properties": {
+                                "band": {
+                                        "description": "Specifies the wireless band to configure the radio for. Available radio device phys on the target system are matched by the wireless band given here. If multiple radio phys support the same band, the settings specified here will be applied to all of them.",
+                                        "type": "string",
+                                        "enum": [
+                                                "2G",
+                                                "5G",
+                                                "6G"
+                                        ]
+                                },
+                                "channel": {
+                                        "description": "Specifies the wireless channel to use. A value of 'auto' starts the ACS algorithm.",
+                                        "oneOf": [
+                                                {
+                                                        "type": "integer",
+                                                        "maximum": 196,
+                                                        "minimum": 1
+                                                },
+                                                {
+                                                        "type": "string",
+                                                        "const": "auto"
+                                                }
+                                        ]
+                                },
+                                "channel-mode": {
+                                        "description": "Define the ideal channel mode that the radio shall use. This can be 802.11n, 802.11ac or 802.11ax. This is just a hint for the AP. If the requested value is not supported then the AP will use the highest common denominator.",
+                                        "type": "string",
+                                        "enum": [
+                                                "HT",
+                                                "VHT",
+                                                "HE",
+                                                "EHT"
+                                        ],
+                                        "default": "HE"
+                                },
+                                "channel-width": {
+                                        "description": "The channel width that the radio shall use. This is just a hint for the AP. If the requested value is not supported then the AP will use the highest common denominator.",
+                                        "type": "integer",
+                                        "enum": [
+                                                20,
+                                                40,
+                                                80,
+                                                160,
+                                                320,
+                                                8080
+                                        ],
+                                        "default": 80
+                                },
+                                "valid-channels": {
+                                        "description": "Pass a list of valid-channels that can be used during ACS.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "integer",
+                                                "maximum": 196,
+                                                "minimum": 1
+                                        }
+                                },
+                                "allow-dfs": {
+                                        "description": "This property defines whether a radio may use DFS channels.",
+                                        "type": "boolean",
+                                        "default": true
+                                },
+                                "require-mode": {
+                                        "description": "Stations that do no fulfill these HT modes will be rejected.",
+                                        "type": "string",
+                                        "enum": [
+                                                "HT",
+                                                "VHT",
+                                                "HE"
+                                        ]
+                                },
+                                "tx-power": {
+                                        "description": "This option specifies the transmission power in dBm",
+                                        "type": "integer",
+                                        "maximum": 30,
+                                        "minimum": 0
+                                },
+                                "rates": {
+                                        "$ref": "#/$defs/radio.rates"
+                                },
+                                "legacy-rates": {
+                                        "description": "Allow legacy 802.11b data rates.",
+                                        "type": "boolean",
+                                        "default": false
+                                },
+                                "maximum-clients": {
+                                        "description": "Set the maximum number of clients that may connect to this radio. This value is accumulative for all attached VAP interfaces.",
+                                        "type": "integer",
+                                        "example": 64
+                                },
+                                "he-multiple-bssid": {
+                                        "description": "Enabling this option will make the PHY broadcast its BSSs using the multiple BSSID beacon IE.",
+                                        "type": "boolean",
+                                        "default": false
+                                }
+                        }
+                },
+                "interface.ipv4.dhcp-pool": {
+                        "description": "This section describes the DHCP server configuration",
+                        "type": "object",
+                        "properties": {
+                                "lease-first": {
+                                        "description": "The last octet of the first IPv4 address in this DHCP pool.",
+                                        "type": "integer",
+                                        "examples": [
+                                                10
+                                        ]
+                                },
+                                "lease-count": {
+                                        "description": "The number of IPv4 addresses inside the DHCP pool.",
+                                        "type": "integer",
+                                        "examples": [
+                                                100
+                                        ]
+                                },
+                                "lease-time": {
+                                        "description": "How long the lease is valid before a RENEW must be issued.",
+                                        "type": "string",
+                                        "format": "uc-timeout",
+                                        "default": "6h"
+                                },
+                                "use-dns": {
+                                        "description": "The DNS server sent to clients as DHCP option 6.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "ipv4"
+                                        }
+                                }
+                        }
+                },
+                "interface.ipv4.dhcp-lease": {
+                        "description": "This section describes the static DHCP leases of this logical interface.",
+                        "type": "object",
+                        "properties": {
+                                "macaddr": {
+                                        "description": "The MAC address of the host that this lease shall be used for.",
+                                        "type": "string",
+                                        "format": "uc-mac",
+                                        "examples": [
+                                                "00:11:22:33:44:55"
+                                        ]
+                                },
+                                "lease-offset": {
+                                        "description": "The offset of the IP that shall be used in relation to the first IP in the available range.",
+                                        "type": "integer",
+                                        "examples": [
+                                                10
+                                        ]
+                                },
+                                "lease-time": {
+                                        "description": "How long the lease is valid before a RENEW muss ne issued.",
+                                        "type": "string",
+                                        "format": "uc-timeout",
+                                        "default": "6h"
+                                },
+                                "publish-hostname": {
+                                        "description": "Shall the hosts hostname be made available locally via DNS.",
+                                        "type": "boolean",
+                                        "default": true
+                                }
+                        }
+                },
+                "interface.ipv4": {
+                        "description": "This section describes the IPv4 properties of a logical interface.",
+                        "type": "object",
+                        "properties": {
+                                "addressing": {
+                                        "description": "This option defines the method by which the IPv4 address of the interface is chosen.",
+                                        "type": "string",
+                                        "enum": [
+                                                "dynamic",
+                                                "static",
+                                                "none"
+                                        ],
+                                        "examples": [
+                                                "static"
+                                        ]
+                                },
+                                "subnet": {
+                                        "description": "This option defines the static IPv4 of the logical interface in CIDR notation. auto/24 can be used, causing the configuration layer to automatically use and address range from globals.ipv4-network.",
+                                        "type": "string",
+                                        "format": "uc-cidr4",
+                                        "examples": [
+                                                "auto/24"
+                                        ]
+                                },
+                                "gateway": {
+                                        "description": "This option defines the static IPv4 gateway of the logical interface.",
+                                        "type": "string",
+                                        "format": "ipv4",
+                                        "examples": [
+                                                "192.168.1.1"
+                                        ]
+                                },
+                                "send-hostname": {
+                                        "description": "include the devices hostname inside DHCP requests",
+                                        "type": "boolean",
+                                        "default": true,
+                                        "examples": [
+                                                true
+                                        ]
+                                },
+                                "use-dns": {
+                                        "description": "Define which DNS servers shall be used. This can either be a list of static IPv4 addresse or dhcp (use the server provided by the DHCP lease)",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "ipv4",
+                                                "examples": [
+                                                        "8.8.8.8",
+                                                        "4.4.4.4"
+                                                ]
+                                        }
+                                },
+                                "disallow-upstream-subnet": {
+                                        "description": "This option only applies to \"downstream\" interfaces. The downstream interface will prevent traffic going out to the listed CIDR4s. This can be used to prevent a guest / captive interface being able to communicate with RFC1918 ranges. Setting this option to 'true' will block all RFC1918 ranges.",
+                                        "anyOf": [
+                                                {
+                                                        "type": "boolean"
+                                                },
+                                                {
+                                                        "type": "array",
+                                                        "items": {
+                                                                "type": "string",
+                                                                "format": "uc-cidr4",
+                                                                "examples": [
+                                                                        "192.168.0.0/16",
+                                                                        "172.16.0.0/12",
+                                                                        "10.0.0.0/8"
+                                                                ]
+                                                        }
+                                                }
+                                        ]
+                                },
+                                "dhcp-pool": {
+                                        "$ref": "#/$defs/interface.ipv4.dhcp-pool"
+                                },
+                                "dhcp-leases": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/interface.ipv4.dhcp-lease",
+                                                        "additionalProperties": false
+                                                }
+                                        }
+                                }
+                        }
+                },
+                "interface.ipv6.dhcpv6": {
+                        "description": "This section describes the DHCPv6 server configuration",
+                        "type": "object",
+                        "properties": {
+                                "mode": {
+                                        "description": "Specifies the DHCPv6 server operation mode. When set to \"stateless\", the system will announce router advertisements only, without offering stateful DHCPv6 service. When set to \"stateful\", emitted router advertisements will instruct clients to obtain a DHCPv6 lease. When set to \"hybrid\", clients can freely chose whether to self-assign a random address through SLAAC, whether to request an address via DHCPv6, or both. For maximum compatibility with different clients, it is recommended to use the hybrid mode. The special mode \"relay\" will instruct the unit to act as DHCPv6 relay between this interface and any of the IPv6 interfaces in \"upstream\" mode.",
+                                        "type": "string",
+                                        "enum": [
+                                                "hybrid",
+                                                "stateless",
+                                                "stateful",
+                                                "relay"
+                                        ]
+                                },
+                                "announce-dns": {
+                                        "description": "Overrides the DNS server to announce in DHCPv6 and RA messages. By default, the device will announce its own local interface address as DNS server, essentially acting as proxy for downstream clients. By specifying a non-empty list of IPv6 addresses here, this default behaviour can be overridden.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "ipv6"
+                                        }
+                                },
+                                "filter-prefix": {
+                                        "description": "Selects a specific downstream prefix or a number of downstream prefix ranges to announce in DHCPv6 and RA messages. By default, all prefixes configured on a given downstream interface are advertised. By specifying an IPv6 prefix in CIDR notation here, only prefixes covered by this CIDR are selected.",
+                                        "type": "string",
+                                        "format": "uc-cidr6",
+                                        "default": "::/0"
+                                }
+                        }
+                },
+                "interface.ipv6": {
+                        "description": "This section describes the IPv6 properties of a logical interface.",
+                        "type": "object",
+                        "properties": {
+                                "addressing": {
+                                        "description": "This option defines the method by which the IPv6 subnet of the interface is acquired. In static addressing mode, the specified subnet and gateway, if any, are configured on the interface in a fixed manner. Also - if a prefix size hint is specified - a prefix of the given size is allocated from each upstream received prefix delegation pool and assigned to the interface. In dynamic addressing mode, a DHCPv6 client will be launched to obtain IPv6 prefixes for the interface itself and for downstream delegation. Note that dynamic addressing usually only ever makes sense on upstream interfaces.",
+                                        "type": "string",
+                                        "enum": [
+                                                "dynamic",
+                                                "static"
+                                        ]
+                                },
+                                "subnet": {
+                                        "description": "This option defines a static IPv6 prefix in CIDR notation to set on the logical interface. A special notation \"auto/64\" can be used, causing the configuration agent to automatically allocate a suitable prefix from the IPv6 address pool specified in globals.ipv6-network. This property only applies to static addressing mode. Note that this is usually not needed due to DHCPv6-PD assisted prefix assignment.",
+                                        "type": "string",
+                                        "format": "uc-cidr6",
+                                        "examples": [
+                                                "auto/64"
+                                        ]
+                                },
+                                "gateway": {
+                                        "description": "This option defines the static IPv6 gateway of the logical interface. It only applies to static addressing mode. Note that this is usually not needed due to DHCPv6-PD assisted prefix assignment.",
+                                        "type": "string",
+                                        "format": "ipv6",
+                                        "examples": [
+                                                "2001:db8:123:456::1"
+                                        ]
+                                },
+                                "prefix-size": {
+                                        "description": "For dynamic addressing interfaces, this property specifies the prefix size to request from an upstream DHCPv6 server through prefix delegation. For static addressing interfaces, it specifies the size of the sub-prefix to allocate from the upstream-received delegation prefixes for assignment to the logical interface.",
+                                        "type": "integer",
+                                        "maximum": 64,
+                                        "minimum": 0
+                                },
+                                "dhcpv6": {
+                                        "$ref": "#/$defs/interface.ipv6.dhcpv6"
+                                }
+                        }
+                },
+                "interface.vlan": {
+                        "description": "This section describes the vlan behaviour of a logical network interface.",
+                        "type": "object",
+                        "properties": {
+                                "id": {
+                                        "description": "This is the pvid of the vlan that shall be assigned to the interface. The individual physical network devices contained within the interface need to be told explicitly if egress traffic shall be tagged.",
+                                        "type": "integer",
+                                        "maximum": 4050
+                                },
+                                "trunks": {
+                                        "description": "Upstream interfaces can prOvide NAT for downstream interfaces that have a different VLAN Id",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "number",
+                                                "maximum": 4050,
+                                                "minimum": 1
+                                        }
+                                }
+                        }
+                },
+                "interface.ssid.encryption": {
+                        "description": "A device has certain properties that describe its identity and location. These properties are described inside this object.",
+                        "type": "object",
+                        "properties": {
+                                "proto": {
+                                        "description": "The wireless encryption protocol that shall be used for this BSS",
+                                        "type": "string",
+                                        "enum": [
+                                                "none",
+                                                "owe",
+                                                "owe-transition",
+                                                "psk",
+                                                "psk2",
+                                                "psk-mixed",
+                                                "wpa",
+                                                "wpa2",
+                                                "wpa-mixed",
+                                                "sae",
+                                                "sae-mixed",
+                                                "wpa3",
+                                                "wpa3-192",
+                                                "wpa3-mixed"
+                                        ],
+                                        "examples": [
+                                                "psk2"
+                                        ]
+                                },
+                                "key": {
+                                        "description": "The Pre Shared Key (PSK) that is used for encryption on the BSS when using any of the WPA-PSK modes.",
+                                        "type": "string",
+                                        "maxLength": 63,
+                                        "minLength": 8
+                                },
+                                "ieee80211w": {
+                                        "description": "Enable 802.11w Management Frame Protection (MFP) for this BSS.",
+                                        "type": "string",
+                                        "enum": [
+                                                "disabled",
+                                                "optional",
+                                                "required"
+                                        ],
+                                        "default": "disabled"
+                                },
+                                "key-caching": {
+                                        "description": "PMKSA created through EAP authentication and RSN preauthentication can be cached.",
+                                        "type": "boolean",
+                                        "default": true
+                                },
+                                "radius-server": {
+                                        "description": "The name of the radius server that shall be used. Use \"local\" for built-in RADIUS server, or reference a server defined in the definitions block.",
+                                        "type": "string",
+                                        "default": "local"
+                                }
+                        }
+                },
+                "interface.ssid.multi-psk": {
+                        "type": "object",
+                        "description": "A SSID can have multiple PSK/VID mappings. Each one of them can be bound to a specific MAC or be a wildcard.",
+                        "properties": {
+                                "mac": {
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "uc-mac"
+                                        }
+                                },
+                                "key": {
+                                        "description": "The Pre Shared Key (PSK) that is used for encryption on the BSS when using any of the WPA-PSK modes.",
+                                        "type": "string",
+                                        "maxLength": 63,
+                                        "minLength": 8
+                                },
+                                "vlan-id": {
+                                        "type": "integer",
+                                        "maximum": 4096,
+                                        "examples": [
+                                                3,
+                                                100,
+                                                200,
+                                                4094
+                                        ]
+                                }
+                        }
+                },
+                "interface.ssid.rate-limit": {
+                        "description": "The UE rate-limiting configuration of this BSS.",
+                        "type": "object",
+                        "properties": {
+                                "ingress-rate": {
+                                        "description": "The ingress rate to which hosts will be shaped. Values are in Mbps",
+                                        "type": "integer",
+                                        "default": 0
+                                },
+                                "egress-rate": {
+                                        "description": "The egress rate to which hosts will be shaped. Values are in Mbps",
+                                        "type": "integer",
+                                        "default": 0
+                                }
+                        }
+                },
+                "interface.ssid.roaming": {
+                        "description": "Enable 802.11r Fast Roaming for this BSS.",
+                        "type": "object",
+                        "properties": {
+                                "message-exchange": {
+                                        "description": "Shall the pre authenticated message exchange happen over the air or distribution system.",
+                                        "type": "string",
+                                        "enum": [
+                                                "air",
+                                                "ds"
+                                        ],
+                                        "default": "air"
+                                },
+                                "generate-psk": {
+                                        "description": "Whether to generate FT response locally for PSK networks. This avoids use of PMK-R1 push/pull from other APs with FT-PSK networks.",
+                                        "type": "boolean",
+                                        "default": true
+                                },
+                                "domain-identifier": {
+                                        "description": "Mobility Domain identifier (dot11FTMobilityDomainID, MDID).",
+                                        "type": "string",
+                                        "maxLength": 4,
+                                        "minLength": 4,
+                                        "examples": [
+                                                "abcd"
+                                        ]
+                                }
+                        }
+                },
+                "interface.ssid.acl": {
+                        "description": "The MAC ACL that defines which clients are allowed or denied to associations.",
+                        "type": "object",
+                        "properties": {
+                                "mode": {
+                                        "description": "Defines if this is an allow or deny list.",
+                                        "type": "string",
+                                        "enum": [
+                                                "allow",
+                                                "deny"
+                                        ]
+                                },
+                                "mac-address": {
+                                        "description": "Association requests will be denied if the rssi is below this threshold.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "uc-mac"
+                                        }
+                                }
+                        }
+                },
+                "interface.ssid": {
+                        "description": "A device has certain properties that describe its identity and location. These properties are described inside this object.",
+                        "type": "object",
+                        "properties": {
+                                "disable": {
+                                        "description": "Allows disabling an SSID from the UI.",
+                                        "type": "boolean"
+                                },
+                                "purpose": {
+                                        "description": "An SSID can have a special purpose such as the hidden on-boarding BSS. All purposes other than \"user-defined\" are static pre-defined configurations.",
+                                        "type": "string",
+                                        "enum": [
+                                                "user-defined",
+                                                "system-defaults"
+                                        ],
+                                        "default": "user-defined"
+                                },
+                                "template": {
+                                        "description": "The configuration/behaviour template used by the BSS.",
+                                        "type": "object",
+                                        "properties": {
+                                                "mode": {
+                                                        "description": "The template mode that defines the encryption behaviour.",
+                                                        "type": "string",
+                                                        "enum": [
+                                                                "open",
+                                                                "encrypted",
+                                                                "enterprise",
+                                                                "batman-adv",
+                                                                "opportunistic"
+                                                        ]
+                                                },
+                                                "security": {
+                                                        "description": "The encryption strength used by this template.",
+                                                        "type": "string",
+                                                        "enum": [
+                                                                "legacy",
+                                                                "compatibility",
+                                                                "maximum"
+                                                        ],
+                                                        "default": "maximum"
+                                                },
+                                                "key": {
+                                                        "description": "The Pre Shared Key for encrypted or batman-adv templates.",
+                                                        "type": "string",
+                                                        "minLength": 8,
+                                                        "maxLength": 63
+                                                },
+                                                "radius-server": {
+                                                        "description": "The RADIUS server name for enterprise template. Use \"local\" for built-in RADIUS server.",
+                                                        "type": "string",
+                                                        "default": "local"
+                                                }
+                                        }
+                                },
+                                "wifi-radios": {
+                                        "description": "The list of radios hat the SSID should be broadcasted on. The configuration layer will use the first matching phy/band.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string"
+                                        }
+                                },
+                                "bss-mode": {
+                                        "description": "Selects the operation mode of the wireless network interface controller.",
+                                        "type": "string",
+                                        "enum": [
+                                                "ap",
+                                                "sta",
+                                                "mesh",
+                                                "wds-ap",
+                                                "wds-sta",
+                                                "wds-repeater"
+                                        ],
+                                        "default": "ap"
+                                },
+                                "ssid": {
+                                        "description": "The broadcasted SSID of the wireless network and for for managed mode the SSID of the network you\u2019re connecting to",
+                                        "type": "string",
+                                        "maxLength": 32,
+                                        "minLength": 1
+                                },
+                                "encryption": {
+                                        "$ref": "#/$defs/interface.ssid.encryption"
+                                },
+                                "bssid": {
+                                        "description": "Override the BSSID of the network, only applicable in adhoc or sta mode.",
+                                        "type": "string",
+                                        "format": "uc-mac"
+                                },
+                                "hidden-ssid": {
+                                        "description": "Disables the broadcasting of beacon frames if set to 1 and,in doing so, hides the ESSID.",
+                                        "type": "boolean"
+                                },
+                                "isolate-clients": {
+                                        "description": "Isolates wireless clients from each other on this BSS.",
+                                        "type": "boolean"
+                                },
+                                "unicast-conversion": {
+                                        "description": "Convert multicast traffic to unicast on this BSS.",
+                                        "type": "boolean"
+                                },
+                                "vendor-elements": {
+                                        "description": "This option allows embedding custom vendor specific IEs inside the beacons of a BSS in AP mode.",
+                                        "type": "string"
+                                },
+                                "multi-psk": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/interface.ssid.multi-psk"
+                                                }
+                                        }
+                                },
+                                "rate-limit": {
+                                        "anyOf": [
+                                                {
+                                                        "$ref": "#/$defs/interface.ssid.rate-limit"
+                                                },
+                                                {
+                                                        "description": "The rate to which hosts will be shaped. Values are in Mbps",
+                                                        "type": "integer"
+                                                }
+                                        ]
+                                },
+                                "roaming": {
+                                        "anyOf": [
+                                                {
+                                                        "$ref": "#/$defs/interface.ssid.roaming"
+                                                },
+                                                {
+                                                        "description": "Enable 802.11r Fast Roaming for this BSS. This will enable \"auto\" mode which will work for most scenarios.",
+                                                        "type": "boolean"
+                                                }
+                                        ]
+                                },
+                                "access-control-list": {
+                                        "$ref": "#/$defs/interface.ssid.acl"
+                                }
+                        }
+                },
+                "interface.ports": {
+                        "type": "string",
+                        "enum": [
+                                "auto",
+                                "tagged",
+                                "un-tagged"
+                        ]
+                },
+                "interface.broad-band": {
+                        "description": "Broadband access credentials and connection parameters for upstream interfaces (PPPoE, WWAN).",
+                        "type": "object",
+                        "properties": {
+                                "type": {
+                                        "description": "Broadband connection type. When set, ipv4/ipv6 addressing sections are ignored and the connection is configured entirely from this section.",
+                                        "type": "string",
+                                        "enum": [
+                                                "pppoe",
+                                                "wwan"
+                                        ]
+                                },
+                                "device": {
+                                        "description": "Full sysfs path of the modem device for WWAN connections (e.g. /sys/devices/platform/soc/20980000.usb/usb1/1-1).",
+                                        "type": "string"
+                                },
+                                "apn": {
+                                        "description": "Access point name for cellular connections.",
+                                        "type": "string"
+                                },
+                                "pincode": {
+                                        "description": "SIM card PIN code.",
+                                        "type": "string"
+                                },
+                                "ip-type": {
+                                        "description": "IP version negotiated by the modem.",
+                                        "type": "string",
+                                        "enum": [
+                                                "ipv4",
+                                                "ipv6",
+                                                "ipv4v6"
+                                        ],
+                                        "default": "ipv4v6"
+                                },
+                                "username": {
+                                        "description": "Authentication username for the broadband connection.",
+                                        "type": "string"
+                                },
+                                "password": {
+                                        "description": "Authentication password for the broadband connection.",
+                                        "type": "string"
+                                },
+                                "service-name": {
+                                        "description": "PPPoE service name filter. Only connect to access concentrators advertising this service.",
+                                        "type": "string"
+                                },
+                                "ac-name": {
+                                        "description": "PPPoE access concentrator name filter.",
+                                        "type": "string"
+                                }
+                        }
+                },
+                "interface.quality-of-service": {
+                        "$module": "uconfig-mod-qosify",
+                        "description": "This section describes the available upstream bandwidth in \"mbit\". Both values need to be enabled for DSCP classification to get enabled.",
+                        "type": "object",
+                        "properties": {
+                                "bandwidth-up": {
+                                        "description": "The upstream bandwidth.",
+                                        "type": "integer"
+                                },
+                                "bandwidth-down": {
+                                        "description": "The downstream bandwidth.",
+                                        "type": "integer"
+                                }
+                        }
+                },
+                "interface": {
+                        "description": "This section describes the logical network interfaces of the device. Interfaces as their primary have a role that is upstream, downstream, guest, ....",
+                        "type": "object",
+                        "properties": {
+                                "role": {
+                                        "description": "The role defines if the interface is upstream or downstream facing.",
+                                        "type": "string",
+                                        "enum": [
+                                                "upstream",
+                                                "downstream"
+                                        ]
+                                },
+                                "disable": {
+                                        "description": "Allows disabling an SSID from the UI.",
+                                        "type": "boolean"
+                                },
+                                "ipv4": {
+                                        "$ref": "#/$defs/interface.ipv4"
+                                },
+                                "ipv6": {
+                                        "$ref": "#/$defs/interface.ipv6"
+                                },
+                                "vlan": {
+                                        "$ref": "#/$defs/interface.vlan"
+                                },
+                                "ssids": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/interface.ssid",
+                                                        "additionalProperties": false
+                                                }
+                                        }
+                                },
+                                "ports": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/interface.ports"
+                                                }
+                                        }
+                                },
+                                "ieee8021x-ports": {
+                                        "description": "The list of physical network devices that shall serve .1x for this interface.",
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/interface.ports"
+                                                }
+                                        }
+                                },
+                                "isolate-hosts": {
+                                        "description": "This option makes sure that any traffic leaving this interface is isolated and all local IP ranges are blocked. It essentially enforces \"guest network\" firewall settings.",
+                                        "type": "boolean"
+                                },
+                                "broad-band": {
+                                        "$ref": "#/$defs/interface.broad-band"
+                                },
+                                "quality-of-service": {
+                                        "$ref": "#/$defs/interface.quality-of-service"
+                                },
+                                "services": {
+                                        "description": "The services that shall be offered on this logical interface. These are just strings such as \"ssh\", \"mdns\"",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "examples": [
+                                                        "ssh",
+                                                        "mdns"
+                                                ]
+                                        }
+                                }
+                        }
+                },
+                "definitions.radius-servers.server": {
+                        "description": "Describe the properties of a Radius server.",
+                        "type": "object",
+                        "properties": {
+                                "host": {
+                                        "description": "The URI of our Radius server.",
+                                        "type": "string",
+                                        "format": "uc-host",
+                                        "examples": [
+                                                "192.168.1.10"
+                                        ]
+                                },
+                                "secret": {
+                                        "description": "The shared Radius authentication secret.",
+                                        "type": "string",
+                                        "default": "secret"
+                                },
+                                "request-attribute": {
+                                        "description": "The additional Access-Request attributes that gets sent to the server.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                        "id": {
+                                                                "type": "integer",
+                                                                "description": "The ID of the RADIUS attribute",
+                                                                "maximum": 255,
+                                                                "minimum": 1
+                                                        },
+                                                        "value": {
+                                                                "anyOf": [
+                                                                        {
+                                                                                "type": "integer",
+                                                                                "description": "The numeric RADIUS attribute value",
+                                                                                "maximum": 4294967295,
+                                                                                "minimum": 0
+                                                                        },
+                                                                        {
+                                                                                "type": "string",
+                                                                                "description": "The RADIUS attribute value string"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                "examples": [
+                                                        {
+                                                                "id": 27,
+                                                                "value": 900
+                                                        },
+                                                        {
+                                                                "id": 32,
+                                                                "value": "My NAS ID"
+                                                        },
+                                                        {
+                                                                "id": 56,
+                                                                "value": 1004
+                                                        },
+                                                        {
+                                                                "id": 126,
+                                                                "value": "Example Operator"
+                                                        }
+                                                ]
+                                        },
+                                        "examples": [
+                                                "126:s:Operator"
+                                        ]
+                                }
+                        }
+                },
+                "definitions.radius-servers": {
+                        "description": "When using EAP encryption we need to provide the required information allowing us to connect to the AAA servers.",
+                        "type": "object",
+                        "properties": {
+                                "nas-identifier": {
+                                        "description": "NAS-Identifier string for RADIUS messages. When used, this should be unique to the NAS within the scope of the RADIUS server.",
+                                        "type": "string"
+                                },
+                                "chargeable-user-id": {
+                                        "description": "This will enable support for Chargeable-User-Identity (RFC 4372).",
+                                        "type": "boolean",
+                                        "default": false
+                                },
+                                "dynamic-authorization": {
+                                        "description": "Dynamic Authorization Extensions (DAE) is an extension to Radius.",
+                                        "type": "object",
+                                        "properties": {
+                                                "host": {
+                                                        "description": "The IP of the DAE client.",
+                                                        "type": "string",
+                                                        "format": "uc-ip",
+                                                        "examples": [
+                                                                "192.168.1.10"
+                                                        ]
+                                                },
+                                                "port": {
+                                                        "description": "The network port that the DAE client can connet on.",
+                                                        "type": "integer",
+                                                        "maximum": 65535,
+                                                        "minimum": 1024,
+                                                        "examples": [
+                                                                1812
+                                                        ]
+                                                },
+                                                "secret": {
+                                                        "description": "The shared DAE authentication secret.",
+                                                        "type": "string",
+                                                        "examples": [
+                                                                "secret"
+                                                        ]
+                                                }
+                                        }
+                                },
+                                "authentication": {
+                                        "allOf": [
+                                                {
+                                                        "$ref": "#/$defs/definitions.radius-servers.server"
+                                                },
+                                                {
+                                                        "type": "object",
+                                                        "properties": {
+                                                                "port": {
+                                                                        "description": "The network port of our Radius server.",
+                                                                        "type": "integer",
+                                                                        "maximum": 65535,
+                                                                        "minimum": 1024,
+                                                                        "default": 1812
+                                                                }
+                                                        }
+                                                }
+                                        ]
+                                },
+                                "accounting": {
+                                        "allOf": [
+                                                {
+                                                        "$ref": "#/$defs/definitions.radius-servers.server"
+                                                },
+                                                {
+                                                        "type": "object",
+                                                        "properties": {
+                                                                "port": {
+                                                                        "description": "The network port of our Radius server.",
+                                                                        "type": "integer",
+                                                                        "maximum": 65535,
+                                                                        "minimum": 1024,
+                                                                        "default": 1813
+                                                                },
+                                                                "interval": {
+                                                                        "description": "The interim accounting update interval. This value is defined in seconds.",
+                                                                        "type": "integer",
+                                                                        "maximum": 600,
+                                                                        "minimum": 60,
+                                                                        "default": 60
+                                                                }
+                                                        }
+                                                }
+                                        ]
+                                }
+                        }
+                },
+                "definitions": {
+                        "description": "A device has certain global properties that are used to derive parts of the final configuration that gets applied.",
+                        "type": "object",
+                        "properties": {
+                                "ipv4-network": {
+                                        "description": "Define the IPv4 range that is delegatable to the downstream interfaces This is described as a CIDR block. (192.168.0.0/16, 172.16.128/17)",
+                                        "type": "string",
+                                        "format": "uc-cidr4",
+                                        "examples": [
+                                                "192.168.0.0/16"
+                                        ]
+                                },
+                                "ipv6-network": {
+                                        "description": "Define the IPv6 range that is delegatable to the downstream interfaces This is described as a CIDR block. (fdca:1234:4567::/48)",
+                                        "type": "string",
+                                        "format": "uc-cidr6",
+                                        "examples": [
+                                                "fdca:1234:4567::/48"
+                                        ]
+                                },
+                                "ntp-servers": {
+                                        "description": "This is an array of URL/IP of the upstream NTP servers that the unit shall use to acquire its current time.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "uc-host"
+                                        },
+                                        "examples": [
+                                                "0.openwrt.pool.ntp.org"
+                                        ]
+                                },
+                                "radius-servers": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/definitions.radius-servers"
+                                                }
+                                        }
+                                }
+                        }
+                },
+                "ethernet": {
+                        "type": "array",
+                        "items": {
+                                "description": "This section defines the link speed and duplex mode of the physical copper/fiber ports of the device.",
+                                "type": "object",
+                                "properties": {
+                                        "select-ports": {
+                                                "description": "The list of physical network devices that shall be configured. The names are logical ones and wildcardable.",
+                                                "type": "array",
+                                                "items": {
+                                                        "type": "string",
+                                                        "examples": [
+                                                                "LAN1",
+                                                                "LAN2",
+                                                                "LAN3",
+                                                                "LAN4",
+                                                                "LAN*",
+                                                                "WAN*",
+                                                                "*"
+                                                        ]
+                                                }
+                                        },
+                                        "speed": {
+                                                "description": "The link speed that shall be forced.",
+                                                "type": "integer",
+                                                "enum": [
+                                                        10,
+                                                        100,
+                                                        1000,
+                                                        2500,
+                                                        5000,
+                                                        10000
+                                                ]
+                                        },
+                                        "duplex": {
+                                                "description": "The duplex mode that shall be forced.",
+                                                "type": "string",
+                                                "enum": [
+                                                        "half",
+                                                        "full"
+                                                ]
+                                        }
+                                }
+                        }
+                },
+                "offload": {
+                        "description": "Offloading configuration for hardware and software acceleration.",
+                        "type": "object",
+                        "properties": {
+                                "firewall": {
+                                        "description": "Controls firewall flow offloading. \"none\" disables offloading, \"software\" enables software flow offloading, \"hardware\" enables both software and hardware flow offloading.",
+                                        "type": "string",
+                                        "enum": [
+                                                "none",
+                                                "software",
+                                                "hardware"
+                                        ],
+                                        "default": "software"
+                                }
+                        }
+                },
+                "service.adguardhome": {
+                        "$module": "uconfig-mod-adguardhome",
+                        "type": "object",
+                        "description": "This section can be used to setup the AdguardHome service",
+                        "properties": {
+                                "webui-port": {
+                                        "description": "The port that the WebUI will run on.",
+                                        "type": "number",
+                                        "maximum": 65535,
+                                        "minimum": 100,
+                                        "default": 3000
+                                },
+                                "dns-intercept": {
+                                        "description": "Intercept/redirect all DNS traffic on enabled interfaces",
+                                        "type": "boolean"
+                                },
+                                "servers": {
+                                        "description": "A list of upstream servers the requests get forwarded to",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "format": "uc-ip"
+                                        }
+                                }
+                        }
+                },
+                "service.ieee8021x": {
+                        "$module": "uconfig-mod-ieee8021x",
+                        "description": "This section allows enabling wired ieee802.1X",
+                        "type": "object",
+                        "properties": {
+                                "radius-server": {
+                                        "description": "The name of the radius server that shall be used. Use \"local\" for built-in RADIUS server, or reference a server defined in the definitions block.",
+                                        "type": "string",
+                                        "default": "local"
+                                }
+                        }
+                },
+                "service.lldp": {
+                        "$module": "uconfig-mod-lldp",
+                        "type": "object",
+                        "description": "This section can be used to enable lldp on network ports.",
+                        "properties": {
+                                "hostname": {
+                                        "description": "The hostname that gets announced.",
+                                        "type": "string",
+                                        "default": "OpenWrt"
+                                },
+                                "description": {
+                                        "description": "The description that gets announced.",
+                                        "type": "string",
+                                        "default": "OpenWrt"
+                                },
+                                "location": {
+                                        "description": "The location that gets announced.",
+                                        "type": "string",
+                                        "default": "LAN"
+                                }
+                        }
+                },
+                "service.log": {
+                        "description": "This section can be used to configure remote syslog support.",
+                        "type": "object",
+                        "properties": {
+                                "host": {
+                                        "description": "IP address of a syslog server to which the log messages should be sent in addition to the local destination.",
+                                        "type": "string",
+                                        "format": "uc-host",
+                                        "examples": [
+                                                "192.168.1.10"
+                                        ]
+                                },
+                                "port": {
+                                        "description": "Port number of the remote syslog server specified with log_ip.",
+                                        "type": "integer",
+                                        "maximum": 65535,
+                                        "minimum": 100,
+                                        "examples": [
+                                                2000
+                                        ]
+                                },
+                                "proto": {
+                                        "description": "Sets the protocol to use for the connection, either tcp or udp.",
+                                        "type": "string",
+                                        "enum": [
+                                                "tcp",
+                                                "udp"
+                                        ],
+                                        "default": "udp"
+                                },
+                                "size": {
+                                        "description": "Size of the file based log buffer in KiB. This value is used as the fallback value for log_buffer_size if the latter is not specified.",
+                                        "type": "integer",
+                                        "minimum": 32,
+                                        "default": 1000
+                                },
+                                "priority": {
+                                        "description": "Filter messages by their log priority. the value maps directly to the 0-7 range used by syslog.",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "default": 7
+                                }
+                        }
+                },
+                "service.mdns": {
+                        "$module": "uconfig-mod-mdns",
+                        "type": "object",
+                        "description": "This section can be used to setup the mdns servers.",
+                        "properties": {
+                                "additional-hostnames": {
+                                        "description": "This is an array of additional hostnames that the AP shall announce.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string"
+                                        }
+                                }
+                        }
+                },
+                "service.quality-of-service.class-selector": {
+                        "type": "string",
+                        "enum": [
+                                "CS0",
+                                "CS1",
+                                "CS2",
+                                "CS3",
+                                "CS4",
+                                "CS5",
+                                "CS6",
+                                "CS7",
+                                "AF11",
+                                "AF12",
+                                "AF13",
+                                "AF21",
+                                "AF22",
+                                "AF23",
+                                "AF31",
+                                "AF32",
+                                "AF33",
+                                "AF41",
+                                "AF42",
+                                "AF43",
+                                "EF",
+                                "VA",
+                                "LE"
+                        ]
+                },
+                "service.quality-of-service": {
+                        "$module": "uconfig-mod-qosify",
+                        "description": "This section describes the QoS behaviour of the unit.",
+                        "type": "object",
+                        "properties": {
+                                "bulk-detection": {
+                                        "description": "Automatically detect and classify bulk flows based on average packet size and PPS.",
+                                        "type": "object",
+                                        "properties": {
+                                                "dscp": {
+                                                        "description": "The DSCP value assigned to packets belonging to a bulk flow.",
+                                                        "$ref": "#/$defs/service.quality-of-service.class-selector",
+                                                        "default": "CS0"
+                                                },
+                                                "packets-per-second": {
+                                                        "description": "The PPS rate that will cause a flow to be classified as bulk.",
+                                                        "type": "number",
+                                                        "default": 0
+                                                }
+                                        }
+                                },
+                                "services": {
+                                        "description": "A list of predefined named services that shall be classified according to the qos.json database.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string"
+                                        }
+                                },
+                                "classifier": {
+                                        "description": "Custom traffic classifiers. Each entry maps traffic matching its constraints to a DSCP value.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                        "dscp": {
+                                                                "description": "The DSCP value to assign to matching packets.",
+                                                                "$ref": "#/$defs/service.quality-of-service.class-selector",
+                                                                "default": "CS1"
+                                                        },
+                                                        "ports": {
+                                                                "description": "Layer 3 protocol and port/range match rules.",
+                                                                "type": "array",
+                                                                "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                                "protocol": {
+                                                                                        "type": "string",
+                                                                                        "enum": [
+                                                                                                "any",
+                                                                                                "tcp",
+                                                                                                "udp"
+                                                                                        ],
+                                                                                        "default": "any"
+                                                                                },
+                                                                                "port": {
+                                                                                        "type": "integer"
+                                                                                },
+                                                                                "range-end": {
+                                                                                        "type": "integer"
+                                                                                },
+                                                                                "reclassify": {
+                                                                                        "type": "boolean",
+                                                                                        "default": true
+                                                                                }
+                                                                        }
+                                                                }
+                                                        },
+                                                        "dns": {
+                                                                "description": "FQDN wildcard match rules. Resolved IPs are used for packet classification.",
+                                                                "type": "array",
+                                                                "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                                "fqdn": {
+                                                                                        "type": "string"
+                                                                                },
+                                                                                "suffix-matching": {
+                                                                                        "type": "boolean",
+                                                                                        "default": true
+                                                                                },
+                                                                                "reclassify": {
+                                                                                        "type": "boolean",
+                                                                                        "default": true
+                                                                                }
+                                                                        }
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                },
+                "service.radius-server.user": {
+                        "description": "A RADIUS user for authentication.",
+                        "type": "object",
+                        "properties": {
+                                "auth-type": {
+                                        "description": "Authentication type for this user.",
+                                        "type": "string",
+                                        "enum": [
+                                                "password",
+                                                "certificate",
+                                                "both"
+                                        ],
+                                        "default": "password"
+                                },
+                                "password": {
+                                        "description": "User password for password-based authentication.",
+                                        "type": "string",
+                                        "minLength": 1
+                                },
+                                "vlan-id": {
+                                        "description": "VLAN ID to assign to this user.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 4094
+                                },
+                                "rate-limit-upload": {
+                                        "description": "Upload rate limit in kbps.",
+                                        "type": "integer"
+                                },
+                                "rate-limit-download": {
+                                        "description": "Download rate limit in kbps.",
+                                        "type": "integer"
+                                }
+                        }
+                },
+                "service.radius-server": {
+                        "description": "This section configures the built-in RADIUS server daemon.",
+                        "type": "object",
+                        "properties": {
+                                "auth-port": {
+                                        "description": "The port for RADIUS authentication requests.",
+                                        "type": "integer",
+                                        "maximum": 65535,
+                                        "minimum": 1024,
+                                        "default": 1812
+                                },
+                                "acct-port": {
+                                        "description": "The port for RADIUS accounting requests.",
+                                        "type": "integer",
+                                        "maximum": 65535,
+                                        "minimum": 1024,
+                                        "default": 1813
+                                },
+                                "secret": {
+                                        "description": "The shared secret for RADIUS clients.",
+                                        "type": "string",
+                                        "default": "secret"
+                                },
+                                "users": {
+                                        "description": "RADIUS users for authentication.",
+                                        "type": "object",
+                                        "patternProperties": {
+                                                ".+": {
+                                                        "$ref": "#/$defs/service.radius-server.user"
+                                                }
+                                        }
+                                }
+                        }
+                },
+                "service.ssh": {
+                        "description": "This section can be used to setup a SSH server on the AP.",
+                        "type": "object",
+                        "properties": {
+                                "port": {
+                                        "description": "This option defines which port the SSH server shall be available on.",
+                                        "type": "integer",
+                                        "maximum": 65535,
+                                        "default": 22
+                                },
+                                "cli-port": {
+                                        "description": "The port the CLI-over-SSH service shall be available on. This spawns a separate dropbear instance that forces the CLI as the login shell.",
+                                        "type": "integer",
+                                        "maximum": 65535,
+                                        "default": 2222
+                                },
+                                "authorized-keys": {
+                                        "description": "This allows the upload of public ssh keys. Keys need to be seperated by a newline.",
+                                        "type": "array",
+                                        "items": {
+                                                "type": "string",
+                                                "examples": [
+                                                        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC0ghdSd2D2y08TFowZLMZn3x1/Djw3BkNsIeHt/Z+RaXwvfV1NQAnNdaOngMT/3uf5jZtYxhpl+dbZtRhoUPRvKflKBeFHYBqjZVzD3r4ns2Ofm2UpHlbdOpMuy9oeTSCeF0IKZZ6szpkvSirQogeP2fe9KRkzQpiza6YxxaJlWw== user@example",
+                                                        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ4FDjyCsg+1Mh2C5G7ibR3z0Kw1dU57kfXebLRwS6CL bob@work",
+                                                        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBP/JpJ/KHtKKImzISBDwLO0/EwytIr4pGZQXcP6GCSHchLMyfjf147KNlF9gC+3FibzqKH02EiQspVhRgfuK6y0= alice@home"
+                                                ]
+                                        }
+                                },
+                                "password-authentication": {
+                                        "description": "This option defines if password authentication shall be enabled. If set to false, only ssh key based authentication is possible.",
+                                        "type": "boolean",
+                                        "default": true
+                                }
+                        }
+                },
+                "service.tailscale": {
+                        "$module": "uconfig-mod-tailscale",
+                        "type": "object",
+                        "description": "This section can be used to configure the Tailscale VPN service",
+                        "properties": {
+                                "auto-start": {
+                                        "description": "Automatically start the Tailscale tunnel when the device boots",
+                                        "type": "boolean",
+                                        "default": false
+                                },
+                                "exit-node": {
+                                        "description": "Advertise this device as an exit node for the Tailnet",
+                                        "type": "boolean",
+                                        "default": false
+                                },
+                                "announce-routes": {
+                                        "description": "Announce LAN routes to the Tailnet",
+                                        "type": "boolean",
+                                        "default": false
+                                }
+                        }
+                },
+                "service": {
+                        "description": "This section describes all of the services that may be present on the AP. Each service is then referenced via its name inside an interface, ssid, ...",
+                        "type": "object",
+                        "properties": {
+                                "adguardhome": {
+                                        "$ref": "#/$defs/service.adguardhome"
+                                },
+                                "ieee8021x": {
+                                        "$ref": "#/$defs/service.ieee8021x"
+                                },
+                                "lldp": {
+                                        "$ref": "#/$defs/service.lldp"
+                                },
+                                "log": {
+                                        "$ref": "#/$defs/service.log"
+                                },
+                                "mdns": {
+                                        "$ref": "#/$defs/service.mdns"
+                                },
+                                "quality-of-service": {
+                                        "$ref": "#/$defs/service.quality-of-service"
+                                },
+                                "radius-server": {
+                                        "$ref": "#/$defs/service.radius-server"
+                                },
+                                "ssh": {
+                                        "$ref": "#/$defs/service.ssh"
+                                },
+                                "tailscale": {
+                                        "$ref": "#/$defs/service.tailscale"
+                                }
+                        }
+                }
+        }
+}

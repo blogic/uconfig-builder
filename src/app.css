@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* Semantic tokens. `surface` = card/input background, `accent` = active state. */
+@theme {
+  --color-surface: #ffffff;
+  --color-accent: #18181b;
+  --color-accent-ink: #ffffff;
+}
+
+/* Tailwind v4's default palette is in oklch(), which some browsers (e.g. Firefox
+   on iOS) don't render. Pin every colour we use to hex so both themes work. */
+:root {
+  color-scheme: light;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-surface: #ffffff;
+  --color-accent: #18181b;
+  --color-accent-ink: #ffffff;
+
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  --color-red-50: #fef2f2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-200: #fde68a;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+}
+
+html {
+  background-color: var(--color-zinc-100);
+}
+
+/* Dark theme: near-black + amber. Most utilities reference the zinc/surface CSS
+   variables, so overriding them here themes the app without per-component work. */
+.dark {
+  color-scheme: dark;
+  --color-surface: #18181b;
+  --color-accent: #f59e0b;
+  --color-accent-ink: #0a0a0a;
+  --color-zinc-50: #27272a;
+  --color-zinc-100: #0a0a0a;
+  --color-zinc-200: #3f3f46;
+  --color-zinc-300: #52525b;
+  --color-zinc-400: #71717a;
+  --color-zinc-500: #a1a1aa;
+  --color-zinc-600: #d4d4d8;
+  --color-zinc-700: #e4e4e7;
+  --color-zinc-800: #f4f4f5;
+  --color-zinc-900: #fafafa;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-md border border-zinc-300 bg-surface px-2.5 py-1.5 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-500 focus:ring-1 focus:ring-zinc-400;
+  }
+  .btn {
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-zinc-300 bg-surface px-3 py-1.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50;
+  }
+  .btn-primary {
+    @apply border-accent bg-accent text-accent-ink hover:opacity-90;
+  }
+  .btn-sm {
+    @apply cursor-pointer rounded border border-zinc-300 bg-surface px-2 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50;
+  }
+  .btn-sm-danger {
+    @apply min-w-20 cursor-pointer rounded border border-red-600 bg-red-600 px-2 py-1 text-center text-xs font-medium text-white transition hover:bg-red-700;
+  }
+  .btn-add {
+    @apply min-w-20 cursor-pointer rounded border border-emerald-600 bg-emerald-600 px-2 py-1 text-center text-xs font-medium text-white transition hover:bg-emerald-700;
+  }
+}
