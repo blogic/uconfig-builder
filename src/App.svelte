@@ -5,6 +5,7 @@
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
   import ConfigurationPanel from './lib/components/ConfigurationPanel.svelte'
   import Sidebar from './lib/components/Sidebar.svelte'
+  import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
   import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
   import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
@@ -223,13 +224,13 @@
 {/snippet}
 
 {#snippet unitBody()}
-  <div class="page-header"><h2 class="page-title">{t('Unit Configuration')}</h2></div>
+  <div class="page-header"><h2 class="page-title">{t('Unit Configuration')}</h2><ChangesIndicator {changes} scope="unit" /></div>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.unit)}</p>
   <LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />
 {/snippet}
 
 {#snippet radiosBody()}
-  <div class="page-header"><h2 class="page-title">{t('Radios')}</h2></div>
+  <div class="page-header"><h2 class="page-title">{t('Radios')}</h2><ChangesIndicator {changes} scope="radios" /></div>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.radios)}</p>
   <MapEditor
     parent={store.doc}
@@ -249,9 +250,9 @@
 
 {#snippet interfacesBody()}
   {#if openInterface != null}
-    <InterfaceDetailPage name={openInterface} onBack={() => (openInterface = null)} />
+    <InterfaceDetailPage name={openInterface} {changes} onBack={() => (openInterface = null)} />
   {:else}
-    <InterfaceListPage onOpen={(n) => (openInterface = n)} />
+    <InterfaceListPage {changes} onOpen={(n) => (openInterface = n)} />
   {/if}
 {/snippet}
 
@@ -266,7 +267,7 @@
   {:else if key === 'radios'}{@render radiosBody()}
   {:else if key === 'interfaces'}{@render interfacesBody()}
   {:else if key === 'changes'}{@render changesBody()}
-  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} />{/if}
+  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />{/if}
 {/snippet}
 
 <div class="flex h-screen flex-col bg-surface text-zinc-900">

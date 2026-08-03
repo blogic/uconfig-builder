@@ -1,13 +1,14 @@
 <script>
   import LayoutRenderer from './LayoutRenderer.svelte'
   import SchemaObject from './SchemaObject.svelte'
+  import ChangesIndicator from './ChangesIndicator.svelte'
   import { def_get, schema_at, title_for } from '../schema.js'
   import { store } from '../store.svelte.js'
   import { servicesLayout } from '../layouts.js'
   import { SERVICE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
-  let { serviceKey } = $props()
+  let { serviceKey, changes = [] } = $props()
 
   const schema = $derived(schema_at(def_get('service'), serviceKey))
   const node = $derived(servicesLayout.find((n) => n.objectSection === serviceKey))
@@ -22,6 +23,7 @@
 
 <div class="page-header">
   <h2 class="page-title">{title_for(serviceKey)}</h2>
+  <ChangesIndicator {changes} scope="service:{serviceKey}" />
 </div>
 
 {#if SERVICE_DESCRIPTIONS[serviceKey]}

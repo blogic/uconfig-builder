@@ -83,17 +83,20 @@ function keys_union(a, b) {
   return [...new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})])].sort()
 }
 
+// Each entry carries a `scope`: the nav section that owns it, so a page can
+// show and reset only its own changes. Scopes match the keys used by
+// `view.section` ('unit', 'radios', 'interfaces', 'service:<key>').
 export function changes_list(cur, base) {
   if (!cur || !base) return []
   const out = []
 
   if (!eq(canon_unit(cur.unit), canon_unit(base.unit))) {
-    out.push({ section: 'Unit', label: 'Unit' })
+    out.push({ section: 'Unit', scope: 'unit', label: 'Unit' })
   }
 
   for (const band of keys_union(cur.radios, base.radios)) {
     if (!eq(canon_radio(cur.radios?.[band], band), canon_radio(base.radios?.[band], band))) {
-      out.push({ section: 'Radios', label: `Radio ${band}` })
+      out.push({ section: 'Radios', scope: 'radios', label: `Radio ${title_for(band)}` })
     }
   }
 
@@ -101,11 +104,11 @@ export function changes_list(cur, base) {
     const ci = cur.interfaces?.[name]
     const bi = base.interfaces?.[name]
     if (!eq(canon_iface(ci), canon_iface(bi))) {
-      out.push({ section: 'Interfaces', label: `Interface ${name}` })
+      out.push({ section: 'Interfaces', scope: 'interfaces', label: `Interface ${name}` })
     }
     for (const ssid of keys_union(ci?.ssids, bi?.ssids)) {
       if (!eq(canon_ssid(ci?.ssids?.[ssid]), canon_ssid(bi?.ssids?.[ssid]))) {
-        out.push({ section: 'Interfaces', label: `SSID ${name} / ${ssid}` })
+        out.push({ section: 'Interfaces', scope: 'interfaces', label: `SSID ${name} / ${ssid}` })
       }
     }
   }
@@ -114,9 +117,13 @@ export function changes_list(cur, base) {
   for (const svc of keys_union(cur.services, base.services)) {
     const schema = svcDef?.properties?.[svc] ? ref_resolve(svcDef.properties[svc]) : null
     if (!eq(strip(cur.services?.[svc], schema), strip(base.services?.[svc], schema))) {
-      out.push({ section: 'Services', label: `Service ${title_for(svc)}` })
+      out.push({ section: 'Services', scope: `service:${svc}`, label: `Service ${title_for(svc)}` })
     }
   }
 
   return out
+}
+
+export function changes_for(list, scope) {
+  return list.filter((c) => c.scope === scope)
 }

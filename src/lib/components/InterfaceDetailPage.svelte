@@ -1,5 +1,6 @@
 <script>
   import LayoutRenderer from './LayoutRenderer.svelte'
+  import ChangesIndicator from './ChangesIndicator.svelte'
   import { def_get } from '../schema.js'
   import { store } from '../store.svelte.js'
   import { interfaceLayout } from '../layouts.js'
@@ -7,7 +8,7 @@
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
-  let { name, onBack } = $props()
+  let { name, onBack, changes = [] } = $props()
 
   const interfaceDef = def_get('interface')
   const iface = $derived(store.doc.interfaces?.[name])
@@ -24,6 +25,7 @@
     <i class="bi bi-arrow-left text-2xl"></i>
   </button>
   <h2 class="page-title">{t('Interface Configuration')}</h2>
+  <ChangesIndicator {changes} scope="interfaces" />
 </div>
 
 {#if iface}

@@ -74,6 +74,28 @@ export function baseline_reset() {
   baseline_snapshot()
 }
 
+// Restore a single nav section from the baseline, leaving the rest of the
+// document untouched. Scopes match `changes_list`'s `scope` field.
+export function scope_reset(scope) {
+  if (!store.baseline) return
+  const base = structuredClone($state.snapshot(store.baseline))
+  if (scope === 'unit') {
+    store.doc.unit = base.unit ?? {}
+    unit_defaults(store.doc)
+    return
+  }
+  if (scope === 'radios' || scope === 'interfaces') {
+    store.doc[scope] = base[scope] ?? {}
+    return
+  }
+  if (scope.startsWith('service:')) {
+    const key = scope.slice(8)
+    if (!store.doc.services || typeof store.doc.services !== 'object') store.doc.services = {}
+    store.doc.services[key] = base.services?.[key] ?? {}
+    service_defaults(store.doc)
+  }
+}
+
 export function doc_reset() {
   store.doc = blank_doc()
   store.loadedFrom = null

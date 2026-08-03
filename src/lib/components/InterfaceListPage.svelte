@@ -1,10 +1,11 @@
 <script>
   import InterfaceAddForm from './InterfaceAddForm.svelte'
+  import ChangesIndicator from './ChangesIndicator.svelte'
   import { store } from '../store.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
-  let { onOpen } = $props()
+  let { onOpen, changes = [] } = $props()
 
   let showModal = $state(false)
 
@@ -27,6 +28,7 @@
 
 <div class="page-header">
   <h2 class="page-title">{t('Interfaces')}</h2>
+  <ChangesIndicator {changes} scope="interfaces" />
   <button type="button" class="btn-primary rounded-base px-3 py-1.5 text-sm font-medium" onclick={() => (showModal = true)}>
     {t('Add Interface')}
   </button>
