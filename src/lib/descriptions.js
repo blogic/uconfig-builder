@@ -34,6 +34,7 @@ export const PAGE_DESCRIPTIONS = {
     'Configure network interface settings including IP addressing, VLAN configuration, and DHCP settings. Network interfaces connect your device to different network segments and services.',
   interfaces:
     'Logical networks on this device. Each interface carries its own addressing, SSIDs, ports and services.',
+  ntp: 'Configure NTP (Network Time Protocol) servers for time synchronisation. NTP keeps the device clock accurate by synchronising with reliable time servers.',
   changes: 'Review the edits pending since this configuration was loaded, grouped by the part of the document they affect.',
   json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.'
 }

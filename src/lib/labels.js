@@ -6,6 +6,7 @@ const LABEL_OVERRIDES = {
   '2G': '2.4GHz',
   '5G': '5GHz',
   '6G': '6GHz',
+  'ntp-servers': 'NTP Servers',
   'leds-active': 'LEDs Active',
   'tty-login': 'TTY Login',
   ipv4: 'IPv4',

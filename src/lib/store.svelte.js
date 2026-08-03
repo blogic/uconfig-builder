@@ -88,6 +88,13 @@ export function scope_reset(scope) {
     store.doc[scope] = base[scope] ?? {}
     return
   }
+  if (scope === 'ntp') {
+    if (!store.doc.definitions || typeof store.doc.definitions !== 'object') store.doc.definitions = {}
+    const servers = base.definitions?.['ntp-servers']
+    if (servers) store.doc.definitions['ntp-servers'] = servers
+    else delete store.doc.definitions['ntp-servers']
+    return
+  }
   if (scope.startsWith('service:')) {
     const key = scope.slice(8)
     if (!store.doc.services || typeof store.doc.services !== 'object') store.doc.services = {}

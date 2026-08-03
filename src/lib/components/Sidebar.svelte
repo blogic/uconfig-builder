@@ -19,10 +19,23 @@
     tailscale: 'bi-hdd-network'
   }
 
-  const services = SERVICES.filter((s) => s.config)
+  // NTP is not a service block: it lives at definitions.ntp-servers, but the
+  // previous UI listed it alongside the services, so it shares the group.
+  const NTP_ENTRY = { key: 'ntp', label: 'NTP', icon: 'bi-clock' }
+
+  const services = SERVICES.filter((s) => s.config).map((s) => ({
+    key: `service:${s.config}`,
+    label: title_for(s.config),
+    icon: SERVICE_ICONS[s.config] ?? 'bi-gear'
+  }))
+
+  const entries = $derived(
+    [...services, NTP_ENTRY].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+  )
+
   let servicesOpen = $state(true)
 
-  const inServices = $derived(services.some((s) => section === `service:${s.config}`))
+  const inServices = $derived(entries.some((e) => section === e.key))
 </script>
 
 <nav class="flex h-full w-[250px] flex-shrink-0 flex-col overflow-y-auto border-r border-zinc-200 bg-surface">
@@ -59,14 +72,14 @@
     <i class="bi {servicesOpen ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs text-zinc-400"></i>
   </button>
   {#if servicesOpen}
-    {#each services as s (s.config)}
+    {#each entries as e (e.key)}
       <button
         type="button"
-        class="nav-subitem {section === `service:${s.config}` ? 'nav-subitem-active' : ''}"
-        onclick={() => onSelect(`service:${s.config}`)}
+        class="nav-subitem {section === e.key ? 'nav-subitem-active' : ''}"
+        onclick={() => onSelect(e.key)}
       >
-        <i class="bi {SERVICE_ICONS[s.config] ?? 'bi-gear'} text-base"></i>
-        <span class="flex-1">{title_for(s.config)}</span>
+        <i class="bi {e.icon} text-base"></i>
+        <span class="flex-1">{t(e.label)}</span>
       </button>
     {/each}
   {/if}

@@ -8,6 +8,7 @@
   import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
+  import NtpPage from './lib/components/NtpPage.svelte'
   import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
   import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
   import NetworkPage from './lib/components/NetworkPage.svelte'
@@ -43,7 +44,11 @@
 
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
-  const serviceKeys = SERVICE_CONFIG_KEYS
+  // Services plus NTP (which lives under definitions), ordered as the sidebar.
+  const serviceCards = [
+    ...SERVICE_CONFIG_KEYS.map((key) => ({ key, label: title_for(key) })),
+    { key: 'ntp', label: 'NTP' }
+  ].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
 
   let openInterface = $state(null)
 
@@ -275,6 +280,7 @@
   {:else if key === 'interfaces'}{@render interfacesBody()}
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
+  {:else if key === 'ntp'}<NtpPage {changes} />
   {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />{/if}
 {/snippet}
 
@@ -453,9 +459,12 @@
         <Card title={t('Interfaces')} subtitle={t('Logical networks, SSIDs, ports')}>
           {#snippet children()}{@render interfacesBody()}{/snippet}
         </Card>
-        {#each serviceKeys as key (key)}
-          <Card title={title_for(key)}>
-            {#snippet children()}<ServicePage serviceKey={key} />{/snippet}
+        {#each serviceCards as c (c.key)}
+          <Card title={c.label}>
+            {#snippet children()}
+              {#if c.key === 'ntp'}<NtpPage {changes} />
+              {:else}<ServicePage serviceKey={c.key} {changes} />{/if}
+            {/snippet}
           </Card>
         {/each}
         <Card title={t('Changes')} badge={changes.length || null}>

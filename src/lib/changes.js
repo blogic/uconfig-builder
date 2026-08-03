@@ -201,6 +201,18 @@ export function changes_list(cur, base) {
     }
   }
 
+  // Only ntp-servers is editable so far; the rest of `definitions` is left
+  // untracked rather than scoped to a page that cannot reset it.
+  if (!eq(strip(cur.definitions?.['ntp-servers']), strip(base.definitions?.['ntp-servers']))) {
+    out.push({
+      section: 'Definitions',
+      scope: 'ntp',
+      kind: 'field',
+      key: 'ntp-servers',
+      label: field_label('ntp-servers', null)
+    })
+  }
+
   const svcDef = ref_resolve(def_get('service'))
   for (const svc of keys_union(cur.services, base.services)) {
     const schema = svcDef?.properties?.[svc] ? ref_resolve(svcDef.properties[svc]) : null
