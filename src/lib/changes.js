@@ -1,5 +1,6 @@
 import { ref_resolve, def_get, title_for } from './schema.js'
 import { default_width } from './channels.js'
+import { t } from './i18n.svelte.js'
 
 // Reduce a value to a default-stripped, empty-pruned canonical form so that
 // defaults the UI materialises while a section is merely viewed do not register
@@ -83,6 +84,66 @@ function keys_union(a, b) {
   return [...new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})])].sort()
 }
 
+// Nested blocks reported as a single entry rather than per leaf, so that one
+// addressing edit reads "Changed IPv4 on interface 'lan'" instead of listing
+// every field inside it.
+const GROUPED = new Set(['ipv4', 'ipv6', 'template', 'dhcpv6', 'vlan', 'dhcp-pool', 'dhcp-leases'])
+
+// `container` is null for top-level pages, else { noun, key } or
+// { noun, key, sub } for a map entry nested inside another (ssids).
+function field_label(key, container) {
+  const field = title_for(key)
+  if (!container) return t('Changed {field}', { field })
+  // ICU treats a single quote as an escape; '' renders one apostrophe.
+  if (container.sub != null) {
+    return t("Changed {field} on {noun} ''{key}''/''{sub}''", {
+      field,
+      noun: container.noun,
+      key: container.key,
+      sub: container.sub
+    })
+  }
+  return t("Changed {field} on {noun} ''{key}''", { field, noun: container.noun, key: container.key })
+}
+
+// Walk two canonicalised objects in parallel, emitting one entry per changed
+// leaf and one per changed grouped block.
+function diff_fields(cur, base, meta) {
+  const out = []
+  for (const key of keys_union(cur, base)) {
+    const a = cur?.[key]
+    const b = base?.[key]
+    if (eq(a, b)) continue
+    const nested =
+      !GROUPED.has(key) &&
+      ((a && typeof a === 'object' && !Array.isArray(a)) || (b && typeof b === 'object' && !Array.isArray(b)))
+    if (nested) {
+      out.push(...diff_fields(a, b, meta))
+      continue
+    }
+    out.push({
+      section: meta.section,
+      scope: meta.scope,
+      kind: 'field',
+      key,
+      label: field_label(key, meta.container ?? null)
+    })
+  }
+  return out
+}
+
+function container_entry(meta, noun, key, added) {
+  return {
+    section: meta.section,
+    scope: meta.scope,
+    kind: added ? 'added' : 'removed',
+    key,
+    label: added
+      ? t('{noun} {key} added', { noun, key })
+      : t('{noun} {key} removed', { noun, key })
+  }
+}
+
 // Each entry carries a `scope`: the nav section that owns it, so a page can
 // show and reset only its own changes. Scopes match the keys used by
 // `view.section` ('unit', 'radios', 'interfaces', 'service:<key>').
@@ -90,35 +151,65 @@ export function changes_list(cur, base) {
   if (!cur || !base) return []
   const out = []
 
-  if (!eq(canon_unit(cur.unit), canon_unit(base.unit))) {
-    out.push({ section: 'Unit', scope: 'unit', label: 'Unit' })
-  }
+  out.push(
+    ...diff_fields(canon_unit(cur.unit), canon_unit(base.unit), { section: 'Unit', scope: 'unit' })
+  )
 
+  const radioMeta = { section: 'Radios', scope: 'radios' }
   for (const band of keys_union(cur.radios, base.radios)) {
-    if (!eq(canon_radio(cur.radios?.[band], band), canon_radio(base.radios?.[band], band))) {
-      out.push({ section: 'Radios', scope: 'radios', label: `Radio ${title_for(band)}` })
+    const inCur = cur.radios?.[band] != null
+    const inBase = base.radios?.[band] != null
+    if (inCur !== inBase) {
+      out.push(container_entry(radioMeta, t('Radio'), title_for(band), inCur))
+      continue
     }
+    out.push(
+      ...diff_fields(canon_radio(cur.radios?.[band], band), canon_radio(base.radios?.[band], band), {
+        ...radioMeta,
+        container: { noun: t('radio'), key: title_for(band) }
+      })
+    )
   }
 
+  const ifaceMeta = { section: 'Interfaces', scope: 'interfaces' }
   for (const name of keys_union(cur.interfaces, base.interfaces)) {
     const ci = cur.interfaces?.[name]
     const bi = base.interfaces?.[name]
-    if (!eq(canon_iface(ci), canon_iface(bi))) {
-      out.push({ section: 'Interfaces', scope: 'interfaces', label: `Interface ${name}` })
+    if ((ci != null) !== (bi != null)) {
+      out.push(container_entry(ifaceMeta, t('Interface'), name, ci != null))
+      continue
     }
+    out.push(
+      ...diff_fields(canon_iface(ci), canon_iface(bi), {
+        ...ifaceMeta,
+        container: { noun: t('interface'), key: name }
+      })
+    )
     for (const ssid of keys_union(ci?.ssids, bi?.ssids)) {
-      if (!eq(canon_ssid(ci?.ssids?.[ssid]), canon_ssid(bi?.ssids?.[ssid]))) {
-        out.push({ section: 'Interfaces', scope: 'interfaces', label: `SSID ${name} / ${ssid}` })
+      const cs = ci?.ssids?.[ssid]
+      const bs = bi?.ssids?.[ssid]
+      if ((cs != null) !== (bs != null)) {
+        out.push(container_entry(ifaceMeta, t('SSID'), `${name}/${ssid}`, cs != null))
+        continue
       }
+      out.push(
+        ...diff_fields(canon_ssid(cs), canon_ssid(bs), {
+          ...ifaceMeta,
+          container: { noun: t('interface'), key: name, sub: ssid }
+        })
+      )
     }
   }
 
   const svcDef = ref_resolve(def_get('service'))
   for (const svc of keys_union(cur.services, base.services)) {
     const schema = svcDef?.properties?.[svc] ? ref_resolve(svcDef.properties[svc]) : null
-    if (!eq(strip(cur.services?.[svc], schema), strip(base.services?.[svc], schema))) {
-      out.push({ section: 'Services', scope: `service:${svc}`, label: `Service ${title_for(svc)}` })
-    }
+    out.push(
+      ...diff_fields(strip(cur.services?.[svc], schema), strip(base.services?.[svc], schema), {
+        section: 'Services',
+        scope: `service:${svc}`
+      })
+    )
   }
 
   return out
