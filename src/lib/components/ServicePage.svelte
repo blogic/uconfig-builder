@@ -4,6 +4,7 @@
   import { def_get, schema_at, title_for } from '../schema.js'
   import { store } from '../store.svelte.js'
   import { servicesLayout } from '../layouts.js'
+  import { SERVICE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
   let { serviceKey } = $props()
@@ -22,6 +23,10 @@
 <div class="page-header">
   <h2 class="page-title">{title_for(serviceKey)}</h2>
 </div>
+
+{#if SERVICE_DESCRIPTIONS[serviceKey]}
+  <p class="page-description">{t(SERVICE_DESCRIPTIONS[serviceKey])}</p>
+{/if}
 
 {#if data}
   {#if node?.children}

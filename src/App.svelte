@@ -15,6 +15,7 @@
   import Spinner from './lib/components/Spinner.svelte'
   import { def_get, title_for } from './lib/schema.js'
   import { SERVICE_CONFIG_KEYS } from './lib/services.js'
+  import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
   import { unitLayout, radioLayout } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
@@ -223,11 +224,13 @@
 
 {#snippet unitBody()}
   <div class="page-header"><h2 class="page-title">{t('Unit Configuration')}</h2></div>
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.unit)}</p>
   <LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />
 {/snippet}
 
 {#snippet radiosBody()}
   <div class="page-header"><h2 class="page-title">{t('Radios')}</h2></div>
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.radios)}</p>
   <MapEditor
     parent={store.doc}
     mapKey="radios"
@@ -254,6 +257,7 @@
 
 {#snippet changesBody()}
   <div class="page-header"><h2 class="page-title">{t('JSON')}</h2></div>
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.json)}</p>
   <ConfigurationPanel {changes} {preview} />
 {/snippet}
 

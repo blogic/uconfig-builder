@@ -1,6 +1,7 @@
 <script>
   import InterfaceAddForm from './InterfaceAddForm.svelte'
   import { store } from '../store.svelte.js'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
   let { onOpen } = $props()
@@ -30,6 +31,8 @@
     {t('Add Interface')}
   </button>
 </div>
+
+<p class="page-description">{t(PAGE_DESCRIPTIONS.interfaces)}</p>
 
 {#if names.length}
   <div class="divide-y divide-zinc-200 rounded-base border border-zinc-200">

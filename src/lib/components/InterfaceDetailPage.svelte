@@ -4,6 +4,7 @@
   import { store } from '../store.svelte.js'
   import { interfaceLayout } from '../layouts.js'
   import { confirm } from '../confirm.svelte.js'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
   let { name, onBack } = $props()
@@ -26,6 +27,8 @@
 </div>
 
 {#if iface}
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.interface)}</p>
+
   <div class="mb-5 rounded-base bg-zinc-50 px-5 py-4 text-sm">
     <p><span class="font-semibold italic text-zinc-900">{t('Interface Name')}:</span> <span class="italic text-zinc-500">{name}</span></p>
     <p><span class="font-semibold italic text-zinc-900">{t('Role')}:</span> <span class="italic text-zinc-500">{iface.role ?? '—'}</span></p>

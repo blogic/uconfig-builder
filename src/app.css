@@ -8,6 +8,7 @@
   --color-surface: #ffffff;
   --color-accent: #3498db;
   --color-accent-ink: #ffffff;
+  --color-accent-dark: #2980b9;
   --color-nav-active: #e3f2fd;
   --radius-base: 4px;
 }
@@ -128,6 +129,10 @@ body {
   .btn-add {
     @apply cursor-pointer rounded-base border-0 bg-accent px-2.5 py-1.5 text-center text-xs font-medium text-white transition hover:brightness-95;
   }
+  /* Row-level removal is a bare accent trash icon, not a filled button. */
+  .btn-remove-item {
+    @apply inline-flex flex-shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-lg leading-none text-accent transition hover:text-accent-dark;
+  }
   .btn-sm-danger {
     @apply cursor-pointer rounded-base border-0 bg-red-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:brightness-95;
   }
@@ -138,6 +143,9 @@ body {
   }
   .page-title {
     @apply flex-1 text-2xl font-semibold text-zinc-900;
+  }
+  .page-description {
+    @apply mb-5 text-sm leading-relaxed text-zinc-900;
   }
 
   /* Section header: bold slate title over a 2px accent rule, with a blue
