@@ -33,7 +33,7 @@
   <div>
     {#if changes.length}
       <p class="text-xs text-zinc-500">{t('{count, plural, one {# Change} other {# Changes}} since this configuration was loaded.', { count: changes.length })}</p>
-      <ul class="mt-3 divide-y divide-zinc-100 rounded-md border border-zinc-200">
+      <ul class="mt-3 divide-y divide-zinc-100 rounded-base border border-zinc-200">
         {#each changes as c}
           <li class="flex items-center gap-2 px-3 py-1.5 text-xs">
             <span class="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
@@ -50,7 +50,7 @@
     <div>
       <button
         type="button"
-        class="btn-primary w-full justify-center rounded-md px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+        class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
         disabled={!changes.length}
         onclick={onApply}
       >
@@ -84,7 +84,7 @@
         />
         <button
           type="button"
-          class="btn-primary rounded-md px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+          class="btn-primary rounded-base px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!trimmed}
           onclick={save}
         >

@@ -62,7 +62,7 @@
       </MapEditor>
     {:else}
       {@const child = obj[e.key]}
-      <div class="rounded-md border border-zinc-200 bg-surface">
+      <div class="rounded-base border border-zinc-200 bg-surface">
         <div class="flex items-center gap-2 px-3 py-2">
           <span class="flex-1 text-xs font-semibold uppercase tracking-wide text-zinc-600">
             {t(title_for(e.key))}

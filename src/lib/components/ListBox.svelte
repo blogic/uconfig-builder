@@ -16,7 +16,7 @@
   {#if label}
     <span class="text-xs font-medium text-zinc-700">{t(label)}</span>
   {/if}
-  <div class="overflow-hidden rounded-md border border-zinc-200">
+  <div class="overflow-hidden rounded-base border border-zinc-200">
     {#each items as item, i (i)}
       <div class="flex items-center gap-2 border-b border-zinc-100 bg-surface px-3 py-1.5 last:border-b-0">
         {@render row(item, i)}

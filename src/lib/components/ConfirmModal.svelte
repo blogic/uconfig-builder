@@ -11,7 +11,7 @@
     onclick={() => confirm_answer(false)}
   >
     <div
-      class="w-full max-w-sm rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg"
+      class="w-full max-w-sm rounded-base border border-zinc-200 bg-surface p-4 shadow-lg"
       onclick={(e) => e.stopPropagation()}
     >
       <p class="text-sm text-zinc-800">{confirmState.message}</p>

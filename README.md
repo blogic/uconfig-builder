@@ -41,8 +41,9 @@ npm run i18n:extract # re-extract translatable strings into the locale catalogue
 2. **login** - opens the websocket to the device and prompts for the password.
 3. **device** - the device dashboard (Network, State, System pages); a Configure button
    opens the builder against the device's live config.
-4. **builder** - the schema-driven config editor (Unit, Radios, Interfaces, Services, and
-   a Configuration/changes section).
+4. **builder** - the schema-driven config editor. On desktop a 250px sidebar lists Unit,
+   Interfaces, Radios, an expandable Services group (one page per configurable service)
+   and JSON; on mobile the same content stacks as collapsible cards.
 
 ## Device control plane
 
@@ -69,8 +70,8 @@ the radio/port maps to what the hardware actually has.
 
 ## The schema-driven editor
 
-The editor is a hybrid: a curated card shell for the top-level sections (unit, radios,
-interfaces, services) with the field widgets driven by the schema.
+The editor is a hybrid: a curated page shell for the top-level sections (unit, radios,
+interfaces, per-service pages) with the field widgets driven by the schema.
 
 - `src/lib/data/schema.json` - the merged uconfig JSON Schema (draft-07, all `$ref`s
   internal as `#/$defs/...`), copied from `../uconfig/generated/schema.json`.
@@ -86,17 +87,22 @@ interfaces, services) with the field widgets driven by the schema.
 
 ### Components
 
-- `Card.svelte` - collapsible top-level section card.
+- `Sidebar.svelte` - the desktop nav rail: top-level entries, the expandable Services
+  group (one entry per configurable service) and JSON, with Bootstrap Icons per row.
+- `Card.svelte` - collapsible top-level section card (mobile/cards layout only).
 - `LayoutRenderer.svelte` - renders a layout array against data and schema, delegating to
   the field widgets; supports `when` predicates to show or prune fields conditionally.
 - `Field.svelte` - schema-driven scalar widget (enum, boolean, number, string,
   string/number array, int-or-keyword union, with secret show/hide).
 - `SchemaObject.svelte` - recursively renders an object subschema: scalars via `Field`,
   nested objects as add/remove groups, `patternProperties` via `MapEditor`.
-- `MapEditor.svelte` - editor for the dynamically-keyed maps (radios, interfaces, ssids,
-  ports, ...) with add, rename and remove, optionally tabbed and lockable.
-- `CollapsibleSection.svelte` - a sub-section that renders as its own card on desktop and
-  flat inside a card on mobile.
+- `MapEditor.svelte` - editor for the dynamically-keyed maps (radios, ssids, ports, ...)
+  with add, rename and remove, optionally tabbed and lockable.
+- `InterfaceListPage.svelte` / `InterfaceDetailPage.svelte` - interfaces are a list that
+  drills into a per-interface page, rather than tabs.
+- `ServicePage.svelte` - one page per configurable service, driven by `servicesLayout`.
+- `CollapsibleSection.svelte` - a flat `<details>` sub-section: bold title over a 2px
+  accent rule with a rotating marker, no card border.
 - `ConfigurationPanel.svelte` / `ChangesPanel.svelte` - the pending-changes view and the
   apply action.
 
@@ -108,12 +114,22 @@ addressing, timezone, ports, vlan, dhcp pool, multi-psk, services, ...).
 `src/lib/view.svelte.js` holds `view.mode`, set in `App.svelte` from
 `matchMedia('(min-width: 768px)')`:
 
-- **`menu`** (>= 768px, desktop): a left sidebar of sections plus a content pane.
+- **`menu`** (>= 768px, desktop): the 250px `Sidebar` rail plus a content pane, one page
+  per nav entry.
 - **`cards`** (< 768px, mobile): a vertical stack of collapsible cards behaving as an
   accordion (one open at a time, via `src/lib/accordion.svelte.js`).
 
-Components such as `CollapsibleSection`, `NetworkPage` and `SystemPage` adapt their chrome
-to the mode so they never nest a bordered card inside another bordered card on mobile.
+`NetworkPage` and `SystemPage` adapt their chrome to the mode so they never nest a
+bordered card inside another bordered card on mobile.
+
+## Styling
+
+Tailwind v4 with semantic tokens in `src/app.css`. The palette is ported from the previous
+Ember builder: accent `#3498db`, slate `#2c3e50` text, white surfaces, 4px radii. The
+`zinc-*` scale is retained as the neutral ramp so components need no per-theme edits; the
+`.dark` block remaps those variables to the slate ramp (`#0f172a` / `#1e293b` / `#334155`).
+Component classes (`.page-header`, `.section-header`, `.tab-button`, `.nav-item`, ...)
+carry the shared chrome. Icons come from `bootstrap-icons`.
 
 ## Regenerating bundled data
 

@@ -82,7 +82,7 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onclick={() => (showModal = false)}>
-    <div class="w-full max-w-xs rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
+    <div class="w-full max-w-xs rounded-base border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
       <h3 class="mb-3 text-sm font-semibold">{t('Add trunk')}</h3>
       <input class="input" type="number" min="2" max="4096" bind:value={entry} placeholder={t('2 to 4096')} onkeydown={(e) => e.key === 'Enter' && commit()} />
       {#if entry !== '' && error}<p class="mt-1 text-[11px] text-amber-600">{error}</p>{/if}

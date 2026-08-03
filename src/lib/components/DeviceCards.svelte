@@ -28,7 +28,7 @@
   </Card>
   <button
     type="button"
-    class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-surface px-4 py-3 text-left text-sm font-semibold text-zinc-900 shadow-sm hover:bg-zinc-50"
+    class="flex items-center justify-between gap-3 rounded-base border border-zinc-200 bg-surface px-4 py-3 text-left text-sm font-semibold text-zinc-900 shadow-flat-md hover:bg-zinc-50"
     onclick={onConfigure}
   >
     <span>{t('Configure')}</span>

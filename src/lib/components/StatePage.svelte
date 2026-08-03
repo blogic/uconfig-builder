@@ -65,11 +65,11 @@
 {/snippet}
 
 {#if error && !info}
-  <div class="rounded-lg border border-zinc-200 bg-surface p-4 text-sm text-red-600">{error}</div>
+  <div class="rounded-base border border-zinc-200 bg-surface p-4 text-sm text-red-600">{error}</div>
 {/if}
 
 <div class="grid gap-4 sm:grid-cols-2">
-  <div class="rounded-lg border border-zinc-200 bg-surface p-4">
+  <div class="rounded-base border border-zinc-200 bg-surface p-4">
     <h3 class="text-sm font-semibold text-zinc-900">{t('Device')}</h3>
     <dl class="mt-2 space-y-1 text-sm">
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Model')}</dt><dd class="text-zinc-800">{model ?? '—'}</dd></div>
@@ -77,7 +77,7 @@
     </dl>
   </div>
 
-  <div class="rounded-lg border border-zinc-200 bg-surface p-4">
+  <div class="rounded-base border border-zinc-200 bg-surface p-4">
     <h3 class="text-sm font-semibold text-zinc-900">{t('CPU load')}</h3>
     <dl class="mt-2 space-y-1 text-sm">
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('1 min')}</dt><dd class="font-mono text-zinc-800">{load[0] ?? '—'}</dd></div>
@@ -86,13 +86,13 @@
     </dl>
   </div>
 
-  <div class="rounded-lg border border-zinc-200 bg-surface p-4">
+  <div class="rounded-base border border-zinc-200 bg-surface p-4">
     <h3 class="text-sm font-semibold text-zinc-900">{t('Memory')}</h3>
     <p class="mt-2 text-sm text-zinc-800">{fmt_bytes(memUsed)} / {fmt_bytes(mem?.total)} <span class="text-zinc-500">({memPct}%)</span></p>
     {@render bar(memPct)}
   </div>
 
-  <div class="rounded-lg border border-zinc-200 bg-surface p-4">
+  <div class="rounded-base border border-zinc-200 bg-surface p-4">
     <h3 class="text-sm font-semibold text-zinc-900">{t('Storage')}</h3>
     <div class="mt-2 text-sm">
       <div class="flex justify-between gap-4"><span class="text-zinc-500">{t('Overlay')}</span><span class="text-zinc-800">{fmt_bytes((info?.root?.used ?? 0) * 1024)} / {fmt_bytes((info?.root?.total ?? 0) * 1024)}</span></div>

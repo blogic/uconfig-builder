@@ -19,10 +19,11 @@
   }
 </script>
 
-<div class="rounded-lg border border-zinc-200 bg-surface shadow-sm">
+<div class="rounded-base border border-zinc-200 bg-surface shadow-flat-sm">
   <button
     type="button"
-    class="flex w-full items-center gap-3 px-4 py-3 text-left"
+    class="mx-4 flex cursor-pointer items-center gap-3 py-3 text-left transition-opacity hover:opacity-80 {isOpen ? 'section-underline' : ''}"
+    style="width: calc(100% - 2rem)"
     onclick={toggle}
   >
     <svg
@@ -56,7 +57,7 @@
     {/if}
   </button>
   {#if isOpen}
-    <div class="border-t border-zinc-100 px-4 py-4">
+    <div class="px-4 py-4">
       {@render children()}
     </div>
   {/if}

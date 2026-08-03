@@ -17,6 +17,7 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "@formatjs/intl": "^4.1.13"
+    "@formatjs/intl": "^4.1.13",
+    "bootstrap-icons": "^1.13.1"
   }
 }

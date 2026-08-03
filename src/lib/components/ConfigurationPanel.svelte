@@ -15,7 +15,7 @@
   const connected = $derived(connection.status === 'connected')
   // In menu view the Configuration section has no surrounding Card, so the
   // status states supply their own card chrome (cards view already wraps them).
-  const panelClass = $derived(view.mode === 'menu' ? 'rounded-lg border border-zinc-200 bg-surface px-4' : '')
+  const panelClass = $derived(view.mode === 'menu' ? 'rounded-base border border-zinc-200 bg-surface px-4' : '')
 
   let applyState = $state('idle') // 'idle' | 'applying' | 'success' | 'error'
   let applyError = $state(null)

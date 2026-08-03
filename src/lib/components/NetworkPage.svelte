@@ -36,7 +36,7 @@
   })
 </script>
 
-<div class={menu ? 'rounded-lg border border-zinc-200 bg-surface' : ''}>
+<div class={menu ? 'rounded-base border border-zinc-200 bg-surface' : ''}>
   {#if menu}
     <div class="flex items-center gap-2 border-b border-zinc-100 px-4 py-3">
       <h3 class="text-sm font-semibold text-zinc-900">{t('Devices')}</h3>
@@ -68,7 +68,7 @@
             <div class="flex items-center gap-2">
               <span class="truncate text-sm font-medium text-zinc-800">{name_of(d)}</span>
               {#if d.fingerprint?.class}
-                <span class="flex-shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">{d.fingerprint.class}</span>
+                <span class="flex-shrink-0 rounded-base bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">{d.fingerprint.class}</span>
               {/if}
             </div>
             <div class="truncate font-mono text-xs text-zinc-400">

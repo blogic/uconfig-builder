@@ -1,93 +1,227 @@
 @import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
-/* Semantic tokens. `surface` = card/input background, `accent` = active state. */
+/* Semantic tokens. `surface` = page/card/input background, `accent` = active
+   state. Palette ported from the previous builder (Flat UI): primary #3498db,
+   slate #2c3e50 text, all-white surfaces. */
 @theme {
   --color-surface: #ffffff;
-  --color-accent: #18181b;
+  --color-accent: #3498db;
   --color-accent-ink: #ffffff;
+  --color-nav-active: #e3f2fd;
+  --radius-base: 4px;
 }
 
 /* Tailwind v4's default palette is in oklch(), which some browsers (e.g. Firefox
-   on iOS) don't render. Pin every colour we use to hex so both themes work. */
+   on iOS) don't render. Pin every colour we use to hex so both themes work.
+
+   The zinc-* names are kept as the neutral ramp so components need no edits;
+   their values are the older palette's greys rather than Tailwind's zinc. */
 :root {
   color-scheme: light;
 
   --color-white: #ffffff;
   --color-black: #000000;
   --color-surface: #ffffff;
-  --color-accent: #18181b;
+  --color-accent: #3498db;
   --color-accent-ink: #ffffff;
+  --color-accent-dark: #2980b9;
+  --color-nav-active: #e3f2fd;
 
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f4f4f5;
-  --color-zinc-200: #e4e4e7;
-  --color-zinc-300: #d4d4d8;
-  --color-zinc-400: #a1a1aa;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #52525b;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-800: #27272a;
-  --color-zinc-900: #18181b;
-  --color-zinc-950: #09090b;
+  --color-zinc-50: #f8f9fa;
+  --color-zinc-100: #ffffff;
+  --color-zinc-200: #e9ecef;
+  --color-zinc-300: #ddd;
+  --color-zinc-400: #bdc3c7;
+  --color-zinc-500: #6c757d;
+  --color-zinc-600: #555555;
+  --color-zinc-700: #495057;
+  --color-zinc-800: #34495e;
+  --color-zinc-900: #2c3e50;
+  --color-zinc-950: #1a252f;
 
-  --color-emerald-500: #10b981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
+  --color-emerald-500: #28a745;
+  --color-emerald-600: #28a745;
+  --color-emerald-700: #1e7e34;
 
-  --color-red-50: #fef2f2;
-  --color-red-200: #fecaca;
-  --color-red-300: #fca5a5;
-  --color-red-500: #ef4444;
-  --color-red-600: #dc2626;
+  --color-red-50: #f8d7da;
+  --color-red-200: #f5c6cb;
+  --color-red-300: #e4a0a6;
+  --color-red-500: #e74c3c;
+  --color-red-600: #e74c3c;
 
-  --color-amber-50: #fffbeb;
-  --color-amber-200: #fde68a;
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
-  --color-amber-600: #d97706;
-  --color-amber-700: #b45309;
+  --color-amber-50: #fff3cd;
+  --color-amber-200: #ffeeba;
+  --color-amber-400: #ffc107;
+  --color-amber-500: #f0ad4e;
+  --color-amber-600: #856404;
+  --color-amber-700: #6d5204;
+
+  --shadow-sm-flat: 0 2px 4px rgb(0 0 0 / 5%);
+  --shadow-md-flat: 0 2px 8px rgb(0 0 0 / 10%);
+  --shadow-lg-flat: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 html {
-  background-color: var(--color-zinc-100);
+  background-color: var(--color-surface);
 }
 
-/* Dark theme: near-black + amber. Most utilities reference the zinc/surface CSS
-   variables, so overriding them here themes the app without per-component work. */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+/* Dark theme, ported from the previous builder's `theme-dark`: the slate ramp
+   (#0f172a / #1e293b / #334155) with the accent unchanged. */
 .dark {
   color-scheme: dark;
-  --color-surface: #18181b;
-  --color-accent: #f59e0b;
-  --color-accent-ink: #0a0a0a;
-  --color-zinc-50: #27272a;
-  --color-zinc-100: #0a0a0a;
-  --color-zinc-200: #3f3f46;
-  --color-zinc-300: #52525b;
-  --color-zinc-400: #71717a;
-  --color-zinc-500: #a1a1aa;
-  --color-zinc-600: #d4d4d8;
-  --color-zinc-700: #e4e4e7;
-  --color-zinc-800: #f4f4f5;
-  --color-zinc-900: #fafafa;
+  --color-surface: #0f172a;
+  --color-accent: #3498db;
+  --color-accent-ink: #ffffff;
+  --color-accent-dark: #2980b9;
+  --color-nav-active: #1c3040;
+
+  --color-zinc-50: #1e293b;
+  --color-zinc-100: #0f172a;
+  --color-zinc-200: #334155;
+  --color-zinc-300: #334155;
+  --color-zinc-400: #94a3b8;
+  --color-zinc-500: #cbd5e1;
+  --color-zinc-600: #e2e8f0;
+  --color-zinc-700: #f1f5f9;
+  --color-zinc-800: #f1f5f9;
+  --color-zinc-900: #f8fafc;
+
+  --color-emerald-500: #2ecc71;
+  --color-emerald-600: #27ae60;
+
+  --color-red-50: #4a2427;
+  --color-red-200: #7b3b40;
+  --color-red-500: #e74c3c;
+  --color-red-600: #ff6b5b;
+
+  --color-amber-50: #3d3423;
+  --color-amber-400: #f0ad4e;
+  --color-amber-600: #f0ad4e;
+}
+
+/* Inputs keep a raised surface in dark mode so fields read against the page. */
+.dark .input {
+  background-color: #1e293b;
 }
 
 @layer components {
   .input {
-    @apply w-full rounded-md border border-zinc-300 bg-surface px-2.5 py-1.5 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-500 focus:ring-1 focus:ring-zinc-400;
+    @apply w-full rounded-base border border-zinc-300 bg-surface px-2.5 py-1.5 text-sm text-zinc-900 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent;
   }
   .btn {
-    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-zinc-300 bg-surface px-3 py-1.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50;
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-base border border-zinc-300 bg-surface px-3 py-1.5 text-sm font-medium text-zinc-700 transition hover:border-accent hover:text-accent;
   }
   .btn-primary {
-    @apply border-accent bg-accent text-accent-ink hover:opacity-90;
+    @apply rounded-base border-accent bg-accent text-accent-ink hover:brightness-95 hover:opacity-100;
   }
   .btn-sm {
-    @apply cursor-pointer rounded border border-zinc-300 bg-surface px-2 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50;
+    @apply cursor-pointer rounded-base border border-zinc-300 bg-surface px-2 py-1 text-xs font-medium text-zinc-700 transition hover:border-accent hover:text-accent;
+  }
+  /* Action buttons: borderless solid fills. Add is accent-blue in the small
+     variant; destructive actions are the danger red at body size. */
+  .btn-add {
+    @apply cursor-pointer rounded-base border-0 bg-accent px-2.5 py-1.5 text-center text-xs font-medium text-white transition hover:brightness-95;
   }
   .btn-sm-danger {
-    @apply min-w-20 cursor-pointer rounded border border-red-600 bg-red-600 px-2 py-1 text-center text-xs font-medium text-white transition hover:bg-red-700;
+    @apply cursor-pointer rounded-base border-0 bg-red-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:brightness-95;
   }
-  .btn-add {
-    @apply min-w-20 cursor-pointer rounded border border-emerald-600 bg-emerald-600 px-2 py-1 text-center text-xs font-medium text-white transition hover:bg-emerald-700;
+
+  /* Page title: 24px slate over a 2px accent rule (the old `.desktop-header`). */
+  .page-header {
+    @apply mb-5 flex items-center gap-3 border-b-2 border-accent pb-2.5;
   }
+  .page-title {
+    @apply flex-1 text-2xl font-semibold text-zinc-900;
+  }
+
+  /* Section header: bold slate title over a 2px accent rule, with a blue
+     triangle marker that rotates when closed (the old `.section-header`).
+     Sections are flat on the page; no card border. */
+  .section-header {
+    @apply flex cursor-pointer list-none select-none items-center border-b-2 border-accent pb-2.5 transition-opacity hover:opacity-80;
+  }
+  .section-header::-webkit-details-marker {
+    display: none;
+  }
+  .section-header::before {
+    content: "▼";
+    color: var(--color-accent);
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .section-header.is-closed::before {
+    transform: rotate(-90deg);
+  }
+  .section-title {
+    @apply m-0 flex-1 text-lg font-semibold text-zinc-900;
+  }
+
+  /* Tabs: solid accent fill on the active tab, plain otherwise, over a 1px
+     rule spanning the row (the old `.radio-tabs` / `.tab-button`). */
+  .tab-row {
+    @apply mb-5 flex flex-wrap items-center gap-0.5 border-b border-zinc-300;
+  }
+  .tab-button {
+    @apply cursor-pointer rounded-t-base border-0 px-5 py-3 text-sm text-zinc-900 transition-colors hover:bg-zinc-50;
+  }
+  .tab-button-active {
+    @apply bg-accent text-white hover:bg-accent;
+  }
+
+  /* Sidebar rows: 250px rail, separator per row.
+     Top-level entries take the accent tint and blue text when active;
+     service sub-entries only get a pale wash, keeping their own text colour. */
+  /* Hover applies to unselected rows only; the active wash must not change
+     under the pointer (`:not(.nav-item-active)` keeps it from being overridden). */
+  .nav-item {
+    @apply flex w-full cursor-pointer items-center gap-3 border-b border-zinc-200 px-5 py-4 text-left text-sm font-medium text-zinc-800 transition;
+  }
+  .nav-item:not(.nav-item-active):hover {
+    background-color: var(--color-zinc-50);
+  }
+  .nav-item-active {
+    @apply bg-nav-active text-accent;
+  }
+  .nav-subitem {
+    @apply flex w-full cursor-pointer items-center gap-3 border-b border-zinc-200 py-3 pl-10 pr-5 text-left text-sm font-medium text-zinc-500 transition;
+  }
+  .nav-subitem:not(.nav-subitem-active):hover {
+    background-color: var(--color-zinc-50);
+  }
+  /* Sub-items keep their own text colour when active; only top-level rows
+     take the blue text (verified against the rendered reference). */
+  .nav-subitem-active {
+    @apply bg-nav-active;
+  }
+  .nav-section-header {
+    @apply flex w-full cursor-pointer items-center gap-3 border-b border-zinc-200 px-5 py-3 text-left text-sm font-semibold text-zinc-900 transition;
+  }
+  .nav-section-header:not(.nav-section-header-open):hover {
+    background-color: var(--color-zinc-50);
+  }
+  .nav-section-header-open {
+    @apply bg-zinc-50;
+  }
+}
+
+@utility shadow-flat-sm {
+  box-shadow: var(--shadow-sm-flat);
+}
+
+@utility shadow-flat-md {
+  box-shadow: var(--shadow-md-flat);
+}
+
+@utility shadow-flat-lg {
+  box-shadow: var(--shadow-lg-flat);
 }

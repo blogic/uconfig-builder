@@ -4,15 +4,19 @@
   import MapEditor from './lib/components/MapEditor.svelte'
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
   import ConfigurationPanel from './lib/components/ConfigurationPanel.svelte'
-  import InterfaceAddForm from './lib/components/InterfaceAddForm.svelte'
+  import Sidebar from './lib/components/Sidebar.svelte'
+  import ServicePage from './lib/components/ServicePage.svelte'
+  import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
+  import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
   import NetworkPage from './lib/components/NetworkPage.svelte'
   import StatePage from './lib/components/StatePage.svelte'
   import SystemPage from './lib/components/SystemPage.svelte'
   import DeviceCards from './lib/components/DeviceCards.svelte'
   import Spinner from './lib/components/Spinner.svelte'
-  import { def_get } from './lib/schema.js'
+  import { def_get, title_for } from './lib/schema.js'
+  import { SERVICE_CONFIG_KEYS } from './lib/services.js'
   import { default_width } from './lib/channels.js'
-  import { unitLayout, radioLayout, interfaceLayout, servicesLayout } from './lib/layouts.js'
+  import { unitLayout, radioLayout } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
   import { settings } from './lib/settings.svelte.js'
   import { accordion_provide } from './lib/accordion.svelte.js'
@@ -36,16 +40,9 @@
 
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
-  const interfaceDef = def_get('interface')
-  const serviceDef = def_get('service')
+  const serviceKeys = SERVICE_CONFIG_KEYS
 
-  const sections = [
-    { key: 'unit', title: 'Unit', subtitle: 'Device identity', card: true },
-    { key: 'radios', title: 'Radios', subtitle: 'Physical radios by band label' },
-    { key: 'interfaces', title: 'Interfaces', subtitle: 'Logical networks, SSIDs, ports' },
-    { key: 'services', title: 'Services', subtitle: 'SSH, mDNS, LLDP, RADIUS, …' },
-    { key: 'changes', title: 'Configuration' }
-  ]
+  let openInterface = $state(null)
 
   function radio_defaults(band) {
     return { 'channel-mode': 'HE', 'channel-width': default_width(band) }
@@ -174,7 +171,10 @@
   const savedConfigs = $derived(saved_names())
   // With device capabilities loaded we know the radios; lock manual add/remove.
   const radiosLocked = $derived(capabilities.data != null)
-  const active = $derived(sections.find((s) => s.key === view.section) ?? sections[0])
+  function section_select(key) {
+    if (key !== 'interfaces') openInterface = null
+    view.section = key
+  }
   const changes = $derived(changes_list(store.doc, store.baseline))
 </script>
 
@@ -191,7 +191,7 @@
       </svg>
     </button>
     {#if menuOpen}
-      <div class="absolute right-0 mt-1 w-44 overflow-hidden rounded-lg border border-zinc-200 bg-surface py-1 shadow-lg">
+      <div class="absolute right-0 mt-1 w-44 overflow-hidden rounded-base border border-zinc-200 bg-surface py-1 shadow-lg">
         <button type="button" class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-100" onclick={() => { menuOpen = false; toggle_theme() }}>
           {#if themeMode === 'dark'}
             <svg class="h-4 w-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,10 +222,12 @@
 {/snippet}
 
 {#snippet unitBody()}
+  <div class="page-header"><h2 class="page-title">{t('Unit Configuration')}</h2></div>
   <LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />
 {/snippet}
 
 {#snippet radiosBody()}
+  <div class="page-header"><h2 class="page-title">{t('Radios')}</h2></div>
   <MapEditor
     parent={store.doc}
     mapKey="radios"
@@ -234,42 +236,24 @@
     tabbed
     keyOptions={radioDef.properties.band.enum}
     makeValue={radio_defaults}
-    tabCard
     locked={radiosLocked}
   >
     {#snippet item(radio, band)}
-      {#if view.mode === 'menu'}
-        <div class="rounded-lg border border-zinc-200 bg-surface p-4">
-          <LayoutRenderer data={radio} schema={radioDef} layout={radioLayout} context={{ band }} />
-        </div>
-      {:else}
-        <LayoutRenderer data={radio} schema={radioDef} layout={radioLayout} context={{ band }} />
-      {/if}
+      <LayoutRenderer data={radio} schema={radioDef} layout={radioLayout} context={{ band }} />
     {/snippet}
   </MapEditor>
 {/snippet}
 
 {#snippet interfacesBody()}
-  <MapEditor parent={store.doc} mapKey="interfaces" valueSchema={interfaceDef} keyLabel="interface" tabbed renamable={false} tabCard>
-    {#snippet addModal({ create, close, map })}
-      <InterfaceAddForm interfaces={map} {create} {close} />
-    {/snippet}
-    {#snippet item(iface, name)}
-      <LayoutRenderer
-        data={iface}
-        schema={interfaceDef}
-        layout={interfaceLayout}
-        context={{ role: iface.role, allInterfaces: store.doc.interfaces, selfName: name, radios: store.doc.radios }}
-      />
-    {/snippet}
-  </MapEditor>
-{/snippet}
-
-{#snippet servicesBody()}
-  <LayoutRenderer data={store.doc.services} schema={serviceDef} layout={servicesLayout} />
+  {#if openInterface != null}
+    <InterfaceDetailPage name={openInterface} onBack={() => (openInterface = null)} />
+  {:else}
+    <InterfaceListPage onOpen={(n) => (openInterface = n)} />
+  {/if}
 {/snippet}
 
 {#snippet changesBody()}
+  <div class="page-header"><h2 class="page-title">{t('JSON')}</h2></div>
   <ConfigurationPanel {changes} {preview} />
 {/snippet}
 
@@ -277,15 +261,15 @@
   {#if key === 'unit'}{@render unitBody()}
   {:else if key === 'radios'}{@render radiosBody()}
   {:else if key === 'interfaces'}{@render interfacesBody()}
-  {:else if key === 'services'}{@render servicesBody()}
-  {:else if key === 'changes'}{@render changesBody()}{/if}
+  {:else if key === 'changes'}{@render changesBody()}
+  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} />{/if}
 {/snippet}
 
-<div class="flex h-screen flex-col bg-zinc-100 text-zinc-900">
+<div class="flex h-screen flex-col bg-surface text-zinc-900">
   {@render appMenu()}
   {#if screen === 'welcome'}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
-      <div class="w-full max-w-lg rounded-lg border border-zinc-200 bg-surface p-6 shadow-sm">
+      <div class="w-full max-w-lg rounded-base border border-zinc-200 bg-surface p-6 shadow-flat-md">
         <div class="mb-4 flex items-start justify-between gap-4">
           <div>
             <h1 class="text-lg font-semibold tracking-tight">{t('uConfig builder')}</h1>
@@ -314,7 +298,7 @@
               <span class="h-px flex-1 bg-zinc-200"></span>
             </div>
           {/if}
-          <button type="button" class="btn-primary rounded-md px-3 py-2 text-sm font-medium" onclick={start_default}>
+          <button type="button" class="btn-primary rounded-base px-3 py-2 text-sm font-medium" onclick={start_default}>
             {t('Start with the default configuration')}
           </button>
           <div class="flex items-center gap-2">
@@ -349,7 +333,7 @@
     </div>
   {:else if screen === 'login'}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
-      <div class="w-full max-w-lg rounded-lg border border-zinc-200 bg-surface p-6 shadow-sm">
+      <div class="w-full max-w-lg rounded-base border border-zinc-200 bg-surface p-6 shadow-flat-md">
         <div class="mb-4 flex items-start justify-between gap-4">
           <div>
             <h1 class="text-lg font-semibold tracking-tight">{t('Log in')}</h1>
@@ -376,7 +360,7 @@
             {#if loginError}
               <p class="text-sm text-red-600">{loginError}</p>
             {/if}
-            <button type="submit" class="btn-primary w-full justify-center rounded-md px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={loggingIn}>
+            <button type="submit" class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={loggingIn}>
               {loggingIn ? t('Logging in…') : t('Log in')}
             </button>
           </form>
@@ -384,7 +368,7 @@
       </div>
     </div>
   {:else if screen === 'device'}
-    <header class="flex-shrink-0 border-b border-zinc-200 bg-surface/90 backdrop-blur">
+    <header class="flex-shrink-0 border-b border-zinc-200 bg-surface shadow-flat-sm">
       <div class="relative mx-auto max-w-5xl px-4 py-3 text-center">
         <h1 class="text-base font-semibold tracking-tight">{capabilities.data?.capabilities?.model ?? t('Device')}</h1>
         <p class="text-xs text-zinc-500">{settings.host}</p>
@@ -400,22 +384,22 @@
           <nav class="flex h-full flex-col gap-1">
             <button
               type="button"
-              class="rounded px-3 py-2 text-left text-sm font-medium transition {devicePage === 'network' ? 'bg-accent text-accent-ink' : 'text-zinc-700 hover:bg-zinc-200'}"
+              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'network' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
               onclick={() => (devicePage = 'network')}
             >{t('Network')}</button>
             <button
               type="button"
-              class="rounded px-3 py-2 text-left text-sm font-medium transition {devicePage === 'state' ? 'bg-accent text-accent-ink' : 'text-zinc-700 hover:bg-zinc-200'}"
+              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'state' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
               onclick={() => (devicePage = 'state')}
             >{t('State')}</button>
             <button
               type="button"
-              class="rounded px-3 py-2 text-left text-sm font-medium text-zinc-700 transition hover:bg-zinc-200"
+              class="rounded-base border-l-2 border-transparent px-3 py-2 text-left text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
               onclick={() => (screen = 'builder')}
             >{t('Configure')}</button>
             <button
               type="button"
-              class="rounded px-3 py-2 text-left text-sm font-medium transition {devicePage === 'system' ? 'bg-accent text-accent-ink' : 'text-zinc-700 hover:bg-zinc-200'}"
+              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'system' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
               onclick={() => (devicePage = 'system')}
             >{t('System')}</button>
           </nav>
@@ -432,70 +416,51 @@
       </div>
     {/if}
   {:else}
-  <header class="flex-shrink-0 border-b border-zinc-200 bg-surface/90 backdrop-blur">
-    <div class="relative mx-auto {view.mode === 'cards' ? 'max-w-3xl' : 'max-w-5xl'} px-4 py-3 text-center">
-      <h1 class="text-base font-semibold tracking-tight">{t('uConfig builder')}</h1>
-      <p class="text-xs text-zinc-500">
-        {t('Intent-based OpenWrt configuration')}
-        {#if store.loadedFrom}<span class="text-zinc-400"> · {store.loadedFrom}</span>{/if}
-      </p>
-    </div>
-  </header>
-
   {#if view.mode === 'cards'}
+    <header class="flex-shrink-0 border-b border-zinc-200 bg-surface">
+      <div class="relative mx-auto max-w-3xl px-4 py-3 text-center">
+        <h1 class="text-base font-semibold tracking-tight">{t('uConfig builder')}</h1>
+        <p class="text-xs text-zinc-500">
+          {t('Intent-based OpenWrt configuration')}
+          {#if store.loadedFrom}<span class="text-zinc-400"> · {store.loadedFrom}</span>{/if}
+        </p>
+      </div>
+    </header>
     <main class="flex-1 overflow-y-auto">
       <div class="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6">
-      {#if deviceSession}
-        <button type="button" class="self-start text-sm font-medium text-zinc-500 hover:text-zinc-800" onclick={back_to_device}>← {t('Back')}</button>
-      {/if}
-      <Card title={t('Unit')} subtitle={t('Device identity')}>
-        {#snippet children()}{@render unitBody()}{/snippet}
-      </Card>
-      <Card title={t('Radios')} subtitle={t('Physical radios by band label')}>
-        {#snippet children()}{@render radiosBody()}{/snippet}
-      </Card>
-      <Card title={t('Interfaces')} subtitle={t('Logical networks, SSIDs, ports')}>
-        {#snippet children()}{@render interfacesBody()}{/snippet}
-      </Card>
-      <Card title={t('Services')} subtitle={t('SSH, mDNS, LLDP, RADIUS, …')}>
-        {#snippet children()}{@render servicesBody()}{/snippet}
-      </Card>
-      <Card title={t('Configuration')} badge={changes.length || null}>
-        {#snippet children()}{@render changesBody()}{/snippet}
-      </Card>
+        {#if deviceSession}
+          <button type="button" class="self-start text-sm font-medium text-zinc-500 hover:text-zinc-800" onclick={back_to_device}>← {t('Back')}</button>
+        {/if}
+        <Card title={t('Unit')} subtitle={t('Device identity')}>
+          {#snippet children()}<LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />{/snippet}
+        </Card>
+        <Card title={t('Radios')} subtitle={t('Physical radios by band label')}>
+          {#snippet children()}{@render radiosBody()}{/snippet}
+        </Card>
+        <Card title={t('Interfaces')} subtitle={t('Logical networks, SSIDs, ports')}>
+          {#snippet children()}{@render interfacesBody()}{/snippet}
+        </Card>
+        {#each serviceKeys as key (key)}
+          <Card title={title_for(key)}>
+            {#snippet children()}<ServicePage serviceKey={key} />{/snippet}
+          </Card>
+        {/each}
+        <Card title={t('JSON')} badge={changes.length || null}>
+          {#snippet children()}<ConfigurationPanel {changes} {preview} />{/snippet}
+        </Card>
       </div>
     </main>
   {:else}
-    <div class="mx-auto flex w-full max-w-5xl flex-1 gap-4 overflow-hidden px-4">
-      <aside class="w-44 flex-shrink-0 overflow-y-auto py-6">
-        <nav class="flex flex-col gap-1">
-          {#if deviceSession}
-            <button type="button" class="mb-1 flex items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium text-zinc-500 hover:bg-zinc-200" onclick={back_to_device}>
-              <span aria-hidden="true">←</span>{t('Back')}
-            </button>
-          {/if}
-          {#each sections as s}
-            <button
-              type="button"
-              class="flex items-center justify-between gap-2 rounded px-3 py-2 text-left text-sm font-medium transition {view.section === s.key ? 'bg-accent text-accent-ink' : 'text-zinc-700 hover:bg-zinc-200'}"
-              onclick={() => (view.section = s.key)}
-            >
-              <span>{t(s.title)}</span>
-              {#if s.key === 'changes' && changes.length}
-                <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold {view.section === s.key ? 'bg-accent-ink text-accent' : 'bg-accent text-accent-ink'}">
-                  {changes.length}
-                </span>
-              {/if}
-            </button>
-          {/each}
-        </nav>
-      </aside>
-      <main class="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto py-6">
-        {#if active.card}
-          <div class="rounded-lg border border-zinc-200 bg-surface p-4">{@render bodyFor(view.section)}</div>
-        {:else}
-          {@render bodyFor(view.section)}
-        {/if}
+    <div class="flex flex-1 overflow-hidden">
+      <Sidebar
+        section={view.section}
+        onSelect={section_select}
+        changes={changes.length}
+        {deviceSession}
+        onBack={back_to_device}
+      />
+      <main class="min-w-0 flex-1 overflow-y-auto bg-surface px-8 py-7">
+        {@render bodyFor(view.section)}
       </main>
     </div>
   {/if}

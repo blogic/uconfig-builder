@@ -2,7 +2,6 @@
   import Field from './Field.svelte'
   import { title_for } from '../schema.js'
   import { confirm } from '../confirm.svelte.js'
-  import { view } from '../view.svelte.js'
   import { t } from '../i18n.svelte.js'
   import AddButton from './AddButton.svelte'
   import RemoveButton from './RemoveButton.svelte'
@@ -19,7 +18,6 @@
     addModal = null,
     makeValue = null,
     item = null,
-    tabCard = false,
     locked = false
   } = $props()
 
@@ -71,7 +69,8 @@
   }
 
   async function remove(name) {
-    if (!(await confirm(t('Remove {label} "{name}"?', { label: t(keyLabel), name })))) return
+    const shown = keyOptions ? title_for(name) : name
+    if (!(await confirm(t('Remove {label} "{name}"?', { label: t(keyLabel), name: shown })))) return
     delete parent[mapKey][name]
   }
 
@@ -117,10 +116,10 @@
     <!-- entries are fixed (device-driven); no manual add -->
   {:else if keyOptions}
     {#if available.length}
-      <AddButton onclick={() => (showModal = true)} />
+      <AddButton label={t(keyLabel)} onclick={() => (showModal = true)} />
     {/if}
   {:else if addModal}
-    <AddButton onclick={() => (showModal = true)} />
+    <AddButton label={t(keyLabel)} onclick={() => (showModal = true)} />
   {:else}
     <input
       class="input {narrow ? 'max-w-[10rem]' : 'max-w-[16rem]'}"
@@ -128,26 +127,24 @@
       bind:value={newKey}
       onkeydown={(e) => e.key === 'Enter' && add()}
     />
-    <AddButton onclick={add} />
+    <AddButton label={t(keyLabel)} onclick={add} />
   {/if}
 {/snippet}
 
 {#if tabbed}
   <div class="flex flex-col gap-3">
-    <div class="flex flex-wrap items-center gap-1 {tabCard && view.mode === 'menu' ? 'rounded-lg border border-zinc-200 bg-surface p-3' : 'border-b border-zinc-200 pb-2'}">
+    <div class="tab-row">
       {#each keys as name (name)}
         <button
           type="button"
-          class="rounded-t-md border-b-2 px-3 py-1.5 text-sm font-medium transition {active === name
-            ? 'border-accent text-accent'
-            : 'border-transparent text-zinc-500 hover:text-zinc-800'}"
+          class="tab-button {active === name ? 'tab-button-active' : ''}"
           onclick={() => (active = name)}
         >
-          {name}
+          {keyOptions ? title_for(name) : name}
         </button>
       {/each}
       {#if !keys.length}
-        <span class="text-xs text-zinc-500">{t('No {label} yet.', { label: title_for(mapKey).toLowerCase() })}</span>
+        <span class="py-3 text-xs text-zinc-500">{t('No {label} yet.', { label: title_for(mapKey).toLowerCase() })}</span>
       {/if}
       <span class="flex-1"></span>
       {@render add_control(true)}
@@ -155,12 +152,12 @@
 
     {#if active != null}
       {#if !staticName}
-        <div class="border-b border-zinc-100 pb-3">{@render rename_input(active)}</div>
+        <div class="mb-4">{@render rename_input(active)}</div>
       {/if}
-      <div class="py-3">{@render body(active)}</div>
+      {@render body(active)}
       {#if !locked}
-        <div class="flex justify-end border-t border-zinc-100 pt-3">
-          <RemoveButton onclick={() => remove(active)} />
+        <div class="mt-6 flex justify-end">
+          <RemoveButton label={t(keyLabel)} onclick={() => remove(active)} />
         </div>
       {/if}
     {/if}
@@ -172,7 +169,7 @@
         <div class="flex items-center gap-2">
           {@render name_or_rename(name)}
           <span class="flex-1"></span>
-          {#if !locked}<RemoveButton onclick={() => remove(name)} />{/if}
+          {#if !locked}<RemoveButton label={t(keyLabel)} onclick={() => remove(name)} />{/if}
         </div>
         {@render body(name)}
       </div>
@@ -187,11 +184,11 @@
       </span>
     </div>
     {#each keys as name (name)}
-      <div class="rounded-md border border-zinc-200 bg-surface">
+      <div class="rounded-base border border-zinc-200 bg-surface">
         <div class="flex items-center gap-2 border-b border-zinc-100 px-3 py-2">
           {@render name_or_rename(name)}
           <span class="flex-1"></span>
-          {#if !locked}<RemoveButton onclick={() => remove(name)} />{/if}
+          {#if !locked}<RemoveButton label={t(keyLabel)} onclick={() => remove(name)} />{/if}
         </div>
         <div class="px-3 py-3">{@render body(name)}</div>
       </div>
@@ -204,11 +201,11 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onclick={() => (showModal = false)}>
-    <div class="w-full max-w-xs rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
+    <div class="w-full max-w-xs rounded-base border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
       <h3 class="mb-3 text-sm font-semibold">{t('Add {label}', { label: t(keyLabel) })}</h3>
       <div class="flex flex-col gap-2">
         {#each available as opt}
-          <button type="button" class="btn justify-center" onclick={() => add_named(opt)}>{t(opt)}</button>
+          <button type="button" class="btn justify-center" onclick={() => add_named(opt)}>{title_for(opt)}</button>
         {/each}
       </div>
       <div class="mt-3 text-right">
@@ -222,7 +219,7 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onclick={() => (showModal = false)}>
-    <div class="w-full max-w-sm rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
+    <div class="w-full max-w-sm rounded-base border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
       {@render addModal({ create, close: () => (showModal = false), map })}
     </div>
   </div>

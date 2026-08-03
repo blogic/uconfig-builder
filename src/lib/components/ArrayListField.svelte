@@ -76,7 +76,7 @@
     onclick={() => (showModal = false)}
   >
     <div
-      class="w-full max-w-xs rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg"
+      class="w-full max-w-xs rounded-base border border-zinc-200 bg-surface p-4 shadow-lg"
       onclick={(e) => e.stopPropagation()}
     >
       <h3 class="mb-3 text-sm font-semibold">{t('Add')} {lbl.replace(/s$/, '')}</h3>

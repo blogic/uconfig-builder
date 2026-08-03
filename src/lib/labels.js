@@ -2,6 +2,10 @@
 // the i18n extraction tooling can reuse title_for without an import assertion.
 
 const LABEL_OVERRIDES = {
+  // Radio band keys are the schema's enum values; these are display-only.
+  '2G': '2.4GHz',
+  '5G': '5GHz',
+  '6G': '6GHz',
   'leds-active': 'LEDs Active',
   'tty-login': 'TTY Login',
   ipv4: 'IPv4',

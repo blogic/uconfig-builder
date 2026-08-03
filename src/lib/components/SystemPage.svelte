@@ -69,7 +69,7 @@
 </script>
 
 {#if status !== 'idle'}
-  <div class="flex flex-col items-center gap-3 text-center text-sm text-zinc-500 {menu ? 'rounded-lg border border-zinc-200 bg-surface p-10' : 'py-10'}">
+  <div class="flex flex-col items-center gap-3 text-center text-sm text-zinc-500 {menu ? 'rounded-base border border-zinc-200 bg-surface p-10' : 'py-10'}">
     <Spinner class="h-6 w-6 text-zinc-400" />
     <span>{t(messages[status])}</span>
   </div>
@@ -92,7 +92,7 @@
     <CollapsibleSection title="Firmware upgrade">
       {#snippet children()}
         <p class="text-xs text-zinc-500">{t('Upload a firmware image and flash it.')}</p>
-        <input type="file" accept=".bin,.img,application/octet-stream" class="mt-3 block w-full text-sm text-zinc-700 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-zinc-200" onchange={pick} />
+        <input type="file" accept=".bin,.img,application/octet-stream" class="mt-3 block w-full text-sm text-zinc-700 file:mr-3 file:rounded-base file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-zinc-200" onchange={pick} />
         <label class="mt-3 flex items-center gap-2 text-sm text-zinc-700">
           <input type="checkbox" bind:checked={keepConfig} />
           {t('Keep current settings')}
@@ -100,7 +100,7 @@
         {#if error}
           <p class="mt-2 text-xs text-red-600">{error}</p>
         {/if}
-        <button type="button" class="btn-primary mt-3 w-full justify-center rounded-md px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={!file} onclick={do_upgrade}>
+        <button type="button" class="btn-primary mt-3 w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={!file} onclick={do_upgrade}>
           {t('Flash firmware')}
         </button>
       {/snippet}

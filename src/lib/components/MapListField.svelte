@@ -65,7 +65,7 @@
     onclick={() => (showModal = false)}
   >
     <div
-      class="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-lg border border-zinc-200 bg-surface p-4 shadow-lg"
+      class="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-base border border-zinc-200 bg-surface p-4 shadow-lg"
       onclick={(e) => e.stopPropagation()}
     >
       <h3 class="mb-3 text-sm font-semibold">{t('Add {label}', { label: t(keyLabel) })}</h3>
