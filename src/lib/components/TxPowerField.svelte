@@ -28,7 +28,7 @@
     step="1"
     value={value}
     oninput={onInput}
-    class="w-full accent-emerald-500"
+    class="w-full accent-accent"
   />
   <p class="text-center text-[11px] text-zinc-500">{pct}% ({value} dBm)</p>
   {#if desc}<p class="text-[11px] leading-snug text-zinc-500">{desc}</p>{/if}

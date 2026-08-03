@@ -78,7 +78,7 @@
         aria-checked={vlanOn}
         aria-label={t('VLAN')}
         onclick={() => (vlanOn = !vlanOn)}
-        class="relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition {vlanOn ? 'bg-emerald-500' : 'bg-zinc-300'}"
+        class="relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition {vlanOn ? 'bg-accent' : 'bg-zinc-300'}"
       >
         <span
           class="inline-block h-4 w-4 transform rounded-full bg-surface shadow transition {vlanOn ? 'translate-x-4' : 'translate-x-0.5'}"
