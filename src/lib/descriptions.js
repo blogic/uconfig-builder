@@ -34,7 +34,8 @@ export const PAGE_DESCRIPTIONS = {
     'Configure network interface settings including IP addressing, VLAN configuration, and DHCP settings. Network interfaces connect your device to different network segments and services.',
   interfaces:
     'Logical networks on this device. Each interface carries its own addressing, SSIDs, ports and services.',
-  json: 'Review the pending changes and the resulting uConfig document before exporting it or applying it to a device.'
+  changes: 'Review the edits pending since this configuration was loaded, grouped by the part of the document they affect.',
+  json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.'
 }
 
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,

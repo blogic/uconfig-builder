@@ -7,6 +7,17 @@
   let name = $state(store.loadedFrom && store.loadedFrom !== 'imported' ? store.loadedFrom : '')
   let savedNote = $state('')
 
+  // Entries keep their document order within a domain; domains appear in the
+  // order they are first seen (Unit, Radios, Interfaces, Services).
+  const grouped = $derived.by(() => {
+    const map = new Map()
+    for (const c of changes) {
+      if (!map.has(c.section)) map.set(c.section, [])
+      map.get(c.section).push(c)
+    }
+    return [...map]
+  })
+
   const existing = $derived(saved_names())
   const trimmed = $derived(name.trim())
   const overwrites = $derived(trimmed && existing.includes(trimmed))
@@ -30,21 +41,25 @@
 </script>
 
 <div class="flex flex-col gap-5">
-  <div>
-    {#if changes.length}
-      <p class="text-xs text-zinc-500">{t('{count, plural, one {# Change} other {# Changes}} since this configuration was loaded.', { count: changes.length })}</p>
-      <ul class="mt-3 divide-y divide-zinc-100 rounded-base border border-zinc-200">
-        {#each changes as c}
-          <li class="flex items-center gap-2 px-3 py-1.5 text-xs">
-            <span class="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
-            <span class="text-zinc-700">{c.label}</span>
-          </li>
-        {/each}
-      </ul>
-    {:else}
-      <p class="text-xs text-zinc-500">{t('No changes since this configuration was loaded.')}</p>
-    {/if}
-  </div>
+  {#if changes.length}
+    <div class="rounded-base border border-zinc-200 px-8 py-6">
+      {#each grouped as [section, items] (section)}
+        <div class="mb-6 last:mb-0">
+          <h3 class="changes-topic-title">{t(section)}</h3>
+          <ul class="mt-4">
+            {#each items as c}
+              <li class="flex items-center gap-2 py-1 text-sm text-zinc-900">
+                <span class="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
+                {c.label}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <p class="text-sm text-zinc-500">{t('No changes since this configuration was loaded.')}</p>
+  {/if}
 
   {#if connected}
     <div>

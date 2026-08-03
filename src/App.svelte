@@ -7,6 +7,7 @@
   import Sidebar from './lib/components/Sidebar.svelte'
   import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
+  import JsonPage from './lib/components/JsonPage.svelte'
   import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
   import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
   import NetworkPage from './lib/components/NetworkPage.svelte'
@@ -178,6 +179,12 @@
     view.section = key
   }
   const changes = $derived(changes_list(store.doc, store.baseline))
+
+  // The Changes entry only exists while there are changes; fall through to JSON
+  // when the last one is reset or applied away.
+  $effect(() => {
+    if (view.section === 'changes' && !changes.length) view.section = 'json'
+  })
 </script>
 
 {#snippet appMenu()}
@@ -257,9 +264,9 @@
 {/snippet}
 
 {#snippet changesBody()}
-  <div class="page-header"><h2 class="page-title">{t('JSON')}</h2></div>
-  <p class="page-description">{t(PAGE_DESCRIPTIONS.json)}</p>
-  <ConfigurationPanel {changes} {preview} />
+  <div class="page-header"><h2 class="page-title">{t('Configuration Changes')}</h2></div>
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
+  <ConfigurationPanel {changes} />
 {/snippet}
 
 {#snippet bodyFor(key)}
@@ -267,6 +274,7 @@
   {:else if key === 'radios'}{@render radiosBody()}
   {:else if key === 'interfaces'}{@render interfacesBody()}
   {:else if key === 'changes'}{@render changesBody()}
+  {:else if key === 'json'}<JsonPage {preview} />
   {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />{/if}
 {/snippet}
 
@@ -450,8 +458,11 @@
             {#snippet children()}<ServicePage serviceKey={key} />{/snippet}
           </Card>
         {/each}
-        <Card title={t('JSON')} badge={changes.length || null}>
-          {#snippet children()}<ConfigurationPanel {changes} {preview} />{/snippet}
+        <Card title={t('Changes')} badge={changes.length || null}>
+          {#snippet children()}<ConfigurationPanel {changes} />{/snippet}
+        </Card>
+        <Card title={t('JSON')}>
+          {#snippet children()}<JsonPage {preview} />{/snippet}
         </Card>
       </div>
     </main>

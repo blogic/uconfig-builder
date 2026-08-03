@@ -1,7 +1,6 @@
 {
   "(optional)": "(optional)",
   "{count, plural, one {# change in this section} other {# changes in this section}}": "{count, plural, one {# change in this section} other {# changes in this section}}",
-  "{count, plural, one {# Change} other {# Changes}} since this configuration was loaded.": "{count, plural, one {# Change} other {# Changes}} since this configuration was loaded.",
   "{label} key": "{label} key",
   "{noun} {key} added": "{noun} {key} added",
   "{noun} {key} removed": "{noun} {key} removed",
@@ -100,6 +99,7 @@
   "Changed {field} on {noun} ''{key}''": "Changed {field} on {noun} ''{key}''",
   "Changed {field} on {noun} ''{key}''/''{sub}''": "Changed {field} on {noun} ''{key}''/''{sub}''",
   "Changes": "Changes",
+  "Changes ({count})": "Changes ({count})",
   "Channel": "Channel",
   "Channel Mode": "Channel Mode",
   "Channel Width": "Channel Width",
@@ -112,6 +112,7 @@
   "Close menu": "Close menu",
   "compatibility": "Compatibility",
   "Configuration applied to the device.": "Configuration applied to the device.",
+  "Configuration Changes": "Configuration Changes",
   "configuration name": "configuration name",
   "Configure": "Configure",
   "Connect": "Connect",

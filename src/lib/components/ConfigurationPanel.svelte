@@ -1,16 +1,12 @@
 <script>
-  import CollapsibleSection from './CollapsibleSection.svelte'
   import ChangesPanel from './ChangesPanel.svelte'
   import Spinner from './Spinner.svelte'
-  import { accordion_provide } from '../accordion.svelte.js'
   import { t } from '../i18n.svelte.js'
   import { doc_export, baseline_reset } from '../store.svelte.js'
   import { connection, request as ws_request } from '../connection.svelte.js'
   import { view } from '../view.svelte.js'
 
-  let { changes, preview } = $props()
-
-  accordion_provide(true)
+  let { changes } = $props()
 
   const connected = $derived(connection.status === 'connected')
   // In menu view the Configuration section has no surrounding Card, so the
@@ -52,14 +48,5 @@
     <button type="button" class="btn" onclick={apply_done}>{t('Done')}</button>
   </div>
 {:else}
-  <div class="flex flex-col gap-4">
-    <CollapsibleSection title={t('Changes')}>
-      {#snippet children()}<ChangesPanel {changes} {connected} {applyError} onApply={apply} />{/snippet}
-    </CollapsibleSection>
-    <CollapsibleSection title={t('JSON')}>
-      {#snippet children()}
-        <pre class="overflow-x-auto text-xs leading-relaxed text-zinc-700">{preview}</pre>
-      {/snippet}
-    </CollapsibleSection>
-  </div>
+  <ChangesPanel {changes} {connected} {applyError} onApply={apply} />
 {/if}

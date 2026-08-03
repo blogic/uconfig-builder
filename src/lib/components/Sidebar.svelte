@@ -71,13 +71,15 @@
     {/each}
   {/if}
 
-  <button type="button" class="nav-item {section === 'changes' ? 'nav-item-active' : ''}" onclick={() => onSelect('changes')}>
+  {#if changes}
+    <button type="button" class="nav-item {section === 'changes' ? 'nav-item-active' : ''}" onclick={() => onSelect('changes')}>
+      <i class="bi bi-exclamation-circle text-base"></i>
+      <span class="flex-1">{t('Changes ({count})', { count: changes })}</span>
+    </button>
+  {/if}
+
+  <button type="button" class="nav-item {section === 'json' ? 'nav-item-active' : ''}" onclick={() => onSelect('json')}>
     <i class="bi bi-code-square text-base"></i>
     <span class="flex-1">{t('JSON')}</span>
-    {#if changes}
-      <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[10px] font-semibold text-accent-ink">
-        {changes}
-      </span>
-    {/if}
   </button>
 </nav>
