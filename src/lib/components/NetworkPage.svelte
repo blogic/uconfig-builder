@@ -25,7 +25,7 @@
 
   $effect(() => {
     devices_refresh()
-    const iv = setInterval(devices_refresh, 60000)
+    const iv = setInterval(devices_refresh, 5000)
     return () => clearInterval(iv)
   })
 </script>
