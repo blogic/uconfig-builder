@@ -1,7 +1,27 @@
 // WebSocket JSON-RPC 2.0 client for a live uConfig device.
-// Endpoint: ws://<host>/uconfig, subprotocol "ui" (see uconfig WEBUI.md).
+// Endpoint: ws://<host>/ucoord, subprotocol "ui".
+//
+// The device speaks the ucoord dialect, where config-get, capabilities and the
+// other per-device methods are addressed by venue and peer. Single-AP
+// management targets one peer, so the address is resolved once after login and
+// applied transparently by request(); it is never surfaced in the UI.
 
 const READY_TIMEOUT_MS = 8000
+
+// Methods that take a { venue, peer } address. The rest are node-local.
+const ADDRESSED = new Set([
+  'config-get',
+  'config-apply',
+  'config-test',
+  'capabilities',
+  'system-info',
+  'info',
+  'state',
+  'reboot',
+  'sysupgrade'
+])
+
+let target = null // { venue, peer } once resolved
 
 let socket = null
 let next_id = 1
@@ -15,6 +35,7 @@ let ready_timer = null
 export const connection = $state({
   status: 'idle', // 'idle' | 'connecting' | 'connected'
   mode: null, // 'standalone' | 'ucoord'
+  device: null, // resolved { venue, peer, model } once logged in
   host: null,
   error: null
 })
@@ -71,9 +92,17 @@ export function request(method, params) {
       reject(new Error('not connected'))
       return
     }
+    let args = params ?? {}
+    if (ADDRESSED.has(method)) {
+      if (!target) {
+        reject(new Error('no device selected'))
+        return
+      }
+      args = { ...target, ...args }
+    }
     const id = next_id++
     pending.set(id, { resolve, reject })
-    socket.send(JSON.stringify({ jsonrpc: '2.0', id, method, params: params ?? {} }))
+    socket.send(JSON.stringify({ jsonrpc: '2.0', id, method, params: args }))
   })
 }
 
@@ -81,7 +110,7 @@ export function request(method, params) {
 export function connect(host) {
   return new Promise((resolve, reject) => {
     try {
-      socket = new WebSocket(`ws://${host}/uconfig`, 'ui')
+      socket = new WebSocket(`ws://${host}/ucoord`, 'ui')
     } catch (e) {
       reject(e)
       return
@@ -123,15 +152,34 @@ export function disconnect() {
     }
   }
   socket = null
+  target = null
   reject_pending('disconnected')
   connection.status = 'idle'
   connection.mode = null
+  connection.device = null
+}
+
+// Resolve the peer to manage from the device's own status. Single-AP
+// management picks the first connected peer; nothing is shown to the user.
+async function target_resolve() {
+  target = null
+  const status = await request('status', {})
+  for (const [venue, peers] of Object.entries(status?.venues ?? {})) {
+    for (const [peer, info] of Object.entries(peers ?? {})) {
+      if (info?.state !== 'connected') continue
+      target = { venue, peer }
+      connection.device = { ...target, model: info.capabilities?.model ?? null }
+      return
+    }
+  }
+  throw new Error('no connected device reported by the AP')
 }
 
 // Authenticate over the already-open socket; returns the device mode.
 export async function login(password) {
   const result = await request('login', { password })
   connection.mode = result?.mode ?? 'standalone'
+  await target_resolve()
   return connection.mode
 }
 

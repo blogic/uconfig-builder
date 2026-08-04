@@ -91,6 +91,7 @@
   let host = $state(settings.host ?? '')
   let password = $state('')
   let loginError = $state(null)
+  let loadWarning = $state(null) // config-get failed, editing a blank document
   let loggingIn = $state(false)
   let connState = $state('idle') // 'connecting' | 'ready' | 'error'
   function start_default() {
@@ -126,21 +127,20 @@
     event?.preventDefault()
     if (loggingIn) return
     loginError = null
+    loadWarning = null
     loggingIn = true
     try {
-      const mode = await ws_login(password)
-      if (mode === 'standalone') {
-        // Pull the device's active config; a fresh device may have none yet.
-        try {
-          doc_adopt(await ws_request('config-get', {}), settings.host)
-        } catch {
-          /* no active config on the device; start from the blank document */
-        }
-        try {
-          capabilities_set(await ws_request('capabilities', {}))
-        } catch {
-          /* device did not report capabilities; static defaults apply */
-        }
+      await ws_login(password)
+      // Pull the device's active config; a fresh device may have none yet.
+      try {
+        doc_adopt(await ws_request('config-get', {}), settings.host)
+      } catch (e) {
+        loadWarning = e?.message || String(e)
+      }
+      try {
+        capabilities_set(await ws_request('capabilities', {}))
+      } catch {
+        /* device did not report capabilities; static defaults apply */
       }
       // Land on the device menu (Network is the default page); Configure opens the builder.
       password = ''
@@ -167,6 +167,7 @@
     capabilities_clear()
     devices_clear()
     doc_reset()
+    loadWarning = null
     deviceSession = false
     screen = 'welcome'
   }
@@ -485,6 +486,11 @@
         onBack={back_to_device}
       />
       <main class="min-w-0 flex-1 overflow-y-auto bg-surface px-8 py-7">
+        {#if loadWarning}
+          <p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {t('Could not load the configuration from the device: {error}. Editing a blank document.', { error: loadWarning })}
+          </p>
+        {/if}
         {@render bodyFor(view.section)}
       </main>
     </div>

@@ -119,6 +119,7 @@
   "Connecting to the device…": "Connecting to the device…",
   "Continue": "Continue",
   "Convert multicast to unicast.": "Convert multicast traffic to unicast on this BSS.",
+  "Could not load the configuration from the device: {error}. Editing a blank document.": "Could not load the configuration from the device: {error}. Editing a blank document.",
   "CPU load": "CPU load",
   "CS0": "CS0",
   "CS1": "CS1",
