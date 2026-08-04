@@ -483,7 +483,7 @@
             >{t('System')}</button>
           </nav>
         </aside>
-        <main class="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto py-6">
+        <main class="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto py-6 pr-3">
           {#if devicePage === 'network'}
             <NetworkPage />
           {:else if devicePage === 'traffic'}

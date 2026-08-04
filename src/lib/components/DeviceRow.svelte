@@ -5,6 +5,7 @@
     device_ip,
     device_traffic,
     bytes_format,
+    rate_format,
     signal_class
   } from '../device-icons.js'
   import { t } from '../i18n.svelte.js'
@@ -38,6 +39,13 @@
         </span>
         {#if wifi.signal != null}
           <span class={signal_class(wifi.signal)}>{wifi.signal} dBm</span>
+        {/if}
+        {#if rate_format(wifi.rx_rate) || rate_format(wifi.tx_rate)}
+          <span class="flex items-center gap-1" title={t('Negotiated link rate')}>
+            <i class="bi bi-speedometer2"></i>
+            {rate_format(Math.max(wifi.rx_rate ?? 0, wifi.tx_rate ?? 0))}
+            {#if wifi.mode}<span class="uppercase text-zinc-400">{wifi.mode}</span>{/if}
+          </span>
         {/if}
       {:else if d.online}
         <span class="flex items-center gap-1"><i class="bi bi-plug"></i>{t('Wired')}</span>

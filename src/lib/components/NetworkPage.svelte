@@ -31,7 +31,9 @@
 </script>
 
 <div class="page-header">
-  <h2 class="page-title">{t('Clients')}</h2>
+  <h2 class="page-title">
+    {t('Clients')}{#if deviceStore.data}<span class="ml-2 font-normal text-zinc-500">({online.length})</span>{/if}
+  </h2>
   {#if deviceStore.loading}<Spinner class="h-4 w-4 text-zinc-400" />{/if}
 </div>
 
@@ -46,15 +48,14 @@
   <p class="py-8 text-center text-sm text-zinc-500">{t('No devices found.')}</p>
 {:else}
   <section class="mb-6">
-    <h3 class="changes-topic-title">{t('Online Clients ({count})', { count: online.length })}</h3>
     {#if online.length}
-      <ul class="mt-3 divide-y divide-zinc-100">
+      <ul class="divide-y divide-zinc-200">
         {#each online as d (d.mac)}
           <DeviceRow device={d} />
         {/each}
       </ul>
     {:else}
-      <p class="mt-3 text-sm text-zinc-500">{t('No clients are online.')}</p>
+      <p class="text-sm text-zinc-500">{t('No clients are online.')}</p>
     {/if}
   </section>
 
@@ -69,7 +70,7 @@
         <span class="section-title text-left">{t('Offline Clients ({count})', { count: offline.length })}</span>
       </button>
       {#if showOffline}
-        <ul class="divide-y divide-zinc-100">
+        <ul class="divide-y divide-zinc-200">
           {#each offline as d (d.mac)}
             <DeviceRow device={d} offline />
           {/each}

@@ -53,6 +53,13 @@ export function device_ip(d) {
   return d.ipv4 || d.ipv6?.[0] || ''
 }
 
+// nl80211 reports the negotiated PHY rate in bits per second.
+export function rate_format(bps) {
+  if (!bps) return null
+  const mbit = bps / 1e6
+  return `${mbit >= 100 ? Math.round(mbit) : mbit.toFixed(1)} Mbit/s`
+}
+
 // Prefer the per-station WiFi counters; wired clients only have the total.
 export function device_traffic(d) {
   if (d.wifi && (d.wifi.rx_bytes != null || d.wifi.tx_bytes != null)) {
