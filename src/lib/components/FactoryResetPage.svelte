@@ -3,6 +3,7 @@
   import { confirm } from '../confirm.svelte.js'
   import { systemState } from '../system.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   async function do_factory_reset() {
@@ -17,9 +18,7 @@
   }
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('Factory Reset')}</h2>
-</div>
+<PageHeader title={t('Factory Reset')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS['factory-reset'])}</p>
 
 <p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">

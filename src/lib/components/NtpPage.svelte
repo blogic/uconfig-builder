@@ -4,6 +4,7 @@
   import { rootSchema, schema_at } from '../schema.js'
   import { store } from '../store.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   let { changes = [] } = $props()
@@ -17,10 +18,11 @@
   const servers = $derived(store.doc.definitions?.['ntp-servers'] ?? [])
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('NTP Servers')}</h2>
-  <ChangesIndicator {changes} scope="ntp" />
-</div>
+<PageHeader title={t('NTP Servers')}>
+  {#snippet actions()}
+    <ChangesIndicator {changes} scope="ntp" />
+  {/snippet}
+</PageHeader>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.ntp)}</p>
 

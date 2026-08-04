@@ -6,6 +6,7 @@
   import { interfaceLayout } from '../layouts.js'
   import { confirm } from '../confirm.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   let { name, onBack, changes = [] } = $props()
@@ -20,15 +21,17 @@
   }
 </script>
 
-<div class="page-header">
-  <button type="button" class="flex items-center text-accent transition hover:opacity-80" aria-label={t('Back')} onclick={onBack}>
-    <i class="bi bi-arrow-left text-2xl"></i>
-  </button>
-  <h2 class="page-title">{t('Interface Configuration')}</h2>
-  <ChangesIndicator {changes} scope="interfaces" />
-</div>
+<PageHeader title={t('Interface Configuration')}>
+  {#snippet actions()}
+    <ChangesIndicator {changes} scope="interfaces" />
+  {/snippet}
+</PageHeader>
 
 {#if iface}
+  <button type="button" class="mb-3 flex items-center gap-1.5 text-sm font-medium text-accent transition hover:opacity-80" onclick={onBack}>
+    <i class="bi bi-arrow-left"></i>{t('All interfaces')}
+  </button>
+
   <p class="page-description">{t(PAGE_DESCRIPTIONS.interface)}</p>
 
   <div class="mb-5 rounded-base bg-zinc-50 px-5 py-4 text-sm">

@@ -1,4 +1,5 @@
 <script>
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   // Mobile only: Services is a drill-down list rather than an expandable nav
@@ -6,9 +7,7 @@
   let { entries, onOpen } = $props()
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('Services')}</h2>
-</div>
+<PageHeader title={t('Services')} />
 
 <div class="divide-y divide-zinc-200 rounded-base border border-zinc-200">
   {#each entries as e (e.key)}

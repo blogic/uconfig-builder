@@ -10,6 +10,7 @@
     has_traffic
   } from '../traffic.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   // Live drives the gauges; the chart shows the selected history.
@@ -34,9 +35,7 @@
   })
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('Traffic')}</h2>
-</div>
+<PageHeader title={t('Traffic')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS.traffic)}</p>
 
 {#if traffic.error && !traffic.data}

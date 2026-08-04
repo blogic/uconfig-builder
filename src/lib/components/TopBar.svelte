@@ -1,5 +1,6 @@
 <script>
   import { t } from '../i18n.svelte.js'
+  import { page } from '../page.svelte.js'
 
   let {
     sections = [],
@@ -38,6 +39,17 @@
         </button>
       {/each}
     </nav>
+  {/if}
+
+  {#if page.title}
+    {#if sections.length > 1}
+      <span class="h-5 w-px flex-shrink-0 bg-zinc-200"></span>
+    {/if}
+    <h1 class="truncate text-sm font-semibold text-zinc-900">{page.title}</h1>
+  {/if}
+
+  {#if page.actions}
+    <span class="flex flex-shrink-0 items-center gap-2">{@render page.actions()}</span>
   {/if}
 
   <span class="flex-1"></span>

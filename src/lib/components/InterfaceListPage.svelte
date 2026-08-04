@@ -3,6 +3,7 @@
   import ChangesIndicator from './ChangesIndicator.svelte'
   import { store } from '../store.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   let { onOpen, changes = [] } = $props()
@@ -26,13 +27,14 @@
   }
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('Interfaces')}</h2>
-  <ChangesIndicator {changes} scope="interfaces" />
-  <button type="button" class="btn-primary rounded-base px-3 py-1.5 text-sm font-medium" onclick={() => (showModal = true)}>
-    {t('Add Interface')}
-  </button>
-</div>
+<PageHeader title={t('Interfaces')}>
+  {#snippet actions()}
+    <ChangesIndicator {changes} scope="interfaces" />
+    <button type="button" class="btn-primary rounded-base px-3 py-1.5 text-sm font-medium" onclick={() => (showModal = true)}>
+      {t('Add Interface')}
+    </button>
+  {/snippet}
+</PageHeader>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.interfaces)}</p>
 

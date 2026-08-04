@@ -3,6 +3,7 @@
   import { confirm } from '../confirm.svelte.js'
   import { systemState } from '../system.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   let file = $state(null)
@@ -29,9 +30,7 @@
   }
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{t('Firmware')}</h2>
-</div>
+<PageHeader title={t('Firmware')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS.firmware)}</p>
 
 <div class="max-w-xl">

@@ -137,13 +137,6 @@ body {
     @apply cursor-pointer rounded-base border-0 bg-red-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:brightness-95;
   }
 
-  /* Page title: 24px slate over a 2px accent rule (the old `.desktop-header`). */
-  .page-header {
-    @apply mb-5 flex items-center gap-3 border-b-2 border-accent pb-2.5;
-  }
-  .page-title {
-    @apply flex-1 text-2xl font-semibold text-zinc-900;
-  }
   .page-description {
     @apply mb-5 text-sm leading-relaxed text-zinc-900;
   }

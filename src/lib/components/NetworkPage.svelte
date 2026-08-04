@@ -3,6 +3,7 @@
   import { device_name } from '../device-icons.js'
   import DeviceRow from './DeviceRow.svelte'
   import Spinner from './Spinner.svelte'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   // `online` is absent rather than false on devices only ever seen via ARP,
@@ -30,12 +31,11 @@
   })
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">
-    {t('Clients')}{#if deviceStore.data}<span class="ml-2 font-normal text-zinc-500">({online.length})</span>{/if}
-  </h2>
-  {#if deviceStore.loading}<Spinner class="h-4 w-4 text-zinc-400" />{/if}
-</div>
+<PageHeader title={deviceStore.data ? t('Clients ({count})', { count: online.length }) : t('Clients')}>
+  {#snippet actions()}
+    {#if deviceStore.loading}<Spinner class="h-4 w-4 text-zinc-400" />{/if}
+  {/snippet}
+</PageHeader>
 
 {#if deviceStore.error && !deviceStore.data}
   <p class="text-sm text-red-600">{deviceStore.error}</p>

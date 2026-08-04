@@ -6,6 +6,7 @@
   import { store } from '../store.svelte.js'
   import { servicesLayout } from '../layouts.js'
   import { SERVICE_DESCRIPTIONS } from '../descriptions.js'
+  import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
   let { serviceKey, changes = [] } = $props()
@@ -21,10 +22,11 @@
   const data = $derived(store.doc.services?.[serviceKey])
 </script>
 
-<div class="page-header">
-  <h2 class="page-title">{title_for(serviceKey)}</h2>
-  <ChangesIndicator {changes} scope="service:{serviceKey}" />
-</div>
+<PageHeader title={title_for(serviceKey)}>
+  {#snippet actions()}
+    <ChangesIndicator {changes} scope="service:{serviceKey}" />
+  {/snippet}
+</PageHeader>
 
 {#if SERVICE_DESCRIPTIONS[serviceKey]}
   <p class="page-description">{t(SERVICE_DESCRIPTIONS[serviceKey])}</p>

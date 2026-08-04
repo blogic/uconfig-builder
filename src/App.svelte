@@ -4,6 +4,7 @@
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
   import ConfigurationPanel from './lib/components/ConfigurationPanel.svelte'
   import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
+  import PageHeader from './lib/components/PageHeader.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
   import NtpPage from './lib/components/NtpPage.svelte'
@@ -334,13 +335,17 @@
 {/snippet}
 
 {#snippet unitBody()}
-  <div class="page-header"><h2 class="page-title">{t('Unit Configuration')}</h2><ChangesIndicator {changes} scope="unit" /></div>
+  <PageHeader title={t('Unit Configuration')}>
+    {#snippet actions()}<ChangesIndicator {changes} scope="unit" />{/snippet}
+  </PageHeader>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.unit)}</p>
   <LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />
 {/snippet}
 
 {#snippet radiosBody()}
-  <div class="page-header"><h2 class="page-title">{t('Radios')}</h2><ChangesIndicator {changes} scope="radios" /></div>
+  <PageHeader title={t('Radios')}>
+    {#snippet actions()}<ChangesIndicator {changes} scope="radios" />{/snippet}
+  </PageHeader>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.radios)}</p>
   <MapEditor
     parent={store.doc}
@@ -367,7 +372,7 @@
 {/snippet}
 
 {#snippet changesBody()}
-  <div class="page-header"><h2 class="page-title">{t('Configuration Changes')}</h2></div>
+  <PageHeader title={t('Configuration Changes')} />
   <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
   <ConfigurationPanel {changes} />
 {/snippet}
