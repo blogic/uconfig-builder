@@ -58,6 +58,7 @@
     dev.devices.devices_clear()
     dev.sysinfo.sysinfo_clear()
     dev.traffic.traffic_clear()
+    dev.system.system_clear()
   }
 
   const DP = $derived(deviceApi.pages)
@@ -383,7 +384,15 @@
     {#if key === 'clients'}<DP.NetworkPage />
     {:else if key === 'traffic'}<DP.TrafficPage />
     {:else if key === 'state'}<DP.StatePage />
-    {:else if key === 'system'}<DP.SystemPage />{/if}
+    {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}
+      <DP.SystemBusy>
+        {#snippet children()}
+          {#if key === 'reboot'}<DP.RebootPage />
+          {:else if key === 'firmware'}<DP.FirmwarePage />
+          {:else}<DP.FactoryResetPage />{/if}
+        {/snippet}
+      </DP.SystemBusy>
+    {/if}
   {/if}
 {/snippet}
 

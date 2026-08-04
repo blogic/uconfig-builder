@@ -35,6 +35,9 @@ export const PAGE_DESCRIPTIONS = {
   interfaces:
     'Logical networks on this device. Each interface carries its own addressing, SSIDs, ports and services.',
   traffic: 'Throughput on the upstream interface. The gauges show the current rate; the chart shows recorded history.',
+  reboot: 'Restart the device. Clients lose their connection until it comes back up, usually within a minute.',
+  firmware: 'Upload a firmware image and flash it. The device reboots once the image is written.',
+  'factory-reset': 'Erase the configuration and return the device to its defaults.',
   ntp: 'Configure NTP (Network Time Protocol) servers for time synchronisation. NTP keeps the device clock accurate by synchronising with reliable time servers.',
   changes: 'Review the edits pending since this configuration was loaded, grouped by the part of the document they affect.',
   json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.'

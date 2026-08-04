@@ -5,4 +5,7 @@
 export { default as NetworkPage } from './components/NetworkPage.svelte'
 export { default as TrafficPage } from './components/TrafficPage.svelte'
 export { default as StatePage } from './components/StatePage.svelte'
-export { default as SystemPage } from './components/SystemPage.svelte'
+export { default as SystemBusy } from './components/SystemBusy.svelte'
+export { default as RebootPage } from './components/RebootPage.svelte'
+export { default as FactoryResetPage } from './components/FactoryResetPage.svelte'
+export { default as FirmwarePage } from './components/FirmwarePage.svelte'

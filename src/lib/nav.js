@@ -46,7 +46,12 @@ export const CONFIG_ITEMS = [
   { key: 'json', label: 'JSON', icon: 'bi-code-square' }
 ]
 
-export const SYSTEM_ITEMS = [{ key: 'system', label: 'System', icon: 'bi-wrench' }]
+// One concern per page: each is a distinct, irreversible action.
+export const SYSTEM_ITEMS = [
+  { key: 'reboot', label: 'Reboot', icon: 'bi-arrow-clockwise' },
+  { key: 'firmware', label: 'Firmware', icon: 'bi-cpu' },
+  { key: 'factory-reset', label: 'Factory Reset', icon: 'bi-exclamation-triangle' }
+]
 
 // Top-level sections. `device` marks the ones that need a live connection, so
 // the editor build drops them; `desktopOnly` keeps reboot and firmware actions

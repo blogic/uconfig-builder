@@ -1,0 +1,32 @@
+<script>
+  import { request as ws_request } from '../connection.svelte.js'
+  import { confirm } from '../confirm.svelte.js'
+  import { systemState } from '../system.svelte.js'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
+  import { t } from '../i18n.svelte.js'
+
+  async function do_factory_reset() {
+    if (!(await confirm(t('Factory reset the device? All settings will be erased.'), 'Factory reset'))) return
+    systemState.error = null
+    systemState.busy = 'resetting'
+    try {
+      await ws_request('factory-reset', {})
+    } catch {
+      /* socket may drop before reply */
+    }
+  }
+</script>
+
+<div class="page-header">
+  <h2 class="page-title">{t('Factory Reset')}</h2>
+</div>
+<p class="page-description">{t(PAGE_DESCRIPTIONS['factory-reset'])}</p>
+
+<p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+  {t('Every setting is erased, including the password and the network configuration. The device returns to its defaults and reboots.')}
+</p>
+
+<button type="button" class="btn-sm-danger inline-flex items-center gap-1.5" onclick={do_factory_reset}>
+  <i class="bi bi-exclamation-triangle"></i>
+  {t('Factory reset')}
+</button>
