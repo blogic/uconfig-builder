@@ -255,6 +255,7 @@
   "Log": "Log",
   "Log buffer size (KiB).": "Size of the file-based log buffer in KiB.",
   "Log in": "Log in",
+  "Log out and disconnect from the device?": "Log out and disconnect from the device?",
   "Logging in…": "Logging in…",
   "Logout": "Logout",
   "Mac": "Mac",

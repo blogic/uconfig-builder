@@ -24,6 +24,8 @@
   import { default_width } from './lib/channels.js'
   import { unitLayout, radioLayout } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
+  import { route, route_parse, route_sync, route_clear } from './lib/router.svelte.js'
+  import { confirm } from './lib/confirm.svelte.js'
   import { settings } from './lib/settings.svelte.js'
   import { accordion_provide } from './lib/accordion.svelte.js'
   import { changes_list } from './lib/changes.js'
@@ -161,6 +163,7 @@
     loginError = null
     connState = 'idle'
     screen = 'welcome'
+    route_clear()
   }
 
   function logout() {
@@ -173,6 +176,7 @@
     loadWarning = null
     deviceSession = false
     screen = 'welcome'
+    route_clear()
   }
 
   function back_to_device() {
@@ -196,7 +200,46 @@
     loadWarning = null
     loginError = null
     screen = 'welcome'
+    route_clear()
     connectionLost = true
+  })
+
+  // Keep the URL in step with the current page so back/forward work. Only the
+  // routed screens are tracked; welcome and login are deliberately excluded.
+  $effect(() => {
+    if (screen !== 'device' && screen !== 'builder') return
+    route_sync({ screen, devicePage, section: view.section, openInterface })
+  })
+
+  function route_apply(r) {
+    if (!r) return
+    // A route only makes sense once a session exists; ignore it otherwise.
+    if (r.screen === 'device' && !deviceSession) return
+    screen = r.screen
+    if (r.devicePage) devicePage = r.devicePage
+    if (r.section) view.section = r.section
+    openInterface = r.openInterface ?? null
+  }
+
+  $effect(() => {
+    const on_pop = async () => {
+      const r = route_parse(location.hash)
+      if (r) {
+        route.path = location.hash
+        route_apply(r)
+        return
+      }
+      // Backed out past the first page of the session. Offer to log out;
+      // staying puts the entry we just left back on the stack.
+      if (screen !== 'device' && screen !== 'builder') return
+      if (!(await confirm(t('Log out and disconnect from the device?'), 'Log out'))) {
+        history.pushState(null, '', route.path)
+        return
+      }
+      logout()
+    }
+    globalThis.addEventListener('popstate', on_pop)
+    return () => globalThis.removeEventListener('popstate', on_pop)
   })
 
   const savedConfigs = $derived(saved_names())

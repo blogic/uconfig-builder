@@ -17,7 +17,9 @@
       <p class="text-sm text-zinc-800">{confirmState.message}</p>
       <div class="mt-4 flex justify-end gap-2">
         <button type="button" class="btn-sm" onclick={() => confirm_answer(false)}>{t('Cancel')}</button>
-        <button type="button" class="btn-sm-danger" onclick={() => confirm_answer(true)}>{t('Remove')}</button>
+        <button type="button" class="btn-sm-danger" onclick={() => confirm_answer(true)}>
+          {t(confirmState.confirmLabel ?? 'Remove')}
+        </button>
       </div>
     </div>
   </div>
