@@ -1,25 +1,22 @@
 <script>
-  import Card from './lib/components/Card.svelte'
   import LayoutRenderer from './lib/components/LayoutRenderer.svelte'
   import MapEditor from './lib/components/MapEditor.svelte'
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
   import ConfigurationPanel from './lib/components/ConfigurationPanel.svelte'
-  import Sidebar from './lib/components/Sidebar.svelte'
   import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
   import NtpPage from './lib/components/NtpPage.svelte'
   import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
   import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
-  import NetworkPage from './lib/components/NetworkPage.svelte'
-  import StatePage from './lib/components/StatePage.svelte'
-  import TrafficPage from './lib/components/TrafficPage.svelte'
-  import SystemPage from './lib/components/SystemPage.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
+  import TopBar from './lib/components/TopBar.svelte'
+  import SectionNav from './lib/components/SectionNav.svelte'
   import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
   import { def_get, title_for } from './lib/schema.js'
-  import { SERVICE_ENTRIES, BUILDER_ITEMS, DEVICE_ITEMS } from './lib/nav.js'
+  import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
+  import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
   import { unitLayout, radioLayout } from './lib/layouts.js'
@@ -40,11 +37,30 @@
     doc_adopt,
     doc_reset
   } from './lib/store.svelte.js'
-  import { connection, connect as ws_connect, login as ws_login, request as ws_request, disconnect as ws_disconnect } from './lib/connection.svelte.js'
-  import { capabilities, capabilities_set, capabilities_clear } from './lib/capabilities.svelte.js'
-  import { devices_clear } from './lib/devices.svelte.js'
-  import { sysinfo_clear } from './lib/sysinfo.svelte.js'
-  import { traffic_clear } from './lib/traffic.svelte.js'
+  import { device_load, deviceApi } from './lib/device.svelte.js'
+
+  // Device modules load on demand; in the editor build the branch is dropped
+  // and nothing below ever runs.
+  let dev = $state(null)
+  const connection = $derived(dev?.conn.connection ?? { status: 'idle', lost: false })
+  const capabilities = $derived(dev?.caps.capabilities ?? { data: null })
+
+  async function device_ready() {
+    if (!IS_DEVICE) return null
+    if (!dev) dev = await device_load()
+    return dev
+  }
+
+  function device_reset() {
+    if (!dev) return
+    dev.conn.disconnect()
+    dev.caps.capabilities_clear()
+    dev.devices.devices_clear()
+    dev.sysinfo.sysinfo_clear()
+    dev.traffic.traffic_clear()
+  }
+
+  const DP = $derived(deviceApi.pages)
 
   const preview = $derived(doc_export())
 
@@ -82,8 +98,8 @@
     view.mode = wide ? 'menu' : 'cards'
   })
 
-  let screen = $state('welcome') // 'welcome' | 'login' | 'device' | 'builder'
-  let devicePage = $state('network') // 'network' | 'state' | 'system'
+  let screen = $state('welcome') // 'welcome' | 'login' | 'app'
+  let section = $state('config') // 'status' | 'config' | 'system'
   let deviceSession = $state(false) // logged into a device (survives idle disconnects)
   let menuOpen = $state(false)
   let welcomeExample = $state('')
@@ -96,18 +112,24 @@
   let loggingIn = $state(false)
   let connState = $state('idle') // 'connecting' | 'ready' | 'error'
   function start_default() {
+    section = 'config'
+    view.section = 'unit'
     example_load('default')
-    screen = 'builder'
+    screen = 'app'
   }
   function start_example() {
     if (!welcomeExample) return
+    section = 'config'
+    view.section = 'unit'
     example_load(welcomeExample)
-    screen = 'builder'
+    screen = 'app'
   }
   function start_saved() {
     if (!welcomeSaved) return
+    section = 'config'
+    view.section = 'unit'
     config_load(welcomeSaved)
-    screen = 'builder'
+    screen = 'app'
   }
   async function host_connect() {
     const h = host.trim()
@@ -115,11 +137,12 @@
     settings.host = h
     loginError = null
     connectionLost = false
-    connection.lost = false
+    if (dev) dev.conn.connection.lost = false
     connState = 'connecting'
     screen = 'login'
     try {
-      await ws_connect(h)
+      const d = await device_ready()
+      await d.conn.connect(h)
       connState = 'ready'
     } catch (e) {
       connState = 'error'
@@ -133,23 +156,24 @@
     loadWarning = null
     loggingIn = true
     try {
-      await ws_login(password)
+      await dev.conn.login(password)
       // Pull the device's active config; a fresh device may have none yet.
       try {
-        doc_adopt(await ws_request('config-get', {}), settings.host)
+        doc_adopt(await dev.conn.request('config-get', {}), settings.host)
       } catch (e) {
         loadWarning = e?.message || String(e)
       }
       try {
-        capabilities_set(await ws_request('capabilities', {}))
+        dev.caps.capabilities_set(await dev.conn.request('capabilities', {}))
       } catch {
         /* device did not report capabilities; static defaults apply */
       }
       // Land on the device menu (Network is the default page); Configure opens the builder.
       password = ''
       deviceSession = true
-      devicePage = 'network'
-      screen = 'device'
+      section = IS_DEVICE ? 'status' : 'config'
+      view.section = IS_DEVICE ? 'clients' : 'unit'
+      screen = 'app'
     } catch (e) {
       loginError = e?.message || String(e)
     } finally {
@@ -158,8 +182,7 @@
   }
 
   function login_back() {
-    ws_disconnect()
-    capabilities_clear()
+    device_reset()
     loginError = null
     connState = 'idle'
     screen = 'welcome'
@@ -167,11 +190,7 @@
   }
 
   function logout() {
-    ws_disconnect()
-    capabilities_clear()
-    devices_clear()
-    sysinfo_clear()
-    traffic_clear()
+    device_reset()
     doc_reset()
     loadWarning = null
     deviceSession = false
@@ -179,20 +198,11 @@
     route_clear()
   }
 
-  function back_to_device() {
-    devicePage = 'network'
-    screen = 'device'
-  }
-
   // A dropped session leaves a signed-in UI that cannot reach the device;
   // reset to the landing page and say why.
   $effect(() => {
     if (!connection.lost) return
-    ws_disconnect()
-    capabilities_clear()
-    devices_clear()
-    sysinfo_clear()
-    traffic_clear()
+    device_reset()
     doc_reset()
     deviceSession = false
     connState = 'idle'
@@ -207,17 +217,17 @@
   // Keep the URL in step with the current page so back/forward work. Only the
   // routed screens are tracked; welcome and login are deliberately excluded.
   $effect(() => {
-    if (screen !== 'device' && screen !== 'builder') return
-    route_sync({ screen, devicePage, section: view.section, openInterface })
+    if (screen !== 'app') return
+    route_sync({ section: activeSection, page: view.section, openInterface })
   })
 
   function route_apply(r) {
     if (!r) return
     // A route only makes sense once a session exists; ignore it otherwise.
-    if (r.screen === 'device' && !deviceSession) return
-    screen = r.screen
-    if (r.devicePage) devicePage = r.devicePage
-    if (r.section) view.section = r.section
+    if (r.section === 'status' && !deviceSession) return
+    screen = 'app'
+    if (r.section) section = r.section
+    if (r.page) view.section = r.page
     openInterface = r.openInterface ?? null
   }
 
@@ -231,7 +241,7 @@
       }
       // Backed out past the first page of the session. Offer to log out;
       // staying puts the entry we just left back on the stack.
-      if (screen !== 'device' && screen !== 'builder') return
+      if (screen !== 'app') return
       if (!(await confirm(t('Log out and disconnect from the device?'), 'Log out'))) {
         history.pushState(null, '', route.path)
         return
@@ -245,28 +255,37 @@
   const savedConfigs = $derived(saved_names())
   // With device capabilities loaded we know the radios; lock manual add/remove.
   const radiosLocked = $derived(capabilities.data != null)
+  const changes = $derived(changes_list(store.doc, store.baseline))
+
+  // Sections available for this build and breakpoint. System and Configure are
+  // desktop-only: reboot, firmware and schema editing are not phone errands.
+  const availableSections = $derived(sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession))
+  const activeSection = $derived(
+    availableSections.some((s) => s.key === section) ? section : (availableSections[0]?.key ?? 'config')
+  )
+  const sectionItems = $derived(
+    (availableSections.find((s) => s.key === activeSection)?.items ?? []).filter(
+      (i) => !i.whenChanges || changes.length > 0
+    )
+  )
+
+  // Switching section lands on its first page.
   function section_select(key) {
+    section = key
+    openInterface = null
+    view.section = SECTIONS.find((s) => s.key === key)?.items?.[0]?.key ?? 'unit'
+  }
+
+  function section_select_page(key) {
     if (key !== 'interfaces') openInterface = null
     view.section = key
   }
 
-  // Bottom bar: service pages and the changes list live under their parent tab.
-  const builderItems = $derived(
-    BUILDER_ITEMS.map((i) => (i.key === 'json' && changes.length ? { ...i, badge: changes.length } : i))
-  )
-  const builderActive = $derived(
-    view.section?.startsWith('service:') || view.section === 'ntp'
-      ? 'services'
-      : view.section === 'changes'
-        ? 'json'
-        : view.section
-  )
-  const changes = $derived(changes_list(store.doc, store.baseline))
-
-  // The Changes entry only exists while there are changes; fall through to JSON
-  // when the last one is reset or applied away.
+  // Keep the current page valid for the active section.
   $effect(() => {
-    if (view.section === 'changes' && !changes.length) view.section = 'json'
+    const keys = sectionItems.map((i) => i.key)
+    const inServices = view.section?.startsWith('service:') || view.section === 'ntp'
+    if (keys.length && !keys.includes(view.section) && !inServices) view.section = keys[0]
   })
 </script>
 
@@ -359,12 +378,19 @@
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />
-  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />{/if}
+  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />
+  {:else if IS_DEVICE && DP}
+    {#if key === 'clients'}<DP.NetworkPage />
+    {:else if key === 'traffic'}<DP.TrafficPage />
+    {:else if key === 'state'}<DP.StatePage />
+    {:else if key === 'system'}<DP.SystemPage />{/if}
+  {/if}
 {/snippet}
 
+
 <div class="flex h-screen flex-col bg-surface text-zinc-900">
-  {@render appMenu()}
   {#if screen === 'welcome'}
+    {@render appMenu()}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
       <div class="w-full max-w-lg rounded-base border border-zinc-200 bg-surface p-6 shadow-flat-md">
         <div class="mb-4 flex items-start justify-between gap-4">
@@ -419,6 +445,7 @@
               {t('Start')}
             </button>
           </div>
+          {#if IS_DEVICE}
           <div class="flex items-center gap-2">
             <span class="h-px flex-1 bg-zinc-200"></span>
             <span class="text-xs text-zinc-400">{t('or connect to a device')}</span>
@@ -430,10 +457,12 @@
               {t('Connect')}
             </button>
           </form>
+          {/if}
         </div>
       </div>
     </div>
   {:else if screen === 'login'}
+    {@render appMenu()}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
       <div class="w-full max-w-lg rounded-base border border-zinc-200 bg-surface p-6 shadow-flat-md">
         <div class="mb-4 flex items-start justify-between gap-4">
@@ -469,126 +498,39 @@
         {/if}
       </div>
     </div>
-  {:else if screen === 'device'}
-    <header class="flex-shrink-0 border-b border-zinc-200 bg-surface shadow-flat-sm">
-      <div class="relative mx-auto max-w-5xl px-4 py-3 text-center">
-        <h1 class="text-base font-semibold tracking-tight">{capabilities.data?.capabilities?.model ?? t('Device')}</h1>
-        <p class="text-xs text-zinc-500">{settings.host}</p>
-      </div>
-    </header>
-    {#if view.mode === 'cards'}
-      <main class="flex-1 overflow-y-auto px-4 pb-24 pt-5">
-        <div class="mx-auto max-w-3xl">
-          {#if devicePage === 'network'}
-            <NetworkPage />
-          {:else if devicePage === 'traffic'}
-            <TrafficPage />
-          {:else if devicePage === 'state'}
-            <StatePage />
-          {:else}
-            <SystemPage />
-          {/if}
-        </div>
-      </main>
-      <BottomNav
-        items={DEVICE_ITEMS}
-        active={devicePage}
-        onSelect={(k) => (k === 'configure' ? (screen = 'builder') : (devicePage = k))}
-      />
-    {:else}
-      <div class="mx-auto flex w-full max-w-5xl flex-1 gap-4 overflow-hidden px-4">
-        <aside class="w-44 flex-shrink-0 overflow-y-auto py-6">
-          <nav class="flex h-full flex-col gap-1">
-            <button
-              type="button"
-              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'network' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
-              onclick={() => (devicePage = 'network')}
-            >{t('Network')}</button>
-            <button
-              type="button"
-              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'traffic' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
-              onclick={() => (devicePage = 'traffic')}
-            >{t('Traffic')}</button>
-            <button
-              type="button"
-              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'state' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
-              onclick={() => (devicePage = 'state')}
-            >{t('State')}</button>
-            <button
-              type="button"
-              class="rounded-base border-l-2 border-transparent px-3 py-2 text-left text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
-              onclick={() => (screen = 'builder')}
-            >{t('Configure')}</button>
-            <button
-              type="button"
-              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'system' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
-              onclick={() => (devicePage = 'system')}
-            >{t('System')}</button>
-          </nav>
-        </aside>
-        <main class="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto py-6 pr-3">
-          {#if devicePage === 'network'}
-            <NetworkPage />
-          {:else if devicePage === 'traffic'}
-            <TrafficPage />
-          {:else if devicePage === 'state'}
-            <StatePage />
-          {:else}
-            <SystemPage />
-          {/if}
-        </main>
-      </div>
-    {/if}
   {:else}
-  {#if view.mode === 'cards'}
-    <header class="flex-shrink-0 border-b border-zinc-200 bg-surface">
-      <div class="relative mx-auto max-w-3xl px-4 py-3 text-center">
-        <h1 class="text-base font-semibold tracking-tight">{t('uConfig builder')}</h1>
-        <p class="text-xs text-zinc-500">
-          {t('Intent-based OpenWrt configuration')}
-          {#if store.loadedFrom}<span class="text-zinc-400"> · {store.loadedFrom}</span>{/if}
-        </p>
-      </div>
-    </header>
-    <main class="flex-1 overflow-y-auto px-4 pb-24 pt-5">
-      <div class="mx-auto max-w-3xl">
-        {#if deviceSession}
-          <button type="button" class="mb-3 flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-800" onclick={back_to_device}>
-            <i class="bi bi-arrow-left"></i>{t('Back')}
-          </button>
-        {/if}
+    <TopBar
+      sections={availableSections}
+      section={activeSection}
+      onSelect={section_select}
+      deviceModel={capabilities.data?.capabilities?.model ?? null}
+      host={deviceSession ? settings.host : null}
+      {themeMode}
+      onToggleTheme={toggle_theme}
+      onLogout={deviceSession ? logout : null}
+    />
+
+    <div class="flex min-h-0 flex-1 overflow-hidden">
+      {#if wide && sectionItems.length > 1}
+        <SectionNav items={sectionItems} page={view.section} onSelect={section_select_page} changes={changes.length} />
+      {/if}
+      <main class="min-w-0 flex-1 overflow-y-auto px-6 py-6 pr-4 {wide ? '' : 'pb-24'}">
         {#if loadWarning}
           <p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('Could not load the configuration from the device: {error}. Editing a blank document.', { error: loadWarning })}
           </p>
         {/if}
-        {#if view.section === 'services'}
-          <ServiceListPage entries={SERVICE_ENTRIES} onOpen={section_select} />
+        {#if !wide && activeSection === 'config' && view.section === 'services'}
+          <ServiceListPage entries={SERVICE_ENTRIES} onOpen={section_select_page} />
         {:else}
           {@render bodyFor(view.section)}
         {/if}
-      </div>
-    </main>
-    <BottomNav items={builderItems} active={builderActive} onSelect={section_select} />
-  {:else}
-    <div class="flex flex-1 overflow-hidden">
-      <Sidebar
-        section={view.section}
-        onSelect={section_select}
-        changes={changes.length}
-        {deviceSession}
-        onBack={back_to_device}
-      />
-      <main class="min-w-0 flex-1 overflow-y-auto bg-surface px-8 py-7">
-        {#if loadWarning}
-          <p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            {t('Could not load the configuration from the device: {error}. Editing a blank document.', { error: loadWarning })}
-          </p>
-        {/if}
-        {@render bodyFor(view.section)}
       </main>
     </div>
-  {/if}
+
+    {#if !wide && sectionItems.length > 1}
+      <BottomNav items={sectionItems} active={view.section} onSelect={section_select_page} />
+    {/if}
   {/if}
 
   <ConfirmModal />

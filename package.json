@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:editor": "UCONFIG_FLAVOUR=editor vite build --outDir dist/editor",
+    "build:device": "UCONFIG_FLAVOUR=device vite build --outDir dist/device",
     "preview": "vite preview",
     "i18n:extract": "node tools/i18n-extract.mjs"
   },
