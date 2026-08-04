@@ -1,37 +1,10 @@
 <script>
   import { t } from '../i18n.svelte.js'
-  import { view } from '../view.svelte.js'
-  import { SERVICES } from '../services.js'
-  import { title_for } from '../schema.js'
+  import { SERVICE_ENTRIES } from '../nav.js'
 
   let { section, onSelect, changes = 0, deviceSession = false, onBack = null } = $props()
 
-  // Bootstrap Icons, matching the icons the previous builder used per entry.
-  const SERVICE_ICONS = {
-    ssh: 'bi-terminal',
-    'radius-server': 'bi-shield-lock',
-    log: 'bi-journal-text',
-    mdns: 'bi-broadcast',
-    lldp: 'bi-diagram-3',
-    adguardhome: 'bi-shield-slash',
-    ieee8021x: 'bi-key',
-    'quality-of-service': 'bi-speedometer2',
-    tailscale: 'bi-hdd-network'
-  }
-
-  // NTP is not a service block: it lives at definitions.ntp-servers, but the
-  // previous UI listed it alongside the services, so it shares the group.
-  const NTP_ENTRY = { key: 'ntp', label: 'NTP', icon: 'bi-clock' }
-
-  const services = SERVICES.filter((s) => s.config).map((s) => ({
-    key: `service:${s.config}`,
-    label: title_for(s.config),
-    icon: SERVICE_ICONS[s.config] ?? 'bi-gear'
-  }))
-
-  const entries = $derived(
-    [...services, NTP_ENTRY].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
-  )
+  const entries = SERVICE_ENTRIES
 
   let servicesOpen = $state(true)
 

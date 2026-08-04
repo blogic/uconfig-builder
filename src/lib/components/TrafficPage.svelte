@@ -10,11 +10,7 @@
     has_traffic
   } from '../traffic.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
-  import { view } from '../view.svelte.js'
   import { t } from '../i18n.svelte.js'
-
-  // In cards view the surrounding Card supplies the heading.
-  const standalone = $derived(view.mode === 'menu')
 
   // Live drives the gauges; the chart shows the selected history.
   const ranges = RESOLUTIONS.filter((r) => r.key !== 'live')
@@ -38,12 +34,10 @@
   })
 </script>
 
-{#if standalone}
-  <div class="page-header">
-    <h2 class="page-title">{t('Traffic')}</h2>
-  </div>
-  <p class="page-description">{t(PAGE_DESCRIPTIONS.traffic)}</p>
-{/if}
+<div class="page-header">
+  <h2 class="page-title">{t('Traffic')}</h2>
+</div>
+<p class="page-description">{t(PAGE_DESCRIPTIONS.traffic)}</p>
 
 {#if traffic.error && !traffic.data}
   <div class="rounded-base border border-zinc-200 p-4 text-sm text-red-600">{traffic.error}</div>

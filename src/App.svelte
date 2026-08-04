@@ -15,10 +15,11 @@
   import StatePage from './lib/components/StatePage.svelte'
   import TrafficPage from './lib/components/TrafficPage.svelte'
   import SystemPage from './lib/components/SystemPage.svelte'
-  import DeviceCards from './lib/components/DeviceCards.svelte'
+  import BottomNav from './lib/components/BottomNav.svelte'
+  import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
   import { def_get, title_for } from './lib/schema.js'
-  import { SERVICE_CONFIG_KEYS } from './lib/services.js'
+  import { SERVICE_ENTRIES, BUILDER_ITEMS, DEVICE_ITEMS } from './lib/nav.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
   import { unitLayout, radioLayout } from './lib/layouts.js'
@@ -47,12 +48,6 @@
 
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
-  // Services plus NTP (which lives under definitions), ordered as the sidebar.
-  const serviceCards = [
-    ...SERVICE_CONFIG_KEYS.map((key) => ({ key, label: title_for(key) })),
-    { key: 'ntp', label: 'NTP' }
-  ].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
-
   let openInterface = $state(null)
 
   function radio_defaults(band) {
@@ -211,6 +206,18 @@
     if (key !== 'interfaces') openInterface = null
     view.section = key
   }
+
+  // Bottom bar: service pages and the changes list live under their parent tab.
+  const builderItems = $derived(
+    BUILDER_ITEMS.map((i) => (i.key === 'json' && changes.length ? { ...i, badge: changes.length } : i))
+  )
+  const builderActive = $derived(
+    view.section?.startsWith('service:') || view.section === 'ntp'
+      ? 'services'
+      : view.section === 'changes'
+        ? 'json'
+        : view.section
+  )
   const changes = $derived(changes_list(store.doc, store.baseline))
 
   // The Changes entry only exists while there are changes; fall through to JSON
@@ -427,9 +434,24 @@
       </div>
     </header>
     {#if view.mode === 'cards'}
-      <main class="flex-1 overflow-y-auto">
-        <DeviceCards onConfigure={() => (screen = 'builder')} />
+      <main class="flex-1 overflow-y-auto px-4 pb-24 pt-5">
+        <div class="mx-auto max-w-3xl">
+          {#if devicePage === 'network'}
+            <NetworkPage />
+          {:else if devicePage === 'traffic'}
+            <TrafficPage />
+          {:else if devicePage === 'state'}
+            <StatePage />
+          {:else}
+            <SystemPage />
+          {/if}
+        </div>
       </main>
+      <BottomNav
+        items={DEVICE_ITEMS}
+        active={devicePage}
+        onSelect={(k) => (k === 'configure' ? (screen = 'builder') : (devicePage = k))}
+      />
     {:else}
       <div class="mx-auto flex w-full max-w-5xl flex-1 gap-4 overflow-hidden px-4">
         <aside class="w-44 flex-shrink-0 overflow-y-auto py-6">
@@ -485,36 +507,26 @@
         </p>
       </div>
     </header>
-    <main class="flex-1 overflow-y-auto">
-      <div class="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6">
+    <main class="flex-1 overflow-y-auto px-4 pb-24 pt-5">
+      <div class="mx-auto max-w-3xl">
         {#if deviceSession}
-          <button type="button" class="self-start text-sm font-medium text-zinc-500 hover:text-zinc-800" onclick={back_to_device}>← {t('Back')}</button>
+          <button type="button" class="mb-3 flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-800" onclick={back_to_device}>
+            <i class="bi bi-arrow-left"></i>{t('Back')}
+          </button>
         {/if}
-        <Card title={t('Unit')} subtitle={t('Device identity')}>
-          {#snippet children()}<LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />{/snippet}
-        </Card>
-        <Card title={t('Radios')} subtitle={t('Physical radios by band label')}>
-          {#snippet children()}{@render radiosBody()}{/snippet}
-        </Card>
-        <Card title={t('Interfaces')} subtitle={t('Logical networks, SSIDs, ports')}>
-          {#snippet children()}{@render interfacesBody()}{/snippet}
-        </Card>
-        {#each serviceCards as c (c.key)}
-          <Card title={c.label}>
-            {#snippet children()}
-              {#if c.key === 'ntp'}<NtpPage {changes} />
-              {:else}<ServicePage serviceKey={c.key} {changes} />{/if}
-            {/snippet}
-          </Card>
-        {/each}
-        <Card title={t('Changes')} badge={changes.length || null}>
-          {#snippet children()}<ConfigurationPanel {changes} />{/snippet}
-        </Card>
-        <Card title={t('JSON')}>
-          {#snippet children()}<JsonPage {preview} />{/snippet}
-        </Card>
+        {#if loadWarning}
+          <p class="mb-5 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {t('Could not load the configuration from the device: {error}. Editing a blank document.', { error: loadWarning })}
+          </p>
+        {/if}
+        {#if view.section === 'services'}
+          <ServiceListPage entries={SERVICE_ENTRIES} onOpen={section_select} />
+        {:else}
+          {@render bodyFor(view.section)}
+        {/if}
       </div>
     </main>
+    <BottomNav items={builderItems} active={builderActive} onSelect={section_select} />
   {:else}
     <div class="flex flex-1 overflow-hidden">
       <Sidebar
