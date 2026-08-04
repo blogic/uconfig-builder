@@ -1,10 +1,12 @@
 <script>
-  import { request as ws_request } from '../connection.svelte.js'
   import { capabilities } from '../capabilities.svelte.js'
+  import { sysinfo, sysinfo_refresh } from '../sysinfo.svelte.js'
   import { t } from '../i18n.svelte.js'
 
-  let info = $state(null)
-  let error = $state(null)
+  // Held in a module store so re-entering the page renders the last reading
+  // straight away, with the refresh landing underneath it.
+  const info = $derived(sysinfo.data)
+  const error = $derived(sysinfo.error)
 
   const model = $derived(capabilities.data?.capabilities?.model)
   const mem = $derived(info?.memory)
@@ -42,18 +44,9 @@
     return s && s.total ? Math.round((s.used / s.total) * 100) : 0
   }
 
-  async function refresh() {
-    try {
-      info = await ws_request('system-info', {})
-      error = null
-    } catch (e) {
-      error = e?.message || String(e)
-    }
-  }
-
   $effect(() => {
-    refresh()
-    const iv = setInterval(refresh, 5000)
+    sysinfo_refresh()
+    const iv = setInterval(sysinfo_refresh, 5000)
     return () => clearInterval(iv)
   })
 </script>

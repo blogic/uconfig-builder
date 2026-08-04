@@ -39,6 +39,7 @@
   import { connection, connect as ws_connect, login as ws_login, request as ws_request, disconnect as ws_disconnect } from './lib/connection.svelte.js'
   import { capabilities, capabilities_set, capabilities_clear } from './lib/capabilities.svelte.js'
   import { devices_clear } from './lib/devices.svelte.js'
+  import { sysinfo_clear } from './lib/sysinfo.svelte.js'
 
   const preview = $derived(doc_export())
 
@@ -169,6 +170,7 @@
     ws_disconnect()
     capabilities_clear()
     devices_clear()
+    sysinfo_clear()
     doc_reset()
     loadWarning = null
     deviceSession = false
@@ -187,6 +189,7 @@
     ws_disconnect()
     capabilities_clear()
     devices_clear()
+    sysinfo_clear()
     doc_reset()
     deviceSession = false
     connState = 'idle'
