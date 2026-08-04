@@ -36,7 +36,7 @@
     doc_adopt,
     doc_reset
   } from './lib/store.svelte.js'
-  import { connect as ws_connect, login as ws_login, request as ws_request, disconnect as ws_disconnect } from './lib/connection.svelte.js'
+  import { connection, connect as ws_connect, login as ws_login, request as ws_request, disconnect as ws_disconnect } from './lib/connection.svelte.js'
   import { capabilities, capabilities_set, capabilities_clear } from './lib/capabilities.svelte.js'
   import { devices_clear } from './lib/devices.svelte.js'
 
@@ -92,6 +92,7 @@
   let password = $state('')
   let loginError = $state(null)
   let loadWarning = $state(null) // config-get failed, editing a blank document
+  let connectionLost = $state(false) // session dropped; shown on the landing page
   let loggingIn = $state(false)
   let connState = $state('idle') // 'connecting' | 'ready' | 'error'
   function start_default() {
@@ -113,6 +114,8 @@
     if (!h) return
     settings.host = h
     loginError = null
+    connectionLost = false
+    connection.lost = false
     connState = 'connecting'
     screen = 'login'
     try {
@@ -176,6 +179,23 @@
     devicePage = 'network'
     screen = 'device'
   }
+
+  // A dropped session leaves a signed-in UI that cannot reach the device;
+  // reset to the landing page and say why.
+  $effect(() => {
+    if (!connection.lost) return
+    ws_disconnect()
+    capabilities_clear()
+    devices_clear()
+    doc_reset()
+    deviceSession = false
+    connState = 'idle'
+    view.section = 'unit'
+    loadWarning = null
+    loginError = null
+    screen = 'welcome'
+    connectionLost = true
+  })
 
   const savedConfigs = $derived(saved_names())
   // With device capabilities loaded we know the radios; lock manual add/remove.
@@ -296,6 +316,11 @@
             <p class="mt-1 text-sm text-zinc-500">{t('Intent-based OpenWrt configuration')}</p>
           </div>
         </div>
+        {#if connectionLost}
+          <p class="mb-4 rounded-base border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {t('The connection to the device was lost. Connect again to continue.')}
+          </p>
+        {/if}
         <p class="text-sm leading-relaxed text-zinc-600">
           {t('Describe the device and export a uConfig document. Choose how to start:')}
         </p>

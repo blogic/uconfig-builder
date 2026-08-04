@@ -36,6 +36,7 @@ export const connection = $state({
   status: 'idle', // 'idle' | 'connecting' | 'connected'
   mode: null, // 'standalone' | 'ucoord'
   device: null, // resolved { venue, peer, model } once logged in
+  lost: false, // an established session dropped; the app resets to the landing page
   host: null,
   error: null
 })
@@ -134,8 +135,15 @@ export function connect(host) {
     }
     socket.onclose = () => {
       reject_pending('connection closed')
+      // An unsolicited close means the session is gone (device rebooted, link
+      // dropped, idle timeout). Flag it so the app can return to the landing
+      // page rather than leaving a signed-in UI that cannot reach the device.
+      const established = connection.status === 'connected'
       socket = null
+      target = null
       connection.status = 'idle'
+      connection.device = null
+      if (established) connection.lost = true
       ready_reject_now(`could not connect to ${host}`)
     }
     socket.onerror = () => {} // detail surfaced via onclose
@@ -145,6 +153,9 @@ export function connect(host) {
 export function disconnect() {
   ready_clear()
   if (socket) {
+    // Closing on purpose; drop the handler so onclose does not report the
+    // session as lost.
+    socket.onclose = null
     try {
       socket.close()
     } catch {
@@ -157,6 +168,7 @@ export function disconnect() {
   connection.status = 'idle'
   connection.mode = null
   connection.device = null
+  connection.lost = false
 }
 
 // Resolve the peer to manage from the device's own status. Single-AP

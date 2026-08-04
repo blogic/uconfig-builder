@@ -426,6 +426,7 @@
   "tcp": "TCP",
   "Temp": "Temp",
   "Template": "Template",
+  "The connection to the device was lost. Connect again to continue.": "The connection to the device was lost. Connect again to continue.",
   "This interface no longer exists.": "This interface no longer exists.",
   "Timezone": "Timezone",
   "Transmit power (dBm).": "The transmission power in dBm.",
