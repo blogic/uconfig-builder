@@ -5,6 +5,7 @@
   import Card from './Card.svelte'
   import NetworkPage from './NetworkPage.svelte'
   import StatePage from './StatePage.svelte'
+  import TrafficPage from './TrafficPage.svelte'
   import SystemPage from './SystemPage.svelte'
   import Spinner from './Spinner.svelte'
   import { deviceStore } from '../devices.svelte.js'
@@ -22,6 +23,9 @@
       {#if deviceStore.loading}<Spinner class="h-4 w-4 text-zinc-400" />{/if}
     {/snippet}
     {#snippet children()}<NetworkPage />{/snippet}
+  </Card>
+  <Card title={t('Traffic')}>
+    {#snippet children()}<TrafficPage />{/snippet}
   </Card>
   <Card title={t('State')}>
     {#snippet children()}<StatePage />{/snippet}

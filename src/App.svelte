@@ -13,6 +13,7 @@
   import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
   import NetworkPage from './lib/components/NetworkPage.svelte'
   import StatePage from './lib/components/StatePage.svelte'
+  import TrafficPage from './lib/components/TrafficPage.svelte'
   import SystemPage from './lib/components/SystemPage.svelte'
   import DeviceCards from './lib/components/DeviceCards.svelte'
   import Spinner from './lib/components/Spinner.svelte'
@@ -40,6 +41,7 @@
   import { capabilities, capabilities_set, capabilities_clear } from './lib/capabilities.svelte.js'
   import { devices_clear } from './lib/devices.svelte.js'
   import { sysinfo_clear } from './lib/sysinfo.svelte.js'
+  import { traffic_clear } from './lib/traffic.svelte.js'
 
   const preview = $derived(doc_export())
 
@@ -171,6 +173,7 @@
     capabilities_clear()
     devices_clear()
     sysinfo_clear()
+    traffic_clear()
     doc_reset()
     loadWarning = null
     deviceSession = false
@@ -190,6 +193,7 @@
     capabilities_clear()
     devices_clear()
     sysinfo_clear()
+    traffic_clear()
     doc_reset()
     deviceSession = false
     connState = 'idle'
@@ -437,6 +441,11 @@
             >{t('Network')}</button>
             <button
               type="button"
+              class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'traffic' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
+              onclick={() => (devicePage = 'traffic')}
+            >{t('Traffic')}</button>
+            <button
+              type="button"
               class="rounded-base border-l-2 px-3 py-2 text-left text-sm font-medium transition {devicePage === 'state' ? 'border-accent bg-accent/10 text-accent' : 'border-transparent text-zinc-700 hover:bg-zinc-50'}"
               onclick={() => (devicePage = 'state')}
             >{t('State')}</button>
@@ -455,6 +464,8 @@
         <main class="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto py-6">
           {#if devicePage === 'network'}
             <NetworkPage />
+          {:else if devicePage === 'traffic'}
+            <TrafficPage />
           {:else if devicePage === 'state'}
             <StatePage />
           {:else}
