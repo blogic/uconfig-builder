@@ -1,6 +1,7 @@
 {
   "(optional)": "(optional)",
   "{count, plural, one {# change in this section} other {# changes in this section}}": "{count, plural, one {# change in this section} other {# changes in this section}}",
+  "{count, plural, one {# change} other {# changes}}": "{count, plural, one {# change} other {# changes}}",
   "{count, plural, one {# peer} other {# peers}}": "{count, plural, one {# peer} other {# peers}}",
   "{label} key": "{label} key",
   "{noun} {key} added": "{noun} {key} added",
@@ -114,7 +115,6 @@
   "Close menu": "Close menu",
   "compatibility": "Compatibility",
   "Configuration applied to the device.": "Configuration applied to the device.",
-  "Configuration Changes": "Configuration Changes",
   "configuration name": "configuration name",
   "Configure": "Configure",
   "Configure basic device settings including hostname, location, and timezone. These settings identify your device on the network and ensure proper time management.": "Configure basic device settings including hostname, location, and timezone. These settings identify your device on the network and ensure proper time management.",

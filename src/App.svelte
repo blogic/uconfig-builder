@@ -408,7 +408,6 @@
 {/snippet}
 
 {#snippet changesBody()}
-  <PageHeader title={t('Configuration Changes')} />
   <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
   <ConfigurationPanel {changes} />
 {/snippet}

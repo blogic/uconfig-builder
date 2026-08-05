@@ -12,6 +12,16 @@
 
   let { changes, connected = false, applyError = null, onApply }: Props = $props()
 
+  // Matched to the sidebar entry for each domain, so a change reads as
+  // belonging to the page it was made on.
+  const SECTION_ICONS: Record<string, string> = {
+    Unit: 'bi-shield-check',
+    Radios: 'bi-broadcast',
+    Interfaces: 'bi-ethernet',
+    Services: 'bi-hdd-network',
+    Definitions: 'bi-clock'
+  }
+
   let name = $state(store.loadedFrom && store.loadedFrom !== 'imported' ? store.loadedFrom : '')
   let savedNote = $state('')
 
@@ -50,21 +60,31 @@
 
 <div class="flex flex-col gap-5">
   {#if changes.length}
-    <div class="rounded-base border border-zinc-200 px-8 py-6">
+    <ul class="divide-y divide-zinc-200 border-b border-zinc-200">
       {#each grouped as [section, items] (section)}
-        <div class="mb-6 last:mb-0">
-          <h3 class="changes-topic-title">{t(section)}</h3>
-          <ul class="mt-4">
-            {#each items as c}
-              <li class="flex items-center gap-2 py-1 text-sm text-zinc-900">
-                <span class="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
-                {c.label}
-              </li>
-            {/each}
-          </ul>
-        </div>
+        <li class="flex items-start gap-3 py-3">
+          <i class="bi {SECTION_ICONS[section] ?? 'bi-sliders'} mt-0.5 flex-shrink-0 text-lg text-zinc-600"></i>
+
+          <div class="min-w-0 flex-1">
+            <div class="flex items-baseline gap-2">
+              <span class="truncate text-sm font-semibold text-zinc-900">{t(section)}</span>
+              <span class="text-xs text-zinc-400">
+                {t('{count, plural, one {# change} other {# changes}}', { count: items.length })}
+              </span>
+            </div>
+
+            <ul class="mt-1">
+              {#each items as c}
+                <li class="flex items-center gap-2 py-0.5 text-xs text-zinc-500">
+                  <span class="inline-block h-1 w-1 flex-shrink-0 rounded-full bg-accent"></span>
+                  {c.label}
+                </li>
+              {/each}
+            </ul>
+          </div>
+        </li>
       {/each}
-    </div>
+    </ul>
   {:else}
     <p class="text-sm text-zinc-500">{t('No changes since this configuration was loaded.')}</p>
   {/if}
