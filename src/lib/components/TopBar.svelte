@@ -10,14 +10,17 @@
     host = null,
     themeMode,
     onToggleTheme,
-    onLogout = null
+    onLogout = null,
+    railed = false
   } = $props()
 
   let menuOpen = $state(false)
 </script>
 
-<header class="flex flex-shrink-0 items-center gap-3 border-b border-zinc-200 bg-surface px-4">
-  <div class="flex items-center gap-2 py-2.5">
+<header class="flex flex-shrink-0 items-center border-b border-zinc-200 bg-surface px-4 {railed ? 'gap-0' : 'gap-3'}">
+  <!-- With a single section there are no tabs, so the brand takes the width of
+       the sidebar and the title lines up with the content column beside it. -->
+  <div class="flex items-center gap-2 py-2.5 {railed ? 'w-[156px] flex-shrink-0' : ''}">
     <span class="grid h-6 w-6 place-items-center rounded-base bg-accent text-xs text-white">
       <i class="bi bi-gear-wide-connected"></i>
     </span>
@@ -41,27 +44,29 @@
     </nav>
   {/if}
 
-  {#if page.title}
-    {#if sections.length > 1}
-      <span class="h-5 w-px flex-shrink-0 bg-zinc-200"></span>
-    {/if}
-    <h1 class="truncate text-sm font-semibold text-zinc-900">{page.title}</h1>
+  {#if railed}
+    <!-- Title and actions share the content column: title left, actions right. -->
+    <div class="flex min-w-0 flex-1 items-center gap-3 pl-6">
+      {#if page.title}
+        <h1 class="truncate text-sm font-semibold text-zinc-900">{page.title}</h1>
+      {/if}
+      <span class="flex-1"></span>
+      {#if page.actions}
+        <span class="flex flex-shrink-0 items-center gap-2">{@render page.actions()}</span>
+      {/if}
+    </div>
+  {:else}
+    <span class="flex-1"></span>
   {/if}
-
-  {#if page.actions}
-    <span class="flex flex-shrink-0 items-center gap-2">{@render page.actions()}</span>
-  {/if}
-
-  <span class="flex-1"></span>
 
   {#if deviceModel || host}
-    <p class="hidden text-xs text-zinc-500 sm:block">
+    <p class="hidden flex-shrink-0 text-xs text-zinc-500 sm:block">
       {#if deviceModel}<span class="font-semibold text-zinc-900">{deviceModel}</span>{/if}
       {#if deviceModel && host} · {/if}{host ?? ''}
     </p>
   {/if}
 
-  <div class="relative">
+  <div class="relative ml-3 flex-shrink-0">
     <button type="button" class="btn-sm" aria-label={t('Menu')} aria-haspopup="true" aria-expanded={menuOpen} onclick={() => (menuOpen = !menuOpen)}>
       <i class="bi bi-three-dots-vertical"></i>
     </button>

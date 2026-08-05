@@ -23,6 +23,7 @@
   import { unitLayout, radioLayout } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
   import { route, route_parse, route_sync, route_clear } from './lib/router.svelte.js'
+  import { hoisted } from './lib/page.svelte.js'
   import { confirm } from './lib/confirm.svelte.js'
   import { settings } from './lib/settings.svelte.js'
   import { accordion_provide } from './lib/accordion.svelte.js'
@@ -270,6 +271,10 @@
       (i) => !i.whenChanges || changes.length > 0
     )
   )
+
+  // The editor has one section, so its top bar can carry the page title.
+  const railed = $derived(wide && availableSections.length === 1 && sectionItems.length > 1)
+  $effect(() => { hoisted.on = railed })
 
   // Switching section lands on its first page.
   function section_select(key) {
@@ -522,6 +527,7 @@
       {themeMode}
       onToggleTheme={toggle_theme}
       onLogout={deviceSession ? logout : null}
+      {railed}
     />
 
     <div class="flex min-h-0 flex-1 overflow-hidden">

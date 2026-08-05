@@ -7,6 +7,10 @@
 
 export const page = $state({ title: null, actions: null })
 
+// True when the top bar has room for the page title: the standalone editor,
+// which has no section tabs. The live device UI keeps its title in the page.
+export const hoisted = $state({ on: false })
+
 export function page_set(title, actions) {
   page.title = title ?? null
   page.actions = actions ?? null
