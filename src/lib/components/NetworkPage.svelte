@@ -3,7 +3,7 @@
   import { device_name } from '../device-icons.js'
   import DeviceRow from './DeviceRow.svelte'
   import Spinner from './Spinner.svelte'
-  import PageHeader from './PageHeader.svelte'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
@@ -30,11 +30,10 @@
   $effect(() => poll_feed('clients'))
 </script>
 
-<PageHeader title={deviceStore.data ? t('Clients ({count})', { count: online.length }) : t('Clients')}>
-  {#snippet actions()}
-    {#if deviceStore.loading}<Spinner class="h-4 w-4 text-zinc-400" />{/if}
-  {/snippet}
-</PageHeader>
+<div class="mb-5 flex items-start gap-3">
+  <p class="page-description mb-0 flex-1">{t(PAGE_DESCRIPTIONS.clients)}</p>
+  {#if deviceStore.loading}<Spinner class="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-400" />{/if}
+</div>
 
 {#if deviceStore.error && !deviceStore.data}
   <p class="text-sm text-red-600">{deviceStore.error}</p>

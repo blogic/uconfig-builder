@@ -1,5 +1,5 @@
 <script>
-  import PageHeader from './PageHeader.svelte'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
   // Mobile only: Services is a drill-down list rather than an expandable nav
@@ -7,7 +7,7 @@
   let { entries, onOpen } = $props()
 </script>
 
-<PageHeader title={t('Services')} />
+<p class="page-description">{t(PAGE_DESCRIPTIONS['service-list'])}</p>
 
 <div class="divide-y divide-zinc-200 rounded-base border border-zinc-200">
   {#each entries as e (e.key)}

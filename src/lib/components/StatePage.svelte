@@ -3,6 +3,7 @@
   import { sysinfo } from '../sysinfo.svelte.js'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
+  import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
   // Held in a module store so re-entering the page renders the last reading
@@ -44,6 +45,8 @@
     <div class="h-full rounded-full bg-accent" style="width: {Math.min(100, Math.max(0, pct))}%"></div>
   </div>
 {/snippet}
+
+<p class="page-description">{t(PAGE_DESCRIPTIONS.state)}</p>
 
 {#if error && !info}
   <div class="rounded-base border border-zinc-200 bg-surface p-4 text-sm text-red-600">{error}</div>

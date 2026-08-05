@@ -3,7 +3,6 @@
   import TrafficChart from './TrafficChart.svelte'
   import { traffic, RESOLUTIONS, rates, current, has_traffic } from '../traffic.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
-  import PageHeader from './PageHeader.svelte'
   import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
@@ -27,7 +26,6 @@
   $effect(() => poll_feed('traffic'))
 </script>
 
-<PageHeader title={t('Traffic')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS.traffic)}</p>
 
 {#if traffic.error && !traffic.data}

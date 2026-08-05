@@ -2,7 +2,6 @@
   import { ucoord, is_managed } from '../ucoord.svelte.js'
   import { uptime_format, ts_relative, bytes_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
-  import PageHeader from './PageHeader.svelte'
   import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
@@ -51,7 +50,6 @@
   $effect(() => poll_feed('ucoord'))
 </script>
 
-<PageHeader title={t('ucoord')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS.ucoord)}</p>
 
 {#if error && !venues}

@@ -34,6 +34,9 @@ export const PAGE_DESCRIPTIONS = {
     'Configure network interface settings including IP addressing, VLAN configuration, and DHCP settings. Network interfaces connect your device to different network segments and services.',
   interfaces:
     'Logical networks on this device. Each interface carries its own addressing, SSIDs, ports and services.',
+  'service-list': 'Services available on this device. Choose one to configure it.',
+  clients: 'Devices seen on the network, split into those currently connected and those that have dropped off. Wireless clients show their signal and negotiated rate.',
+  state: 'What the device is doing right now: how long it has been up, how hard it is working, and how much memory and storage remain.',
   traffic: 'Throughput on the upstream interface. The gauges show the current rate; the chart shows recorded history.',
   ucoord: 'Devices coordinated with this one, grouped by venue. Only the highlighted peer is managed from this session.',
   reboot: 'Restart the device. Clients lose their connection until it comes back up, usually within a minute.',

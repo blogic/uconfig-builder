@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join, resolve } from 'path'
 import { title_for } from '../src/lib/labels.js'
-import { DESCRIPTIONS } from '../src/lib/descriptions.js'
+import { DESCRIPTIONS, PAGE_DESCRIPTIONS, SERVICE_DESCRIPTIONS } from '../src/lib/descriptions.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const schemaPath = join(root, 'src/lib/data/schema.json')
@@ -18,8 +18,11 @@ const srcDir = join(root, 'src')
 
 const keys = new Set()
 
-// describe text for schema-auto-rendered fields lives as object values.
-for (const v of Object.values(DESCRIPTIONS)) if (v) keys.add(v)
+// Description text lives as object values rather than in t() calls, so it has
+// to be pulled from the modules directly: field help, page intros and the
+// per-service blurbs alike.
+for (const bag of [DESCRIPTIONS, PAGE_DESCRIPTIONS, SERVICE_DESCRIPTIONS])
+  for (const v of Object.values(bag)) if (v) keys.add(v)
 
 const schema = JSON.parse(readFileSync(schemaPath, 'utf8'))
 function walk_schema(node) {
