@@ -3,11 +3,14 @@
   import type { Radio } from '../types/uconfig'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     describe?: string | null
   }
 
-  let { obj, describe = null }: Props = $props()
+  let { obj, onset, describe = null }: Props = $props()
 
   // Reads go through a narrowed view; the prop itself stays the caller's
   // object so mutations keep Svelte's ownership link.
@@ -20,11 +23,11 @@
   const pct = $derived(Math.round((value / MAX) * 100))
 
   $effect(() => {
-    if (obj['tx-power'] == null) obj['tx-power'] = MAX
+    if (obj['tx-power'] == null) onset('tx-power', MAX)
   })
 
   function onInput(e: Event) {
-    obj['tx-power'] = Number((e.currentTarget as HTMLInputElement).value)
+    onset('tx-power', Number((e.currentTarget as HTMLInputElement).value))
   }
 </script>
 

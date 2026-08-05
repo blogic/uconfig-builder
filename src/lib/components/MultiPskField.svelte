@@ -6,10 +6,13 @@
   import type { InterfaceSsid1 } from '../types/uconfig'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
   }
 
-  let { obj }: Props = $props()
+  let { obj, onset }: Props = $props()
 
   const KEY = 'multi-psk'
   const map = $derived((obj[KEY] as Record<string, InterfaceSsid1> | undefined) ?? {})
@@ -40,7 +43,7 @@
   }
   function commit() {
     if (!valid) return
-    if (!obj[KEY] || typeof obj[KEY] !== 'object') obj[KEY] = {}
+    if (!obj[KEY] || typeof obj[KEY] !== 'object') onset(KEY, {})
     const entry: InterfaceSsid1 = { key: psk }
     if (mac) entry.mac = [mac]
     ;(obj[KEY] as Record<string, InterfaceSsid1>)[next_name()] = entry
@@ -50,7 +53,7 @@
     if (!(await confirm(t('Remove PSK "{name}"?', { name: k })))) return
     const m = obj[KEY] as Record<string, InterfaceSsid1>
     delete m[k]
-    if (!Object.keys(m).length) delete obj[KEY]
+    if (!Object.keys(m).length) onset(KEY, undefined)
   }
 </script>
 

@@ -5,6 +5,9 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema: JsonSchemaNode
     band: string
@@ -12,7 +15,7 @@
   }
 
   // `schema` kept in Props for the widget call-site contract; unused here.
-  let { obj, schema: _schema, band, describe = null }: Props = $props()
+  let { obj, onset, schema: _schema, band, describe = null }: Props = $props()
 
   // Reads go through a narrowed view; the prop itself stays the caller's
   // object so mutations keep Svelte's ownership link.
@@ -27,13 +30,13 @@
   // Persist the displayed value: ACS when unset, and re-ACS when a width change
   // makes the selected channel invalid.
   $effect(() => {
-    if (value == null) obj.channel = 'auto'
-    else if (value !== 'auto' && !options.includes(value)) obj.channel = 'auto'
+    if (value == null) onset('channel', 'auto')
+    else if (value !== 'auto' && !options.includes(value)) onset('channel', 'auto')
   })
 
   function onChange(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value
-    obj.channel = v === 'auto' ? 'auto' : Number(v)
+    onset('channel', v === 'auto' ? 'auto' : Number(v))
   }
 </script>
 

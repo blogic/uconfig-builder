@@ -4,10 +4,13 @@
   import type { Unit } from '../types/uconfig'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
   }
 
-  let { obj }: Props = $props()
+  let { obj, onset }: Props = $props()
 
   // Reads go through a narrowed view; the prop itself stays the caller's
   // object so mutations keep Svelte's ownership link.
@@ -19,8 +22,8 @@
 
   function onChange(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value
-    if (!v) delete obj.timezone
-    else obj.timezone = v
+    if (!v) onset('timezone', undefined)
+    else onset('timezone', v)
   }
 </script>
 

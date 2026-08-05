@@ -21,6 +21,13 @@
   })
 
   const servers = $derived(store.doc.definitions?.['ntp-servers'] ?? [])
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 </script>
 
 <PageHeader title={t('NTP Servers')}>
@@ -34,6 +41,7 @@
 {#if store.doc.definitions}
   <ArrayListField
     obj={store.doc.definitions as Record<string, unknown>}
+    onset={(k, v) => field_set(store.doc.definitions as Record<string, unknown>, k, v)}
     key="ntp-servers"
     {schema}
     label="NTP Server"

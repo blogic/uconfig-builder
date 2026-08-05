@@ -8,6 +8,9 @@
   type ArrayValue = (string | number)[]
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     key: string
     schema: JsonSchemaNode
@@ -15,7 +18,7 @@
     describe?: string | null
   }
 
-  let { obj, key, schema, label = null, describe = null }: Props = $props()
+  let { obj, onset, key, schema, label = null, describe = null }: Props = $props()
 
   const lbl = $derived(t(label ?? title_for(key)))
   const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim(), { value: obj[key] as string }))
@@ -57,7 +60,7 @@
 
   function commit() {
     if (error) return
-    if (!Array.isArray(obj[key])) obj[key] = []
+    if (!Array.isArray(obj[key])) onset(key, [])
     ;(obj[key] as ArrayValue).push(value)
     showModal = false
   }
@@ -65,7 +68,7 @@
   function removeAt(i: number) {
     const arr = obj[key] as ArrayValue
     arr.splice(i, 1)
-    if (arr.length === 0) delete obj[key]
+    if (arr.length === 0) onset(key, undefined)
   }
 </script>
 

@@ -27,6 +27,13 @@
   })
 
   const data = $derived((store.doc.services as Record<string, Record<string, unknown> | undefined> | undefined)?.[serviceKey])
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 </script>
 
 <PageHeader title={title_for(serviceKey)}>
@@ -43,7 +50,7 @@
   {#if node?.children}
     <LayoutRenderer {data} {schema} layout={node.children} />
   {:else}
-    <SchemaObject obj={data} {schema} />
+    <SchemaObject obj={data} onset={(k, v) => field_set(data, k, v)} {schema} />
   {/if}
 {:else}
   <p class="text-sm text-zinc-500">{t('No configuration available for this service.')}</p>

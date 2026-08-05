@@ -11,6 +11,13 @@
   let { obj, context }: Props = $props()
 
   const options = $derived(interface_services(context?.role))
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 </script>
 
-<ChoiceListField {obj} key="services" {options} label="" />
+<ChoiceListField {obj} onset={(k, v) => field_set(obj, k, v)} key="services" {options} label="" />

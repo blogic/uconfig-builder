@@ -15,11 +15,14 @@
   type LeafObj = Record<string, LeafValue>
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema: JsonSchemaNode
   }
 
-  let { obj, schema }: Props = $props()
+  let { obj, onset, schema }: Props = $props()
 
   type EntryKind = 'map' | 'object' | 'array' | 'scalar'
 
@@ -56,25 +59,32 @@
   }
 
   function add_object(key: string) {
-    obj[key] = {}
+    onset(key, {})
   }
   async function remove_object(key: string) {
     if (!(await confirm(t('Remove "{name}"?', { name: t(title_for(key)) })))) return
-    delete obj[key]
+    onset(key, undefined)
+  }
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
   }
 </script>
 
 <div class="flex flex-col gap-4">
   {#each entries as e (e.key)}
     {#if e.kind === 'array'}
-      <ArrayListField obj={obj as LeafObj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
+      <ArrayListField obj={obj as LeafObj} key={e.key} onset={(k, v) => field_set(obj as Record<string, unknown>, k, v)} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
     {:else if e.kind === 'scalar'}
-      <Field obj={obj as LeafObj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
+      <Field obj={obj as LeafObj} key={e.key} onset={(k, v) => field_set(obj as Record<string, unknown>, k, v)} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
     {:else if e.kind === 'map'}
       {@const vs = pattern_value_schema(e.schema)}
       <MapEditor parent={obj} mapKey={e.key} valueSchema={vs}>
         {#snippet item(entry: Record<string, unknown>)}
-          <Self obj={entry} schema={vs ?? {}} />
+          <Self obj={entry} onset={(k, v) => field_set(entry as Record<string, unknown>, k, v)} schema={vs ?? {}} />
         {/snippet}
       </MapEditor>
     {:else}
@@ -92,7 +102,7 @@
         </div>
         {#if child !== undefined && child !== null}
           <div class="px-3 pb-3">
-            <Self obj={child as Record<string, unknown>} schema={objBranchSchema(e.schema)} />
+            <Self obj={child as Record<string, unknown>} onset={(k, v) => field_set(child as Record<string, unknown>, k, v)} schema={objBranchSchema(e.schema)} />
           </div>
         {/if}
       </div>

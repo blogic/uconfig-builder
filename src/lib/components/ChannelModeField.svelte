@@ -5,13 +5,16 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema?: JsonSchemaNode
     band: string
     describe?: string | null
   }
 
-  let { obj, schema, band, describe = null }: Props = $props()
+  let { obj, onset, schema, band, describe = null }: Props = $props()
 
   // Reads go through a narrowed view; the prop itself stays the caller's
   // object so mutations keep Svelte's ownership link.
@@ -29,8 +32,8 @@
 
   function onChange(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value
-    if (v === '') delete obj['channel-mode']
-    else obj['channel-mode'] = v as Radio['channel-mode']
+    if (v === '') onset('channel-mode', undefined)
+    else onset('channel-mode', v as Radio['channel-mode'])
   }
 </script>
 

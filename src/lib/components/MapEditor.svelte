@@ -61,6 +61,13 @@
     if (!keys.includes(active ?? '')) active = keys[0] ?? null
   })
 
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
+
   function ensure() {
     if (!parent[mapKey] || typeof parent[mapKey] !== 'object') parent[mapKey] = {}
   }
@@ -120,7 +127,7 @@
 
 {#snippet body(name: string)}
   {#if scalarValue}
-    <Field obj={map as Record<string, string>} key={name} schema={valueSchema ?? {}} label="value" />
+    <Field obj={map as Record<string, unknown>} key={name} onset={(k, v) => field_set(parent[mapKey] as Record<string, unknown>, k, v)} schema={valueSchema ?? {}} label="value" />
   {:else if item}
     {@render item(map[name], name)}
   {/if}

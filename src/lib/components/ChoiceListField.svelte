@@ -4,13 +4,16 @@
   import { t } from '../i18n.svelte.js'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     key: string
     options: string[]
     label?: string | null
   }
 
-  let { obj, key, options, label = null }: Props = $props()
+  let { obj, onset, key, options, label = null }: Props = $props()
 
   const list = $derived(Array.isArray(obj[key]) ? (obj[key] as string[]) : [])
   const available = $derived(options.filter((o) => !list.includes(o)))
@@ -24,14 +27,14 @@
   }
   function commit() {
     if (!sel) return
-    if (!Array.isArray(obj[key])) obj[key] = []
+    if (!Array.isArray(obj[key])) onset(key, [])
     ;(obj[key] as string[]).push(sel)
     showModal = false
   }
   function remove(v: string) {
     const arr = obj[key] as string[]
     arr.splice(arr.indexOf(v), 1)
-    if (!arr.length) delete obj[key]
+    if (!arr.length) onset(key, undefined)
   }
 </script>
 

@@ -12,6 +12,9 @@
 
   interface Props {
     obj: FieldObj
+    // The owner of `obj` performs the write. Mutating a prop this component
+    // does not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: FieldValue) => void
     key: string
     schema: JsonSchemaNode
     label?: string | null
@@ -20,7 +23,7 @@
     describe?: string | null
   }
 
-  let { obj, key, schema, label = null, required = false, fallback = undefined, describe = null }: Props = $props()
+  let { obj, key, onset, schema, label = null, required = false, fallback = undefined, describe = null }: Props = $props()
 
   const fid = $props.id()
   const value = $derived(obj[key] as FieldValue)
@@ -40,12 +43,12 @@
   // pre-populated.
   $effect(() => {
     if (obj[key] !== undefined) return
-    if (kind === 'boolean') obj[key] = ((fallback ?? schema.default) as boolean) ?? false
+    if (kind === 'boolean') onset(key, ((fallback ?? schema.default) as boolean) ?? false)
     else if (kind === 'enum') {
-      if (enumDefault !== undefined) obj[key] = enumDefault
+      if (enumDefault !== undefined) onset(key, enumDefault)
     } else if (kind !== 'array') {
       const d = fallback ?? (schema.default as FieldValue)
-      if (d !== undefined) obj[key] = d
+      if (d !== undefined) onset(key, d)
     }
   })
 
@@ -65,8 +68,7 @@
   }
 
   function set(v: FieldValue) {
-    if (v === '' || v === undefined || v === null) delete obj[key]
-    else obj[key] = v
+    onset(key, v)
   }
 
   function onText(e: Event) {

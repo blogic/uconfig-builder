@@ -6,11 +6,14 @@
   import type { LayoutContext } from '../layouts'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     context?: LayoutContext
   }
 
-  let { obj, context }: Props = $props()
+  let { obj, onset, context }: Props = $props()
 
   const KEY = 'wifi-radios'
   const list = $derived(Array.isArray(obj[KEY]) ? (obj[KEY] as string[]) : [])
@@ -26,14 +29,14 @@
   }
   function commit() {
     if (!sel) return
-    if (!Array.isArray(obj[KEY])) obj[KEY] = []
+    if (!Array.isArray(obj[KEY])) onset(KEY, [])
     ;(obj[KEY] as string[]).push(sel)
     showModal = false
   }
   function remove(b: string) {
     const arr = obj[KEY] as string[]
     arr.splice(arr.indexOf(b), 1)
-    if (!arr.length) delete obj[KEY]
+    if (!arr.length) onset(KEY, undefined)
   }
 </script>
 

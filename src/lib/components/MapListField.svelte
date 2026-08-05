@@ -56,6 +56,13 @@
       .map(([, x]) => `${x}`)
       .join(' · ')
   }
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 </script>
 
 <ListBox items={keys} label={title_for(mapKey)} onAdd={open}>
@@ -88,7 +95,7 @@
             <p class="text-[11px] text-amber-600">{nameError}</p>
           {/if}
         </div>
-        <SchemaObject obj={draft} schema={valueSchema ?? {}} />
+        <SchemaObject obj={draft} onset={(k, v) => field_set(draft as Record<string, unknown>, k, v)} schema={valueSchema ?? {}} />
       </div>
       <div class="mt-4 flex justify-end gap-2">
         <button type="button" class="btn-sm" onclick={() => (showModal = false)}>{t('Cancel')}</button>

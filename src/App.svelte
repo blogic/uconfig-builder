@@ -374,7 +374,7 @@
   <!-- Guarded rather than defaulted: `?? {}` would hand the renderer a fresh
        object each time, which Svelte does not own, so edits would not stick. -->
   {#if store.doc.unit}
-    <LayoutRenderer data={store.doc.unit} schema={unitDef ?? {}} layout={unitLayout} />
+    <LayoutRenderer data={store.doc.unit as Record<string, unknown>} schema={unitDef ?? {}} layout={unitLayout} />
   {/if}
 {/snippet}
 

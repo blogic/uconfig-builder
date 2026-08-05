@@ -23,6 +23,13 @@
   $effect(() => {
     if (ipv4['dhcp-pool'] == null) ipv4['dhcp-pool'] = {}
   })
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 </script>
 
 <CollapsibleSection title={t('DHCP Pool')}>
@@ -30,9 +37,9 @@
     {@const pool = ipv4['dhcp-pool'] as Record<string, PoolFieldValue> | undefined}
     {#if pool}
       <div class="flex flex-col gap-4">
-        <Field obj={pool} key="lease-first" schema={poolProps['lease-first'] ?? {}} describe={DESCRIPTIONS['lease-first']} />
-        <Field obj={pool} key="lease-count" schema={poolProps['lease-count'] ?? {}} describe={DESCRIPTIONS['lease-count']} />
-        <Field obj={pool} key="lease-time" schema={poolProps['lease-time'] ?? {}} describe={DESCRIPTIONS['lease-time']} />
+        <Field obj={pool} key="lease-first" onset={(k, v) => field_set(pool as Record<string, unknown>, k, v)} schema={poolProps['lease-first'] ?? {}} describe={DESCRIPTIONS['lease-first']} />
+        <Field obj={pool} key="lease-count" onset={(k, v) => field_set(pool as Record<string, unknown>, k, v)} schema={poolProps['lease-count'] ?? {}} describe={DESCRIPTIONS['lease-count']} />
+        <Field obj={pool} key="lease-time" onset={(k, v) => field_set(pool as Record<string, unknown>, k, v)} schema={poolProps['lease-time'] ?? {}} describe={DESCRIPTIONS['lease-time']} />
         <LeasesField container={ipv4} subnet={ipv4.subnet} />
       </div>
     {/if}

@@ -6,6 +6,9 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema?: JsonSchemaNode
     band: string
@@ -13,7 +16,7 @@
   }
 
   // `schema` kept in Props for the widget call-site contract; unused here.
-  let { obj, schema: _schema, band, describe = null }: Props = $props()
+  let { obj, onset, schema: _schema, band, describe = null }: Props = $props()
 
   // Reads go through a narrowed view; the prop itself stays the caller's
   // object so mutations keep Svelte's ownership link.
@@ -30,14 +33,14 @@
   const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim()))
 
   $effect(() => {
-    if (obj['channel-width'] == null) obj['channel-width'] = default_width(band) as Radio['channel-width']
-    if (is5G && obj['channel-width'] === 160) obj['allow-dfs'] = true
+    if (obj['channel-width'] == null) onset('channel-width', default_width(band) as Radio['channel-width'])
+    if (is5G && obj['channel-width'] === 160) onset('allow-dfs', true)
   })
 
   function onChange(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value
-    if (v === '') delete obj['channel-width']
-    else obj['channel-width'] = Number(v) as Radio['channel-width']
+    if (v === '') onset('channel-width', undefined)
+    else onset('channel-width', Number(v) as Radio['channel-width'])
   }
 </script>
 

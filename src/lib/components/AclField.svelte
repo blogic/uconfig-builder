@@ -4,10 +4,13 @@
   import { t } from '../i18n.svelte.js'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
   }
 
-  let { obj }: Props = $props()
+  let { obj, onset }: Props = $props()
 
   const KEY = 'access-control-list'
   const fid = $props.id()
@@ -18,11 +21,18 @@
   function onMode(e: Event) {
     const v = (e.currentTarget as HTMLSelectElement).value
     if (v === 'disabled') {
-      delete obj[KEY]
+      onset(KEY, undefined)
     } else {
-      if (!obj[KEY] || typeof obj[KEY] !== 'object') obj[KEY] = {}
+      if (!obj[KEY] || typeof obj[KEY] !== 'object') onset(KEY, {})
       ;(obj[KEY] as Record<string, unknown>).mode = v
     }
+  }
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
   }
 </script>
 
@@ -36,6 +46,6 @@
     </select>
   </div>
   {#if acl}
-    <ArrayListField obj={acl} key="mac-address" schema={macSchema} label="" />
+    <ArrayListField obj={acl} onset={(k, v) => field_set(acl as Record<string, unknown>, k, v)} key="mac-address" schema={macSchema} label="" />
   {/if}
 </div>

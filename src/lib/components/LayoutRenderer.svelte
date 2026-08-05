@@ -35,7 +35,7 @@
   interface Props {
     // Structural, and deliberately wide: casting at a call site makes a new
     // expression and breaks Svelte's ownership tracking for mutations.
-    data: object
+    data: Record<string, unknown>
     schema: JsonSchemaNode
     layout: LayoutNode[]
     context?: LayoutContext
@@ -46,6 +46,14 @@
   // Narrowed once here rather than at every call site, so callers hand over
   // their state object unwrapped.
   const data_obj = $derived(data as Record<string, unknown>)
+
+  // Writes happen here, on the object this component was given, rather than
+  // inside the field widgets: a child mutating a prop it does not own is what
+  // Svelte reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
+  }
 
   accordion_provide(true)
 
@@ -143,27 +151,27 @@
         {@const fs = enumOpts ? { ...fs0, enum: enumOpts } : fs0}
         {@const w = node.widget ?? (fs.type === 'array' ? 'list' : 'field')}
         {#if w === 'field'}
-          <Field obj={parent} key={fkey} schema={fs} required={req_of(node)} label={node.label ?? null} fallback={node.default as LeafValue} describe={node.describe ?? null} />
+          <Field obj={parent} key={fkey} onset={(k, v) => field_set(parent, k, v)} schema={fs} required={req_of(node)} label={node.label ?? null} fallback={node.default as LeafValue} describe={node.describe ?? null} />
         {:else if w === 'list'}
-          <ArrayListField obj={parent} key={fkey} schema={fs} label={node.label ?? null} describe={node.describe ?? null} />
+          <ArrayListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} schema={fs} label={node.label ?? null} describe={node.describe ?? null} />
         {:else if w === 'channel'}
-          <ChannelField obj={parent} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          <ChannelField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
         {:else if w === 'channel-width'}
-          <ChannelWidthField obj={parent} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          <ChannelWidthField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
         {:else if w === 'channel-mode'}
-          <ChannelModeField obj={parent} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          <ChannelModeField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
         {:else if w === 'tx-power'}
-          <TxPowerField obj={parent} describe={node.describe ?? null} />
+          <TxPowerField obj={parent} onset={(k, v) => field_set(parent, k, v)} describe={node.describe ?? null} />
         {:else if w === 'addressing'}
-          <AddressingField obj={parent} schema={fs} role={context.role} describe={node.describe ?? null} />
+          <AddressingField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} role={context.role} describe={node.describe ?? null} />
         {:else if w === 'addressing-ro'}
           <AddressingReadonly obj={parent} />
         {:else if w === 'timezone'}
-          <TimezoneField obj={parent} />
+          <TimezoneField obj={parent} onset={(k, v) => field_set(parent, k, v)} />
         {:else if w === 'bands'}
-          <BandsField obj={parent} {context} />
+          <BandsField obj={parent} onset={(k, v) => field_set(parent, k, v)} {context} />
         {:else if w === 'choice'}
-          <ChoiceListField obj={parent} key={fkey} options={(node.options ?? []) as string[]} label={node.label ?? null} />
+          <ChoiceListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} options={(node.options ?? []) as string[]} label={node.label ?? null} />
         {:else if w === 'services'}
           <ServicesField obj={parent} {context} />
         {/if}
@@ -182,7 +190,7 @@
               {#if node.children}
                 <Self data={target} schema={ts} layout={node.children} {context} />
               {:else}
-                <SchemaObject obj={target} schema={ts} />
+                <SchemaObject obj={target} onset={(k, v) => field_set(target as Record<string, unknown>, k, v)} schema={ts} />
               {/if}
             {/if}
           {/snippet}
@@ -195,9 +203,9 @@
           <ToggleSection container={parent} key={tkey} title={node.title ?? title_for(tkey)}>
             {#snippet children()}
               {#if node.children}
-                <Self data={parent[tkey] as object} schema={ts} layout={node.children} {context} />
+                <Self data={parent[tkey] as Record<string, unknown>} schema={ts} layout={node.children} {context} />
               {:else}
-                <SchemaObject obj={parent[tkey] as Record<string, unknown>} schema={ts} />
+                <SchemaObject obj={parent[tkey] as Record<string, unknown>} onset={(k, v) => field_set(parent[tkey] as Record<string, unknown>, k, v)} schema={ts} />
               {/if}
             {/snippet}
           </ToggleSection>
@@ -214,7 +222,7 @@
                   {#if node.item}
                     <Self data={entry} schema={vs} layout={node.item} {context} />
                   {:else}
-                    <SchemaObject obj={entry} schema={vs} />
+                    <SchemaObject obj={entry} onset={(k, v) => field_set(entry as Record<string, unknown>, k, v)} schema={vs} />
                   {/if}
                 {/snippet}
                 {#snippet addModal({ create, close, map }: { create: (name: string, value: Record<string, unknown>) => void, close: () => void, map: Record<string, unknown> })}
@@ -227,7 +235,7 @@
                   {#if node.item}
                     <Self data={entry} schema={vs} layout={node.item} {context} />
                   {:else}
-                    <SchemaObject obj={entry} schema={vs} />
+                    <SchemaObject obj={entry} onset={(k, v) => field_set(entry as Record<string, unknown>, k, v)} schema={vs} />
                   {/if}
                 {/snippet}
               </MapEditor>
@@ -235,9 +243,9 @@
           {/snippet}
         </CollapsibleSection>
       {:else if node.aclField}
-        <AclField obj={data_obj} />
+        <AclField obj={data} onset={(k, v) => field_set(data, k, v)} />
       {:else if node.multiPsk}
-        <MultiPskField obj={data_obj} />
+        <MultiPskField obj={data} onset={(k, v) => field_set(data, k, v)} />
       {:else if node.portsSection}
         <PortsSection
           iface={data as Interface}
@@ -266,7 +274,7 @@
         {@const obj = walk(data_obj, node.disallow, true)}
         {@const ds = ref_resolve(schema_at(schema, node.disallow).properties?.['disallow-upstream-subnet'] ?? {})}
         {#if obj}
-          <DisallowUpstreamSection {obj} schema={ds} />
+          <DisallowUpstreamSection {obj} onset={(k, v) => field_set(obj, k, v)} schema={ds} />
         {/if}
       {/if}
     {/if}

@@ -3,13 +3,16 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema: JsonSchemaNode
     role?: string
     describe?: string | null
   }
 
-  let { obj, schema, role, describe = null }: Props = $props()
+  let { obj, onset, schema, role, describe = null }: Props = $props()
 
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
@@ -20,14 +23,14 @@
   // Downstream interfaces are always static; upstream default to dynamic (DHCP).
   $effect(() => {
     if (isDownstream) {
-      if (obj.addressing !== 'static') obj.addressing = 'static'
+      if (obj.addressing !== 'static') onset('addressing', 'static')
     } else if (obj.addressing == null) {
-      obj.addressing = 'dynamic'
+      onset('addressing', 'dynamic')
     }
   })
 
   function onChange(e: Event) {
-    obj.addressing = (e.currentTarget as HTMLSelectElement).value
+    onset('addressing', (e.currentTarget as HTMLSelectElement).value)
   }
 </script>
 

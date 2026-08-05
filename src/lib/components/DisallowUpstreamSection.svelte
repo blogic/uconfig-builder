@@ -7,11 +7,14 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
+    // The owner of `obj` performs the write; a child mutating a prop it does
+    // not own is what Svelte reports as ownership_invalid_mutation.
+    onset: (key: string, value: unknown) => void
     obj: Record<string, unknown>
     schema: JsonSchemaNode
   }
 
-  let { obj, schema }: Props = $props()
+  let { obj, onset, schema }: Props = $props()
 
   const KEY = 'disallow-upstream-subnet'
   const acc = accordion_get()
@@ -33,8 +36,15 @@
   )
 
   function toggle_rfc() {
-    if (anyRfc) delete obj[KEY]
-    else obj[KEY] = true
+    if (anyRfc) onset(KEY, undefined)
+    else onset(KEY, true)
+  }
+
+  // The owner writes: a child mutating a prop it does not own is what Svelte
+  // reports as ownership_invalid_mutation.
+  function field_set(target: Record<string, unknown>, k: string, v: unknown) {
+    if (v === '' || v === undefined || v === null) delete target[k]
+    else target[k] = v
   }
 </script>
 
@@ -56,7 +66,7 @@
       <span class="text-xs font-medium text-zinc-700">{t('Any RFC1918 subnet')}</span>
     </div>
     {#if !anyRfc}
-      <ArrayListField {obj} key={KEY} schema={arraySchema} label="Blocked subnets" />
+      <ArrayListField {obj} onset={(k, v) => field_set(obj, k, v)} key={KEY} schema={arraySchema} label="Blocked subnets" />
     {/if}
   </div>
 {/snippet}
