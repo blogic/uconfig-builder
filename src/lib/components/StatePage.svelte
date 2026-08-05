@@ -3,14 +3,9 @@
   import { sysinfo } from '../sysinfo.svelte.js'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
+  import UsageGauge from './UsageGauge.svelte'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
-
-  interface Storage {
-    total: number
-    free: number
-    used: number
-  }
 
   // Held in a module store so re-entering the page renders the last reading
   // straight away, with the refresh landing underneath it.
@@ -18,9 +13,9 @@
   const error = $derived(sysinfo.error)
 
   const model = $derived(capabilities.data?.capabilities?.model)
+  const board = $derived(sysinfo.board)
   const mem = $derived(info?.memory)
   const memUsed = $derived(mem ? mem.total - mem.available : null)
-  const memPct = $derived(memUsed != null && mem?.total ? Math.round((memUsed / mem.total) * 100) : 0)
 
   function fmt_bytes(b: number | null | undefined): string {
     if (b == null) return '—'
@@ -37,20 +32,10 @@
   // ubus loadavg is fixed-point, scaled by 1<<16.
   const load = $derived((info?.load ?? []).map((v) => (v / 65536).toFixed(2)))
 
-  function storage_pct(s: Storage | null | undefined): number {
-    return s && s.total ? Math.round((s.used / s.total) * 100) : 0
-  }
-
 
   // Refresh on arrival, then poll while this page is open.
   $effect(() => poll_feed('state'))
 </script>
-
-{#snippet bar(pct: number)}
-  <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-200">
-    <div class="h-full rounded-full bg-accent" style="width: {Math.min(100, Math.max(0, pct))}%"></div>
-  </div>
-{/snippet}
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.state)}</p>
 
@@ -62,7 +47,11 @@
   <div class="rounded-base border border-zinc-200 bg-surface p-4">
     <h3 class="text-sm font-semibold text-zinc-900">{t('Device')}</h3>
     <dl class="mt-2 space-y-1 text-sm">
-      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Model')}</dt><dd class="text-zinc-800">{model ?? '—'}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Model')}</dt><dd class="truncate text-zinc-800">{model ?? '—'}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Firmware')}</dt><dd class="truncate text-zinc-800">{board?.release?.description ?? '—'}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Target')}</dt><dd class="truncate font-mono text-xs text-zinc-800">{board?.release?.target ?? '—'}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Kernel')}</dt><dd class="font-mono text-xs text-zinc-800">{board?.kernel ?? '—'}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('CPU')}</dt><dd class="truncate text-zinc-800">{board?.system ?? '—'}</dd></div>
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Uptime')}</dt><dd class="text-zinc-800">{uptime_format(info?.uptime)}</dd></div>
     </dl>
   </div>
@@ -76,19 +65,21 @@
     </dl>
   </div>
 
-  <div class="rounded-base border border-zinc-200 bg-surface p-4">
-    <h3 class="text-sm font-semibold text-zinc-900">{t('Memory')}</h3>
-    <p class="mt-2 text-sm text-zinc-800">{fmt_bytes(memUsed)} / {fmt_bytes(mem?.total)} <span class="text-zinc-500">({memPct}%)</span></p>
-    {@render bar(memPct)}
-  </div>
-
-  <div class="rounded-base border border-zinc-200 bg-surface p-4">
-    <h3 class="text-sm font-semibold text-zinc-900">{t('Storage')}</h3>
-    <div class="mt-2 text-sm">
-      <div class="flex justify-between gap-4"><span class="text-zinc-500">{t('Overlay')}</span><span class="text-zinc-800">{fmt_bytes((info?.root?.used ?? 0) * 1024)} / {fmt_bytes((info?.root?.total ?? 0) * 1024)}</span></div>
-      {@render bar(storage_pct(info?.root))}
-      <div class="mt-2 flex justify-between gap-4"><span class="text-zinc-500">{t('Temp')}</span><span class="text-zinc-800">{fmt_bytes((info?.tmp?.used ?? 0) * 1024)} / {fmt_bytes((info?.tmp?.total ?? 0) * 1024)}</span></div>
-      {@render bar(storage_pct(info?.tmp))}
+  <div class="rounded-base border border-zinc-200 bg-surface p-4 sm:col-span-2">
+    <h3 class="text-sm font-semibold text-zinc-900">{t('Usage')}</h3>
+    <div class="mt-2 flex flex-wrap items-start gap-12 py-2">
+      <UsageGauge
+        used={memUsed ?? 0}
+        total={mem?.total ?? 0}
+        label="Memory"
+        detail="{fmt_bytes(memUsed)} of {fmt_bytes(mem?.total)}"
+      />
+      <UsageGauge
+        used={(info?.root?.used ?? 0) * 1024}
+        total={(info?.root?.total ?? 0) * 1024}
+        label="Flash"
+        detail="{fmt_bytes((info?.root?.used ?? 0) * 1024)} of {fmt_bytes((info?.root?.total ?? 0) * 1024)}"
+      />
     </div>
   </div>
 </div>
