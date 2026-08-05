@@ -1,6 +1,7 @@
 <script>
   import { t } from '../i18n.svelte.js'
   import { page } from '../page.svelte.js'
+  import BrandMark from './BrandMark.svelte'
 
   let {
     sections = [],
@@ -23,9 +24,7 @@
        follows -- section tabs, or the page title in the editor -- starts on the
        content column rather than straddling the sidebar edge. -->
   <div class="flex items-center gap-2 py-2.5 {aligned ? 'w-[156px] flex-shrink-0' : ''}">
-    <span class="grid h-6 w-6 place-items-center rounded-base bg-accent text-xs text-white">
-      <i class="bi bi-gear-wide-connected"></i>
-    </span>
+    <BrandMark size={24} />
     <span class="text-sm font-semibold text-zinc-900">{t('uConfig')}</span>
   </div>
 

@@ -13,12 +13,12 @@ import { traffic_refresh, traffic_clear } from './traffic.svelte.js'
 // samples traffic every 10s, so polling it faster only re-reads the same
 // buckets.
 const FEEDS = [
-  { key: 'clients', label: 'Clients', refresh: devices_refresh, clear: devices_clear, every: 5000 },
-  { key: 'state', label: 'System state', refresh: sysinfo_refresh, clear: sysinfo_clear, every: 5000 },
-  { key: 'traffic', label: 'Traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 }
+  { key: 'clients', refresh: devices_refresh, clear: devices_clear, every: 5000 },
+  { key: 'state', refresh: sysinfo_refresh, clear: sysinfo_clear, every: 5000 },
+  { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 }
 ]
 
-export const loading = $state({ active: false, done: 0, total: FEEDS.length, label: null })
+export const loading = $state({ active: false, done: 0, total: FEEDS.length })
 
 let timers = []
 
@@ -28,11 +28,9 @@ export async function preload() {
   loading.active = true
   loading.done = 0
   loading.total = FEEDS.length
-  loading.label = null
 
   await Promise.all(
     FEEDS.map(async (f) => {
-      loading.label = f.label
       try {
         await f.refresh()
       } catch {
@@ -43,7 +41,6 @@ export async function preload() {
   )
 
   loading.active = false
-  loading.label = null
 }
 
 // Poll one feed while its page is open: refresh immediately on arrival, then
@@ -72,5 +69,4 @@ export function poll_clear() {
   for (const f of FEEDS) f.clear()
   loading.active = false
   loading.done = 0
-  loading.label = null
 }

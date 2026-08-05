@@ -15,7 +15,7 @@
   import SectionNav from './lib/components/SectionNav.svelte'
   import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
-  import LoadingScreen from './lib/components/LoadingScreen.svelte'
+  import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get, title_for } from './lib/schema.js'
   import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
@@ -66,7 +66,7 @@
   }
 
   const DP = $derived(deviceApi.pages)
-  const loading = $derived(dev?.poll.loading ?? { active: false, done: 0, total: 1, label: null })
+  const loading = $derived(dev?.poll.loading ?? { active: false, done: 0, total: 1 })
 
   const preview = $derived(doc_export())
 
@@ -178,11 +178,11 @@
       deviceSession = true
       section = IS_DEVICE ? 'status' : 'config'
       view.section = IS_DEVICE ? 'clients' : 'unit'
-      screen = 'app'
 
-      // Seed every live page before showing the UI, so navigating between
-      // Clients, Traffic and State never waits on a round trip.
+      // Seed every live page before leaving the login card, so the app appears
+      // fully populated rather than filling in behind visible chrome.
       if (IS_DEVICE) await dev.poll.preload()
+      screen = 'app'
     } catch (e) {
       loginError = e?.message || String(e)
     } finally {
@@ -489,29 +489,34 @@
   {:else if screen === 'login'}
     {@render appMenu()}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
-      <div class="w-full max-w-lg rounded-base border border-zinc-200 bg-surface p-6 shadow-flat-md">
-        <div class="mb-4 flex items-start justify-between gap-4">
-          <div>
-            <h1 class="text-lg font-semibold tracking-tight">{t('Log in')}</h1>
-            <p class="mt-1 text-sm text-zinc-500">{settings.host}</p>
-          </div>
+      <div class="w-full max-w-sm rounded-base border border-zinc-200 bg-surface p-8 text-center shadow-flat-md">
+        <div class="flex items-center justify-center gap-2.5">
+          <BrandMark size={32} />
+          <h1 class="text-xl font-semibold tracking-tight">{t('uConfig')}</h1>
         </div>
+
         {#if connState === 'connecting'}
-          <div class="flex flex-col items-center gap-3 py-8 text-sm text-zinc-500">
+          <div class="mt-6 flex flex-col items-center gap-3 text-sm text-zinc-500">
             <Spinner class="h-6 w-6 text-zinc-400" />
             <span>{t('Connecting to the device…')}</span>
           </div>
         {:else if connState === 'error'}
-          <p class="text-sm text-red-600">{loginError}</p>
-          <div class="mt-4 flex justify-end">
-            <button type="button" class="btn" onclick={login_back}>{t('Back')}</button>
+          <p class="mt-6 text-sm text-red-600">{loginError}</p>
+          <button type="button" class="btn mt-5 w-full justify-center" onclick={login_back}>{t('Back')}</button>
+        {:else if loading.active}
+          <div class="mt-6 flex flex-col items-center gap-3 text-sm text-zinc-500">
+            <Spinner class="h-6 w-6 text-zinc-400" />
+            <span>{t('Loading data…')}</span>
+          </div>
+          <div class="mt-5 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+            <div class="h-full rounded-full bg-accent transition-all duration-300" style="width: {Math.round((loading.done / loading.total) * 100)}%"></div>
           </div>
         {:else}
-          <form class="flex flex-col gap-4" onsubmit={host_login}>
+          <form class="mt-6 flex flex-col gap-4" onsubmit={host_login}>
             <input type="hidden" name="username" autocomplete="username" value="admin" />
-            <label class="flex flex-col gap-1">
-              <span class="text-sm font-medium text-zinc-700">{t('Password')}</span>
-              <input class="input" type="password" name="password" autocomplete="current-password" bind:value={password} />
+            <label class="flex flex-col gap-1.5">
+              <input class="input text-center" type="password" name="password" autocomplete="current-password" bind:value={password} />
+              <span class="text-xs text-zinc-500">{t('Password')}</span>
             </label>
             {#if loginError}
               <p class="text-sm text-red-600">{loginError}</p>
@@ -537,9 +542,6 @@
       aligned={wide && sectionItems.length > 1}
     />
 
-    {#if loading.active}
-      <LoadingScreen done={loading.done} total={loading.total} label={loading.label} />
-    {:else}
     <div class="flex min-h-0 flex-1 overflow-hidden">
       {#if wide && sectionItems.length > 1}
         <SectionNav items={sectionItems} page={view.section} onSelect={section_select_page} changes={changes.length} />
@@ -560,7 +562,6 @@
 
     {#if !wide && sectionItems.length > 1}
       <BottomNav items={sectionItems} active={view.section} onSelect={section_select_page} />
-    {/if}
     {/if}
   {/if}
 
