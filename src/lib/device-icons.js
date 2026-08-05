@@ -34,6 +34,31 @@ export function bytes_format(b) {
   return `${v.toFixed(v < 10 && i > 0 ? 1 : 0)} ${units[i]}`
 }
 
+export function uptime_format(s) {
+  if (s == null) return '—'
+  const d = Math.floor(s / 86400)
+  const h = Math.floor((s % 86400) / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const parts = []
+  if (d) parts.push(`${d}d`)
+  if (d || h) parts.push(`${h}h`)
+  parts.push(`${m}m`)
+  return parts.join(' ')
+}
+
+// Coarse age of a UNIX timestamp. ucoord peer timestamps can be days old while
+// the peer is perfectly healthy, so granularity below a minute is noise.
+export function ts_relative(ts) {
+  if (!ts) return '—'
+  const secs = Math.max(0, Math.floor(Date.now() / 1000) - ts)
+  if (secs < 60) return 'just now'
+  const mins = Math.floor(secs / 60)
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.floor(hours / 24)}d ago`
+}
+
 // Signal bands follow the usual WiFi rule of thumb: -60 and better is strong,
 // -75 and better is usable, below that is weak.
 export function signal_class(dbm) {

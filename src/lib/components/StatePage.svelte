@@ -2,6 +2,7 @@
   import { capabilities } from '../capabilities.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import { poll_feed } from '../poll.svelte.js'
+  import { uptime_format } from '../device-icons.js'
   import { t } from '../i18n.svelte.js'
 
   // Held in a module store so re-entering the page renders the last reading
@@ -13,18 +14,6 @@
   const mem = $derived(info?.memory)
   const memUsed = $derived(mem ? mem.total - mem.available : null)
   const memPct = $derived(mem && mem.total ? Math.round((memUsed / mem.total) * 100) : 0)
-
-  function fmt_uptime(s) {
-    if (s == null) return '—'
-    const d = Math.floor(s / 86400)
-    const h = Math.floor((s % 86400) / 3600)
-    const m = Math.floor((s % 3600) / 60)
-    const parts = []
-    if (d) parts.push(`${d}d`)
-    if (d || h) parts.push(`${h}h`)
-    parts.push(`${m}m`)
-    return parts.join(' ')
-  }
 
   function fmt_bytes(b) {
     if (b == null) return '—'
@@ -65,7 +54,7 @@
     <h3 class="text-sm font-semibold text-zinc-900">{t('Device')}</h3>
     <dl class="mt-2 space-y-1 text-sm">
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Model')}</dt><dd class="text-zinc-800">{model ?? '—'}</dd></div>
-      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Uptime')}</dt><dd class="text-zinc-800">{fmt_uptime(info?.uptime)}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('Uptime')}</dt><dd class="text-zinc-800">{uptime_format(info?.uptime)}</dd></div>
     </dl>
   </div>
 

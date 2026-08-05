@@ -33,7 +33,8 @@ export const SERVICE_ENTRIES = [
 export const STATUS_ITEMS = [
   { key: 'clients', label: 'Clients', icon: 'bi-people' },
   { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' },
-  { key: 'state', label: 'State', icon: 'bi-speedometer2' }
+  { key: 'state', label: 'State', icon: 'bi-speedometer2' },
+  { key: 'ucoord', label: 'ucoord', icon: 'bi-diagram-3' }
 ]
 
 // Pages of the Configure section. Services expands into SERVICE_ENTRIES.

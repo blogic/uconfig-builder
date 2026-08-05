@@ -8,6 +8,7 @@
 import { devices_refresh, devices_clear } from './devices.svelte.js'
 import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.js'
 import { traffic_refresh, traffic_clear } from './traffic.svelte.js'
+import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.js'
 
 // Interval matches how fast the underlying data actually changes: the device
 // samples traffic every 10s, so polling it faster only re-reads the same
@@ -15,7 +16,10 @@ import { traffic_refresh, traffic_clear } from './traffic.svelte.js'
 const FEEDS = [
   { key: 'clients', refresh: devices_refresh, clear: devices_clear, every: 5000 },
   { key: 'state', refresh: sysinfo_refresh, clear: sysinfo_clear, every: 5000 },
-  { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 }
+  { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 },
+  // Peer entries only change on a state transition, so this is near-static; the
+  // cost is one status call plus an info call per connected peer.
+  { key: 'ucoord', refresh: ucoord_refresh, clear: ucoord_clear, every: 10000 }
 ]
 
 export const loading = $state({ active: false, done: 0, total: FEEDS.length })

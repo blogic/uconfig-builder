@@ -400,6 +400,7 @@
     {#if key === 'clients'}<DP.NetworkPage />
     {:else if key === 'traffic'}<DP.TrafficPage />
     {:else if key === 'state'}<DP.StatePage />
+    {:else if key === 'ucoord'}<DP.UcoordPage />
     {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}
       <DP.SystemBusy>
         {#snippet children()}

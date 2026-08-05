@@ -35,6 +35,7 @@ export const PAGE_DESCRIPTIONS = {
   interfaces:
     'Logical networks on this device. Each interface carries its own addressing, SSIDs, ports and services.',
   traffic: 'Throughput on the upstream interface. The gauges show the current rate; the chart shows recorded history.',
+  ucoord: 'Devices coordinated with this one, grouped by venue. Only the highlighted peer is managed from this session.',
   reboot: 'Restart the device. Clients lose their connection until it comes back up, usually within a minute.',
   firmware: 'Upload a firmware image and flash it. The device reboots once the image is written.',
   'factory-reset': 'Erase the configuration and return the device to its defaults.',
