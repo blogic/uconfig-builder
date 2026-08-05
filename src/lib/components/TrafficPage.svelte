@@ -4,6 +4,7 @@
   import { traffic, RESOLUTIONS, rates, current, has_traffic } from '../traffic.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
+  import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
   // Live drives the gauges; the chart shows the selected history.
@@ -21,6 +22,9 @@
     week: '7 days ago'
   }
 
+
+  // Refresh on arrival, then poll while this page is open.
+  $effect(() => poll_feed('traffic'))
 </script>
 
 <PageHeader title={t('Traffic')} />

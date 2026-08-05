@@ -4,6 +4,7 @@
   import DeviceRow from './DeviceRow.svelte'
   import Spinner from './Spinner.svelte'
   import PageHeader from './PageHeader.svelte'
+  import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
   // `online` is absent rather than false on devices only ever seen via ARP,
@@ -24,6 +25,9 @@
   // Stale ARP entries usually outnumber the live ones; keep them out of the way.
   let showOffline = $state(false)
 
+
+  // Refresh on arrival, then poll while this page is open.
+  $effect(() => poll_feed('clients'))
 </script>
 
 <PageHeader title={deviceStore.data ? t('Clients ({count})', { count: online.length }) : t('Clients')}>

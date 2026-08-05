@@ -46,9 +46,20 @@ export async function preload() {
   loading.label = null
 }
 
-export function polling_start() {
-  polling_stop()
-  timers = FEEDS.map((f) => setInterval(f.refresh, f.every))
+// Poll one feed while its page is open: refresh immediately on arrival, then
+// on an interval, and stop on leave. Returns a teardown for $effect.
+export function poll_feed(key) {
+  const feed = FEEDS.find((f) => f.key === key)
+  if (!feed) return () => {}
+
+  feed.refresh()
+  const iv = setInterval(feed.refresh, feed.every)
+  timers.push(iv)
+
+  return () => {
+    clearInterval(iv)
+    timers = timers.filter((t) => t !== iv)
+  }
 }
 
 export function polling_stop() {

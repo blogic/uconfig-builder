@@ -1,6 +1,7 @@
 <script>
   import { capabilities } from '../capabilities.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
+  import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
   // Held in a module store so re-entering the page renders the last reading
@@ -44,6 +45,9 @@
     return s && s.total ? Math.round((s.used / s.total) * 100) : 0
   }
 
+
+  // Refresh on arrival, then poll while this page is open.
+  $effect(() => poll_feed('state'))
 </script>
 
 {#snippet bar(pct)}

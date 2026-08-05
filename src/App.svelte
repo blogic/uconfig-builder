@@ -182,10 +182,7 @@
 
       // Seed every live page before showing the UI, so navigating between
       // Clients, Traffic and State never waits on a round trip.
-      if (IS_DEVICE) {
-        await dev.poll.preload()
-        dev.poll.polling_start()
-      }
+      if (IS_DEVICE) await dev.poll.preload()
     } catch (e) {
       loginError = e?.message || String(e)
     } finally {
