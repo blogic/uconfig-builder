@@ -1,10 +1,18 @@
-<script>
+<script lang="ts">
   import { title_for } from '../schema.js'
   import { accordion_get } from '../accordion.svelte.js'
   import { view } from '../view.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Snippet } from 'svelte'
 
-  let { container, key, title = null, children } = $props()
+  interface Props {
+    container: Record<string, unknown>
+    key: string
+    title?: string | null
+    children: Snippet
+  }
+
+  let { container, key, title = null, children }: Props = $props()
 
   const acc = accordion_get()
   const id = $props.id()
@@ -39,7 +47,7 @@
   </button>
 {/snippet}
 
-{#snippet chevron(rev)}
+{#snippet chevron(rev: boolean)}
   <svg
     class="h-4 w-4 flex-shrink-0 text-zinc-400 transition-transform {open ? (rev ? '-rotate-180' : 'rotate-180') : ''}"
     viewBox="0 0 24 24"

@@ -1,7 +1,26 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
   import { page } from '../page.svelte.js'
   import BrandMark from './BrandMark.svelte'
+
+  interface Section {
+    key: string
+    label: string
+    icon: string
+  }
+
+  interface Props {
+    sections?: Section[]
+    section: string
+    onSelect: (key: string) => void
+    deviceModel?: string | null
+    host?: string | null
+    themeMode: 'light' | 'dark'
+    onToggleTheme: () => void
+    onLogout?: (() => void) | null
+    railed?: boolean
+    aligned?: boolean
+  }
 
   let {
     sections = [],
@@ -14,7 +33,7 @@
     onLogout = null,
     railed = false,
     aligned = false
-  } = $props()
+  }: Props = $props()
 
   let menuOpen = $state(false)
 </script>

@@ -3,7 +3,7 @@
 // Layout-driven fields carry their own describe in layouts.js; this covers the
 // fields that have no layout entry (quality-of-service, RADIUS-server users,
 // DHCP pool and similar nested objects).
-export const DESCRIPTIONS = {
+export const DESCRIPTIONS: Record<string, string> = {
   // quality-of-service
   services: 'Named services to classify.',
   'bulk-detection': 'Auto-classify bulk flows.',
@@ -26,7 +26,7 @@ export const DESCRIPTIONS = {
 
 // Prose shown under each page header, keyed by nav section. The wording for
 // unit, radios and interface is carried over from the previous builder.
-export const PAGE_DESCRIPTIONS = {
+export const PAGE_DESCRIPTIONS: Record<string, string> = {
   unit: 'Configure basic device settings including hostname, location, and timezone. These settings identify your device on the network and ensure proper time management.',
   radios:
     'Configure wireless radio settings for different frequency bands. Adjust power levels, channels, and other radio parameters to optimize wireless performance.',
@@ -50,7 +50,7 @@ export const PAGE_DESCRIPTIONS = {
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,
 // log, mdns and lldp are carried over from the previous builder; the remaining
 // services had no page there, so their wording follows the same register.
-export const SERVICE_DESCRIPTIONS = {
+export const SERVICE_DESCRIPTIONS: Record<string, string> = {
   ssh: 'Configure the SSH (Secure Shell) server for secure remote access to the device.',
   'radius-server':
     'Configure the local RADIUS service settings. The RADIUS service provides authentication and authorization services for network devices.',

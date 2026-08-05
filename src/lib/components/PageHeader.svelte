@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // The standalone editor has no section tabs, so its top bar has room for the
   // page title and it is hoisted there (see TopBar's `railed` mode).
   //
@@ -8,7 +8,12 @@
   import { page_set, page_clear } from '../page.svelte.js'
   import { hoisted } from '../page.svelte.js'
 
-  let { title, actions = null } = $props()
+  interface Props {
+    title: string
+    actions?: import('svelte').Snippet | null
+  }
+
+  let { title, actions = null }: Props = $props()
 
   $effect(() => {
     if (!hoisted.on) return

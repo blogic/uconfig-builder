@@ -5,9 +5,24 @@
 // deltas per bucket. Buckets are unlabelled: index 0 is oldest, last is
 // newest. Slot widths come from uconfig-state, which polls every 10s.
 
-import { request } from './connection.svelte.js'
+import { request } from './connection.svelte.ts'
 
-export const RESOLUTIONS = [
+export interface Resolution {
+  key: string
+  index: number
+  buckets: number
+  slot: number
+  label: string
+}
+
+// Each of `up`/`down` is four series of byte deltas per bucket, indexed by
+// `Resolution.index`. Buckets are unlabelled: index 0 is oldest, last is newest.
+export interface TrafficData {
+  up: number[][]
+  down: number[][]
+}
+
+export const RESOLUTIONS: Resolution[] = [
   { key: 'live', index: 0, buckets: 12, slot: 10, label: 'Live' },
   { key: 'hour', index: 1, buckets: 60, slot: 60, label: 'Hour' },
   { key: 'day', index: 2, buckets: 24, slot: 3600, label: 'Day' },
@@ -17,15 +32,19 @@ export const RESOLUTIONS = [
 // Gauge full scale, until the WAN link speed is plumbed through.
 export const LINK_BITS = 1e9
 
-export const traffic = $state({ data: null, error: null, loading: false })
+export const traffic = $state<{
+  data: TrafficData | null
+  error: string | null
+  loading: boolean
+}>({ data: null, error: null, loading: false })
 
 export async function traffic_refresh() {
   traffic.loading = true
   try {
-    traffic.data = (await request('traffic', {})) ?? null
+    traffic.data = (await request<TrafficData>('traffic', {})) ?? null
     traffic.error = null
   } catch (e) {
-    traffic.error = e?.message || String(e)
+    traffic.error = e instanceof Error ? e.message : String(e)
   } finally {
     traffic.loading = false
   }
@@ -37,26 +56,26 @@ export function traffic_clear() {
   traffic.loading = false
 }
 
-function series(dir, index) {
+function series(dir: keyof TrafficData, index: number): number[] {
   const s = traffic.data?.[dir]?.[index]
   return Array.isArray(s) ? s : []
 }
 
 // Bytes per bucket to bits per second at that resolution's slot width.
-export function rates(dir, res) {
+export function rates(dir: keyof TrafficData, res: Resolution): number[] {
   return series(dir, res.index).map((b) => ((b ?? 0) * 8) / res.slot)
 }
 
 // Newest bucket of the live series: the current throughput.
-export function current(dir) {
+export function current(dir: keyof TrafficData): number {
   const live = RESOLUTIONS[0]
   const s = series(dir, live.index)
   return s.length ? ((s[s.length - 1] ?? 0) * 8) / live.slot : 0
 }
 
-export function has_traffic() {
+export function has_traffic(): boolean {
   if (!traffic.data) return false
-  for (const dir of ['up', 'down']) {
+  for (const dir of ['up', 'down'] as const) {
     for (const res of RESOLUTIONS) {
       if (series(dir, res.index).some((b) => b > 0)) return true
     }
@@ -64,7 +83,7 @@ export function has_traffic() {
   return false
 }
 
-export function bits_format(bps) {
+export function bits_format(bps: number | null | undefined): { value: string; unit: string } {
   if (!bps || bps < 1) return { value: '0', unit: 'bit/s' }
   const units = ['bit/s', 'kbit/s', 'Mbit/s', 'Gbit/s']
   let i = 0

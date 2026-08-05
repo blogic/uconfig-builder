@@ -1,9 +1,15 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
+
+  interface Props {
+    onclick: (e: MouseEvent) => void
+    label?: string | null
+    filled?: boolean
+  }
 
   // Row-level removal is a bare trash icon; `filled` gives the page-level
   // destructive button (e.g. Remove Interface) its red fill and text.
-  let { onclick, label = null, filled = false } = $props()
+  let { onclick, label = null, filled = false }: Props = $props()
 
   const text = $derived(label ? t('Remove {label}', { label }) : t('Remove'))
 </script>

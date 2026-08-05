@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Reboot, factory reset and firmware upgrade all put the device out of reach
   // while they run, so the whole System section shows the progress state
   // rather than each page owning its own.
@@ -6,7 +6,11 @@
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
 
-  let { children } = $props()
+  interface Props {
+    children: import('svelte').Snippet
+  }
+
+  let { children }: Props = $props()
 </script>
 
 {#if systemState.busy}

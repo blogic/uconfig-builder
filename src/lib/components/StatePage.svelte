@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
   import { capabilities } from '../capabilities.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
+
+  interface Storage {
+    total: number
+    free: number
+    used: number
+  }
 
   // Held in a module store so re-entering the page renders the last reading
   // straight away, with the refresh landing underneath it.
@@ -14,9 +20,9 @@
   const model = $derived(capabilities.data?.capabilities?.model)
   const mem = $derived(info?.memory)
   const memUsed = $derived(mem ? mem.total - mem.available : null)
-  const memPct = $derived(mem && mem.total ? Math.round((memUsed / mem.total) * 100) : 0)
+  const memPct = $derived(memUsed != null && mem?.total ? Math.round((memUsed / mem.total) * 100) : 0)
 
-  function fmt_bytes(b) {
+  function fmt_bytes(b: number | null | undefined): string {
     if (b == null) return '—'
     const u = ['B', 'KB', 'MB', 'GB', 'TB']
     let i = 0
@@ -31,7 +37,7 @@
   // ubus loadavg is fixed-point, scaled by 1<<16.
   const load = $derived((info?.load ?? []).map((v) => (v / 65536).toFixed(2)))
 
-  function storage_pct(s) {
+  function storage_pct(s: Storage | null | undefined): number {
     return s && s.total ? Math.round((s.used / s.total) * 100) : 0
   }
 
@@ -40,7 +46,7 @@
   $effect(() => poll_feed('state'))
 </script>
 
-{#snippet bar(pct)}
+{#snippet bar(pct: number)}
   <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-200">
     <div class="h-full rounded-full bg-accent" style="width: {Math.min(100, Math.max(0, pct))}%"></div>
   </div>

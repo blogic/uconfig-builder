@@ -1,12 +1,21 @@
-<script>
+<script lang="ts">
   import { band_modes } from '../capabilities.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Radio } from '../types/uconfig'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema, band, describe = null } = $props()
+  interface Props {
+    obj: Radio
+    schema?: JsonSchemaNode
+    band: string
+    describe?: string | null
+  }
+
+  let { obj, schema, band, describe = null }: Props = $props()
 
   const fid = $props.id()
   const value = $derived(obj['channel-mode'])
-  const def = $derived(schema?.default ?? 'HE')
+  const def = $derived((schema?.default as Radio['channel-mode'] | undefined) ?? 'HE')
   const options = $derived(band_modes(band))
   const fallback = $derived(options.includes(def) ? def : options[options.length - 1])
   const invalid = $derived(value != null && !options.includes(value))
@@ -14,10 +23,10 @@
   const selected = $derived(value ?? fallback)
   const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim()))
 
-  function onChange(e) {
-    const v = e.target.value
+  function onChange(e: Event) {
+    const v = (e.currentTarget as HTMLSelectElement).value
     if (v === '') delete obj['channel-mode']
-    else obj['channel-mode'] = v
+    else obj['channel-mode'] = v as Radio['channel-mode']
   }
 </script>
 

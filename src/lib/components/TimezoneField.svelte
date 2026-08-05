@@ -1,15 +1,20 @@
-<script>
+<script lang="ts">
   import { tz_keys } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Unit } from '../types/uconfig'
 
-  let { obj } = $props()
+  interface Props {
+    obj: Unit
+  }
+
+  let { obj }: Props = $props()
 
   const fid = $props.id()
   const value = $derived(obj.timezone)
   const options = $derived(value && !tz_keys.includes(value) ? [value, ...tz_keys] : tz_keys)
 
-  function onChange(e) {
-    const v = e.target.value
+  function onChange(e: Event) {
+    const v = (e.currentTarget as HTMLSelectElement).value
     if (!v) delete obj.timezone
     else obj.timezone = v
   }

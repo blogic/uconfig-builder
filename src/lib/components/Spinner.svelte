@@ -1,5 +1,9 @@
-<script>
-  let { class: cls = 'h-5 w-5 text-zinc-400' } = $props()
+<script lang="ts">
+  interface Props {
+    class?: string
+  }
+
+  let { class: cls = 'h-5 w-5 text-zinc-400' }: Props = $props()
 </script>
 
 <svg class="animate-spin {cls}" viewBox="0 0 24 24" fill="none" aria-hidden="true">

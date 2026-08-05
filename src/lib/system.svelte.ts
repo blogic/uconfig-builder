@@ -2,12 +2,14 @@
 // upgrade each own a page, but all three put the device out of reach while
 // they run, so the busy state is held here rather than per page.
 
-export const systemState = $state({
-  busy: null, // 'rebooting' | 'resetting' | 'uploading' | 'upgrading'
+export type SystemBusy = 'rebooting' | 'resetting' | 'uploading' | 'upgrading'
+
+export const systemState = $state<{ busy: SystemBusy | null; error: string | null }>({
+  busy: null,
   error: null
 })
 
-export const BUSY_MESSAGES = {
+export const BUSY_MESSAGES: Record<SystemBusy, string> = {
   rebooting: 'The device is rebooting…',
   resetting: 'The device is resetting to factory defaults…',
   uploading: 'Uploading firmware…',

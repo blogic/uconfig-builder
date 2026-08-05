@@ -1,11 +1,17 @@
-<script>
+<script lang="ts">
   import ArrayListField from './ArrayListField.svelte'
   import { title_for } from '../schema.js'
   import { accordion_get } from '../accordion.svelte.js'
   import { view } from '../view.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+    schema: JsonSchemaNode
+  }
+
+  let { obj, schema }: Props = $props()
 
   const KEY = 'disallow-upstream-subnet'
   const acc = accordion_get()
@@ -55,7 +61,7 @@
   </div>
 {/snippet}
 
-{#snippet chevron(rev)}
+{#snippet chevron(rev: boolean)}
   <svg
     class="h-4 w-4 flex-shrink-0 text-zinc-400 transition-transform {open ? (rev ? '-rotate-180' : 'rotate-180') : ''}"
     viewBox="0 0 24 24"

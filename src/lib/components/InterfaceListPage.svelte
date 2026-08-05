@@ -1,26 +1,33 @@
-<script>
+<script lang="ts">
   import InterfaceAddForm from './InterfaceAddForm.svelte'
   import ChangesIndicator from './ChangesIndicator.svelte'
   import { store } from '../store.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
+  import type { Interface } from '../types/uconfig'
 
-  let { onOpen, changes = [] } = $props()
+  interface Props {
+    onOpen: (name: string) => void
+    changes?: ChangeEntry[]
+  }
+
+  let { onOpen, changes = [] }: Props = $props()
 
   let showModal = $state(false)
 
   const interfaces = $derived(store.doc.interfaces ?? {})
   const names = $derived(Object.keys(interfaces))
 
-  function create(name, value) {
+  function create(name: string, value: Interface) {
     if (!store.doc.interfaces || typeof store.doc.interfaces !== 'object') store.doc.interfaces = {}
     if (store.doc.interfaces[name] === undefined) store.doc.interfaces[name] = value
     showModal = false
     onOpen(name)
   }
 
-  function summary(iface) {
+  function summary(iface: Interface | undefined) {
     const addressing = iface?.ipv4?.addressing ?? (iface?.role === 'downstream' ? 'static' : 'dynamic')
     const ports = Object.keys(iface?.ports ?? {}).join(', ')
     return { addressing, ports }

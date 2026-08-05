@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { request as ws_request, upload as ws_upload } from '../connection.svelte.js'
   import { confirm } from '../confirm.svelte.js'
   import { systemState } from '../system.svelte.js'
@@ -6,25 +6,25 @@
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
-  let file = $state(null)
+  let file: File | null = $state(null)
   let keepConfig = $state(false)
 
-  function pick(e) {
-    file = e.target.files?.[0] ?? null
+  function pick(e: Event): void {
+    file = (e.currentTarget as HTMLInputElement).files?.[0] ?? null
   }
 
-  async function do_upgrade() {
+  async function do_upgrade(): Promise<void> {
     if (!file) return
     if (!(await confirm(t('Flash "{name}" and reboot?', { name: file.name }), 'Flash'))) return
     systemState.error = null
     systemState.busy = 'uploading'
     try {
-      const tok = await ws_request('sysupgrade', { action: 'token' })
+      const tok = await ws_request<{ upload_url: string }>('sysupgrade', { action: 'token' })
       const res = await ws_upload(tok.upload_url, file)
       systemState.busy = 'upgrading'
       await ws_request('sysupgrade', { action: 'apply', file_id: res.file_id, keep_config: keepConfig })
     } catch (e) {
-      systemState.error = e?.message || String(e)
+      systemState.error = e instanceof Error ? e.message : String(e)
       systemState.busy = null
     }
   }

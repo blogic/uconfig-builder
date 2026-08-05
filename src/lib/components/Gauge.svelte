@@ -1,8 +1,14 @@
-<script>
+<script lang="ts">
   import { bits_format, LINK_BITS } from '../traffic.svelte.js'
   import { t } from '../i18n.svelte.js'
 
-  let { value = 0, label, muted = false } = $props()
+  interface Props {
+    value?: number
+    label: string
+    muted?: boolean
+  }
+
+  let { value = 0, label, muted = false }: Props = $props()
 
   const R = 52
   const CX = 60
@@ -17,12 +23,12 @@
   const frac = $derived(fraction(value))
   const fmt = $derived(bits_format(value))
 
-  function fraction(bps) {
+  function fraction(bps: number): number {
     if (!bps || bps < 1e3) return 0
     return Math.min(1, Math.log10(bps / 1e3) / DECADES)
   }
 
-  function arc(from, to) {
+  function arc(from: number, to: number): string {
     const a0 = ((START + from * SWEEP) * Math.PI) / 180
     const a1 = ((START + to * SWEEP) * Math.PI) / 180
     const x0 = CX + R * Math.cos(a0)

@@ -1,8 +1,18 @@
-<script>
+<script lang="ts">
   import { channel_options, default_width } from '../channels.js'
   import { t } from '../i18n.svelte.js'
+  import type { Radio } from '../types/uconfig'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema, band, describe = null } = $props()
+  interface Props {
+    obj: Radio
+    schema: JsonSchemaNode
+    band: string
+    describe?: string | null
+  }
+
+  // `schema` kept in Props for the widget call-site contract; unused here.
+  let { obj, schema: _schema, band, describe = null }: Props = $props()
 
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
@@ -17,8 +27,8 @@
     else if (value !== 'auto' && !options.includes(value)) obj.channel = 'auto'
   })
 
-  function onChange(e) {
-    const v = e.target.value
+  function onChange(e: Event) {
+    const v = (e.currentTarget as HTMLSelectElement).value
     obj.channel = v === 'auto' ? 'auto' : Number(v)
   }
 </script>

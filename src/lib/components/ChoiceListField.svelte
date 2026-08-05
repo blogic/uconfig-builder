@@ -1,11 +1,18 @@
-<script>
+<script lang="ts">
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { t } from '../i18n.svelte.js'
 
-  let { obj, key, options, label = null } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+    key: string
+    options: string[]
+    label?: string | null
+  }
 
-  const list = $derived(Array.isArray(obj[key]) ? obj[key] : [])
+  let { obj, key, options, label = null }: Props = $props()
+
+  const list = $derived(Array.isArray(obj[key]) ? (obj[key] as string[]) : [])
   const available = $derived(options.filter((o) => !list.includes(o)))
 
   let showModal = $state(false)
@@ -18,17 +25,18 @@
   function commit() {
     if (!sel) return
     if (!Array.isArray(obj[key])) obj[key] = []
-    obj[key].push(sel)
+    ;(obj[key] as string[]).push(sel)
     showModal = false
   }
-  function remove(v) {
-    obj[key].splice(obj[key].indexOf(v), 1)
-    if (!obj[key].length) delete obj[key]
+  function remove(v: string) {
+    const arr = obj[key] as string[]
+    arr.splice(arr.indexOf(v), 1)
+    if (!arr.length) delete obj[key]
   }
 </script>
 
 <ListBox items={list} {label} showAdd={available.length > 0} onAdd={open}>
-  {#snippet row(v)}
+  {#snippet row(v: string)}
     <span class="flex-1 font-mono text-xs font-semibold text-zinc-800">{v}</span>
     <RemoveButton onclick={() => remove(v)} />
   {/snippet}

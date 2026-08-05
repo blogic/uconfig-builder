@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
   import { bits_format } from '../traffic.svelte.js'
   import { t } from '../i18n.svelte.js'
 
-  let { down = [], up = [], leftLabel = '', rightLabel = '' } = $props()
+  interface Props {
+    down?: number[]
+    up?: number[]
+    leftLabel?: string
+    rightLabel?: string
+  }
+
+  let { down = [], up = [], leftLabel = '', rightLabel = '' }: Props = $props()
 
   const W = 600
   const H = 160
@@ -13,7 +20,7 @@
   const peak = $derived(Math.max(1, ...down, ...up))
   const peakFmt = $derived(bits_format(peak))
 
-  function area(values, up_ward) {
+  function area(values: number[], up_ward: boolean): string {
     const n = values.length
     if (!n) return ''
     const step = W / Math.max(1, n - 1)

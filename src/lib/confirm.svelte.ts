@@ -1,4 +1,11 @@
-export const confirmState = $state({
+interface ConfirmState {
+  open: boolean
+  message: string
+  confirmLabel: string | null
+  _resolve: ((ok: boolean) => void) | null
+}
+
+export const confirmState = $state<ConfirmState>({
   open: false,
   message: '',
   confirmLabel: null,
@@ -7,8 +14,8 @@ export const confirmState = $state({
 
 // `confirmLabel` names the destructive action; it defaults to Remove, which is
 // what most call sites are asking about.
-export function confirm(message, confirmLabel) {
-  return new Promise((resolve) => {
+export function confirm(message: string, confirmLabel?: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
     confirmState.message = message
     confirmState.confirmLabel = confirmLabel ?? null
     confirmState.open = true
@@ -16,7 +23,7 @@ export function confirm(message, confirmLabel) {
   })
 }
 
-export function confirm_answer(ok) {
+export function confirm_answer(ok: boolean) {
   const resolve = confirmState._resolve
   confirmState.open = false
   confirmState.message = ''

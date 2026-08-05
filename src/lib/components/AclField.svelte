@@ -1,23 +1,27 @@
-<script>
+<script lang="ts">
   import ArrayListField from './ArrayListField.svelte'
   import { def_get, ref_resolve } from '../schema.js'
   import { t } from '../i18n.svelte.js'
 
-  let { obj } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+  }
+
+  let { obj }: Props = $props()
 
   const KEY = 'access-control-list'
   const fid = $props.id()
-  const acl = $derived(obj[KEY])
-  const mode = $derived(acl?.mode ?? 'disabled')
-  const macSchema = ref_resolve(def_get('interface.ssid.acl')).properties['mac-address']
+  const acl = $derived(obj[KEY] as Record<string, unknown> | undefined)
+  const mode = $derived((acl?.mode as 'allow' | 'deny' | undefined) ?? 'disabled')
+  const macSchema = ref_resolve(def_get('interface.ssid.acl') ?? {}).properties?.['mac-address'] ?? {}
 
-  function onMode(e) {
-    const v = e.target.value
+  function onMode(e: Event) {
+    const v = (e.currentTarget as HTMLSelectElement).value
     if (v === 'disabled') {
       delete obj[KEY]
     } else {
       if (!obj[KEY] || typeof obj[KEY] !== 'object') obj[KEY] = {}
-      obj[KEY].mode = v
+      ;(obj[KEY] as Record<string, unknown>).mode = v
     }
   }
 </script>

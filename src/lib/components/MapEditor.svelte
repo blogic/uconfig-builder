@@ -1,10 +1,35 @@
-<script>
+<script lang="ts" generics="V extends Record<string, unknown> | string">
   import Field from './Field.svelte'
   import { title_for } from '../schema.js'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
   import AddButton from './AddButton.svelte'
   import RemoveButton from './RemoveButton.svelte'
+  import type { Snippet } from 'svelte'
+  import type { JsonSchemaNode } from '../schema'
+
+  type MapEntry = Record<string, unknown>
+
+  interface AddModalArg {
+    create: (name: string, value: MapEntry) => void
+    close: () => void
+    map: Record<string, MapEntry>
+  }
+
+  interface Props {
+    parent: Record<string, unknown>
+    mapKey: string
+    valueSchema: JsonSchemaNode | null
+    keyLabel?: string
+    tabbed?: boolean
+    keyOptions?: string[] | null
+    renamable?: boolean
+    embedded?: boolean
+    addModal?: Snippet<[AddModalArg]> | null
+    makeValue?: ((name: string) => V) | null
+    item?: Snippet<[V, string]> | null
+    locked?: boolean
+  }
 
   let {
     parent,
@@ -19,82 +44,89 @@
     makeValue = null,
     item = null,
     locked = false
-  } = $props()
+  }: Props = $props()
 
-  const map = $derived(parent[mapKey] ?? {})
+  const map = $derived((parent[mapKey] as Record<string, V> | undefined) ?? {})
   const keys = $derived(Object.keys(map))
   const scalarValue = $derived(valueSchema && valueSchema.type && valueSchema.type !== 'object')
   const staticName = $derived(keyOptions != null || !renamable)
 
   let newKey = $state('')
   let showModal = $state(false)
-  let active = $state(null)
+  let active: string | null = $state(null)
 
   const available = $derived(keyOptions ? keyOptions.filter((o) => !keys.includes(o)) : null)
 
   $effect(() => {
-    if (!keys.includes(active)) active = keys[0] ?? null
+    if (!keys.includes(active ?? '')) active = keys[0] ?? null
   })
 
   function ensure() {
     if (!parent[mapKey] || typeof parent[mapKey] !== 'object') parent[mapKey] = {}
   }
 
-  function new_value(name) {
+  function new_value(name: string): V {
     if (makeValue) return makeValue(name)
-    return scalarValue ? '' : {}
+    // Without a makeValue factory the caller is using the built-in shape, which
+    // is an empty string for scalar maps and an empty object otherwise; neither
+    // is expressible as an arbitrary V.
+    return (scalarValue ? '' : {}) as V
   }
 
   function add() {
     const name = newKey.trim()
     if (!name) return
     ensure()
-    if (parent[mapKey][name] === undefined) parent[mapKey][name] = new_value(name)
+    const m = parent[mapKey] as Record<string, V>
+    if (m[name] === undefined) m[name] = new_value(name)
     active = name
     newKey = ''
   }
 
-  function add_named(name) {
+  function add_named(name: string) {
     ensure()
-    if (parent[mapKey][name] === undefined) parent[mapKey][name] = new_value(name)
+    const m = parent[mapKey] as Record<string, V>
+    if (m[name] === undefined) m[name] = new_value(name)
     active = name
     showModal = false
   }
 
-  function create(name, value) {
+  function create(name: string, value: MapEntry) {
     ensure()
-    if (parent[mapKey][name] === undefined) parent[mapKey][name] = value
+    const m = parent[mapKey] as Record<string, V>
+    // addModal builds plain entry objects; only object-valued maps use it.
+    if (m[name] === undefined) m[name] = value as V
     active = name
     showModal = false
   }
 
-  async function remove(name) {
+  async function remove(name: string) {
     const shown = keyOptions ? title_for(name) : name
     if (!(await confirm(t('Remove {label} "{name}"?', { label: t(keyLabel), name: shown })))) return
-    delete parent[mapKey][name]
+    delete (parent[mapKey] as Record<string, V>)[name]
   }
 
-  function rename(oldName, e) {
-    const next = e.target.value.trim()
+  function rename(oldName: string, e: Event) {
+    const next = (e.currentTarget as HTMLInputElement).value.trim()
     if (!next || next === oldName) return
-    const m = parent[mapKey]
+    const m = parent[mapKey] as Record<string, V>
     if (m[next] !== undefined) return
-    const rebuilt = {}
+    const rebuilt: Record<string, V> = {}
     for (const [k, v] of Object.entries(m)) rebuilt[k === oldName ? next : k] = v
     parent[mapKey] = rebuilt
     if (active === oldName) active = next
   }
 </script>
 
-{#snippet body(name)}
+{#snippet body(name: string)}
   {#if scalarValue}
-    <Field obj={map} key={name} schema={valueSchema} label="value" />
+    <Field obj={map as Record<string, string>} key={name} schema={valueSchema ?? {}} label="value" />
   {:else if item}
     {@render item(map[name], name)}
   {/if}
 {/snippet}
 
-{#snippet rename_input(name)}
+{#snippet rename_input(name: string)}
   <input
     class="input max-w-[16rem] font-mono text-xs"
     value={name}
@@ -103,7 +135,7 @@
   />
 {/snippet}
 
-{#snippet name_or_rename(name)}
+{#snippet name_or_rename(name: string)}
   {#if staticName}
     <span class="font-mono text-xs font-semibold text-zinc-700">{name}</span>
   {:else}
@@ -111,11 +143,11 @@
   {/if}
 {/snippet}
 
-{#snippet add_control(narrow)}
+{#snippet add_control(narrow: boolean)}
   {#if locked}
     <!-- entries are fixed (device-driven); no manual add -->
   {:else if keyOptions}
-    {#if available.length}
+    {#if available?.length}
       <AddButton label={t(keyLabel)} onclick={() => (showModal = true)} />
     {/if}
   {:else if addModal}
@@ -157,7 +189,7 @@
       {@render body(active)}
       {#if !locked}
         <div class="mt-6 flex justify-end">
-          <RemoveButton label={t(keyLabel)} onclick={() => remove(active)} />
+          <RemoveButton label={t(keyLabel)} onclick={() => active != null && remove(active)} />
         </div>
       {/if}
     {/if}
@@ -220,7 +252,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onclick={() => (showModal = false)}>
     <div class="w-full max-w-sm rounded-base border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
-      {@render addModal({ create, close: () => (showModal = false), map })}
+      {@render addModal({ create, close: () => (showModal = false), map: map as Record<string, MapEntry> })}
     </div>
   </div>
 {/if}

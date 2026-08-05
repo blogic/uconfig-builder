@@ -1,8 +1,16 @@
-<script>
+<script lang="ts">
   import { store, doc_export, config_save, saved_names } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { changes, connected = false, applyError = null, onApply } = $props()
+  interface Props {
+    changes: ChangeEntry[]
+    connected?: boolean
+    applyError?: string | null
+    onApply: () => void
+  }
+
+  let { changes, connected = false, applyError = null, onApply }: Props = $props()
 
   let name = $state(store.loadedFrom && store.loadedFrom !== 'imported' ? store.loadedFrom : '')
   let savedNote = $state('')
@@ -10,10 +18,10 @@
   // Entries keep their document order within a domain; domains appear in the
   // order they are first seen (Unit, Radios, Interfaces, Services).
   const grouped = $derived.by(() => {
-    const map = new Map()
+    const map = new Map<string, ChangeEntry[]>()
     for (const c of changes) {
       if (!map.has(c.section)) map.set(c.section, [])
-      map.get(c.section).push(c)
+      map.get(c.section)!.push(c)
     }
     return [...map]
   })

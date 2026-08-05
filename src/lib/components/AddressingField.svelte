@@ -1,12 +1,21 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema, role, describe = null } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+    schema: JsonSchemaNode
+    role?: string
+    describe?: string | null
+  }
+
+  let { obj, schema, role, describe = null }: Props = $props()
 
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
   const isDownstream = $derived(role === 'downstream')
-  const options = $derived(schema.enum ?? ['dynamic', 'static'])
+  const options = $derived((schema.enum as string[] | undefined) ?? ['dynamic', 'static'])
+  const addressing = $derived(obj.addressing as string | undefined)
 
   // Downstream interfaces are always static; upstream default to dynamic (DHCP).
   $effect(() => {
@@ -17,15 +26,15 @@
     }
   })
 
-  function onChange(e) {
-    obj.addressing = e.target.value
+  function onChange(e: Event) {
+    obj.addressing = (e.currentTarget as HTMLSelectElement).value
   }
 </script>
 
 {#if !isDownstream}
   <div class="flex flex-col gap-1">
     <label for={fid} class="text-xs font-medium text-zinc-700">{t('Addressing')}</label>
-    <select id={fid} class="input" value={obj.addressing ?? 'dynamic'} onchange={onChange}>
+    <select id={fid} class="input" value={addressing ?? 'dynamic'} onchange={onChange}>
       {#each options as o}
         <option value={o}>{t(o)}</option>
       {/each}

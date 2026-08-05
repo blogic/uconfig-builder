@@ -6,7 +6,7 @@
 // channels the hardware actually reports; the builder has no hardware to query,
 // so it offers every theoretically valid channel for the band.
 
-const ALL_20 = {
+const ALL_20: Record<string, number[]> = {
   '2G': Array.from({ length: 13 }, (_, i) => i + 1),
   '5G': [
     36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132,
@@ -17,7 +17,7 @@ const ALL_20 = {
 // 6 GHz Preferred Scanning Channels (PSC). On 6 GHz we only offer PSC channels.
 const PSC_6G = [5, 21, 37, 53, 69, 85, 101, 117, 133, 149, 165, 181, 197, 213, 229]
 
-const WIDTH = {
+const WIDTH: Record<string, Record<number, number[]>> = {
   '2G': {
     40: [1, 9]
   },
@@ -28,30 +28,30 @@ const WIDTH = {
   }
 }
 
-const WIDTHS = {
+const WIDTHS: Record<string, number[]> = {
   '2G': [20, 40],
   '5G': [20, 40, 80, 160],
   '6G': [20, 40, 80, 160, 320]
 }
 
-export function width_options(band) {
+export function width_options(band: string): number[] {
   return WIDTHS[String(band).toUpperCase()] ?? [20, 40, 80, 160]
 }
 
-export function default_width(band) {
+export function default_width(band: string): number {
   return String(band).toUpperCase() === '2G' ? 20 : 80
 }
 
 // Dynamic per-field visibility for the radio editor. Static drops
 // (require-mode, rates, maximum-clients, valid-channels, band) are handled via
 // skipKeys; this covers the rules that depend on band/width/channel-mode.
-export function radio_field_hidden(obj, band, key) {
-  band = String(band).toUpperCase()
+export function radio_field_hidden(obj: Record<string, unknown>, band: string, key: string): boolean {
+  const upperBand = String(band).toUpperCase()
   if (key === 'allow-dfs') {
-    if (band !== '5G') return true
-    return (obj['channel-width'] ?? default_width(band)) === 160
+    if (upperBand !== '5G') return true
+    return (obj['channel-width'] ?? default_width(upperBand)) === 160
   }
-  if (key === 'legacy-rates') return band !== '2G'
+  if (key === 'legacy-rates') return upperBand !== '2G'
   if (key === 'he-multiple-bssid') {
     const mode = obj['channel-mode'] ?? 'HE'
     return !(mode === 'HE' || mode === 'EHT')
@@ -59,10 +59,10 @@ export function radio_field_hidden(obj, band, key) {
   return false
 }
 
-export function channel_options(band, width) {
-  band = String(band).toUpperCase()
-  if (band === '6G') return PSC_6G
+export function channel_options(band: string, width: number | string): number[] {
+  const upperBand = String(band).toUpperCase()
+  if (upperBand === '6G') return PSC_6G
   const w = Number(width) || 20
-  if (w === 20) return ALL_20[band] ?? []
-  return WIDTH[band]?.[w] ?? []
+  if (w === 20) return ALL_20[upperBand] ?? []
+  return WIDTH[upperBand]?.[w] ?? []
 }

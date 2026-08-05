@@ -6,7 +6,14 @@
 //             service has no configuration block.
 //  - iface:   interface selectability - true (any), false (not per-interface),
 //             or 'downstream' (downstream interfaces only).
-export const SERVICES = [
+export interface ServiceEntry {
+  name: string
+  builtin: boolean
+  config: string | null
+  iface: boolean | 'downstream'
+}
+
+export const SERVICES: ServiceEntry[] = [
   { name: 'ssh', builtin: true, config: 'ssh', iface: true },
   { name: 'log', builtin: true, config: 'log', iface: false },
   { name: 'radius-server', builtin: true, config: 'radius-server', iface: true },
@@ -26,11 +33,11 @@ export const SERVICES = [
 ]
 
 // Service names selectable on an interface with the given role.
-export function interface_services(role) {
+export function interface_services(role: string | undefined): string[] {
   return SERVICES.filter((s) => s.iface === true || (s.iface === 'downstream' && role === 'downstream')).map(
     (s) => s.name
   )
 }
 
 // Config-schema keys for services that are available and configurable.
-export const SERVICE_CONFIG_KEYS = SERVICES.filter((s) => s.config).map((s) => s.config)
+export const SERVICE_CONFIG_KEYS: string[] = SERVICES.filter((s) => s.config).map((s) => s.config as string)

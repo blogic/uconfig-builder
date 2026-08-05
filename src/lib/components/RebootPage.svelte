@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { request as ws_request } from '../connection.svelte.js'
   import { confirm } from '../confirm.svelte.js'
   import { systemState } from '../system.svelte.js'
@@ -6,7 +6,7 @@
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
 
-  async function do_reboot() {
+  async function do_reboot(): Promise<void> {
     if (!(await confirm(t('Reboot the device now?'), 'Reboot'))) return
     systemState.error = null
     systemState.busy = 'rebooting'

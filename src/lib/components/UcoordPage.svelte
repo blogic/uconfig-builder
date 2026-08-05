@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
   import { ucoord, is_managed } from '../ucoord.svelte.js'
+  import type { UcoordPeer, PeerInfo } from '../ucoord.svelte.js'
   import { uptime_format, ts_relative, bytes_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { poll_feed } from '../poll.svelte.js'
@@ -10,24 +11,24 @@
   const empty = $derived(venues != null && Object.keys(venues).length === 0)
 
   // Connected is the steady state; the rest are transitions worth noticing.
-  const STATE_TONE = {
+  const STATE_TONE: Record<string, string> = {
     connected: 'bg-accent/10 text-accent',
     pending: 'bg-zinc-100 text-zinc-500'
   }
 
-  function state_tone(state) {
-    return STATE_TONE[state] ?? 'bg-amber-50 text-amber-700'
+  function state_tone(state: string | undefined): string {
+    return STATE_TONE[state ?? ''] ?? 'bg-amber-50 text-amber-700'
   }
 
-  function peers_of(venue) {
+  function peers_of(venue: Record<string, UcoordPeer> | undefined): [string, UcoordPeer][] {
     return Object.entries(venue ?? {})
   }
 
-  function info_for(venue, peer) {
+  function info_for(venue: string, peer: string): PeerInfo | null {
     return ucoord.info[`${venue}/${peer}`] ?? null
   }
 
-  function ports_of(peer) {
+  function ports_of(peer: UcoordPeer | undefined): string | null {
     const net = peer?.capabilities?.network
     if (!net) return null
     const lan = net.lan?.length ?? 0
@@ -35,13 +36,13 @@
     return `${lan} LAN · ${wan} WAN`
   }
 
-  function release_of(peer) {
+  function release_of(peer: UcoordPeer | undefined): string | null {
     const r = peer?.board?.release
     if (!r) return null
     return [r.distribution, r.version].filter(Boolean).join(' ')
   }
 
-  function mem_of(info) {
+  function mem_of(info: PeerInfo | null): string | null {
     if (!info?.memory?.total) return null
     const used = info.memory.total - info.memory.available
     return `${bytes_format(used)} / ${bytes_format(info.memory.total)}`

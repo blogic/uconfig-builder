@@ -5,10 +5,10 @@
 // then kept fresh by a single set of timers, so every page renders immediately
 // from the store it already has.
 
-import { devices_refresh, devices_clear } from './devices.svelte.js'
-import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.js'
-import { traffic_refresh, traffic_clear } from './traffic.svelte.js'
-import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.js'
+import { devices_refresh, devices_clear } from './devices.svelte.ts'
+import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.ts'
+import { traffic_refresh, traffic_clear } from './traffic.svelte.ts'
+import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.ts'
 
 // Interval matches how fast the underlying data actually changes: the device
 // samples traffic every 10s, so polling it faster only re-reads the same
@@ -24,7 +24,7 @@ const FEEDS = [
 
 export const loading = $state({ active: false, done: 0, total: FEEDS.length })
 
-let timers = []
+let timers: ReturnType<typeof setInterval>[] = []
 
 // Fetch every feed once. Failures are tolerated: a page that has no data shows
 // its own error, which beats blocking the whole UI on one slow call.
@@ -49,7 +49,7 @@ export async function preload() {
 
 // Poll one feed while its page is open: refresh immediately on arrival, then
 // on an interval, and stop on leave. Returns a teardown for $effect.
-export function poll_feed(key) {
+export function poll_feed(key: string): () => void {
   const feed = FEEDS.find((f) => f.key === key)
   if (!feed) return () => {}
 

@@ -1,7 +1,14 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
 
-  let { existing, keyLabel = 'entry', onCreate, close } = $props()
+  interface Props {
+    existing: Record<string, unknown>
+    keyLabel?: string
+    onCreate: (name: string, value: Record<string, unknown>) => void
+    close: () => void
+  }
+
+  let { existing, keyLabel = 'entry', onCreate, close }: Props = $props()
 
   let name = $state('')
   const trimmed = $derived(name.trim())

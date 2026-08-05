@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
+  import type { Interface } from '../types/uconfig'
 
-  let { interfaces, create, close } = $props()
+  interface Props {
+    interfaces: Record<string, Interface>
+    create: (name: string, value: Interface) => void
+    close: () => void
+  }
+
+  let { interfaces, create, close }: Props = $props()
 
   let name = $state('')
-  let role = $state('downstream')
+  let role = $state<'upstream' | 'downstream'>('downstream')
   let vlanOn = $state(false)
   let vlanId = $state('')
 
@@ -16,13 +23,13 @@
   const upstreamVlans = $derived(
     Object.values(interfaces)
       .filter((i) => i?.role === 'upstream' && i?.vlan?.id != null)
-      .map((i) => i.vlan.id)
+      .map((i) => i.vlan!.id as number)
   )
 
   const vid = $derived(Number(vlanId))
   const vlanError = $derived(vlan_error())
 
-  function vlan_error() {
+  function vlan_error(): string {
     if (!vlanOn) return ''
     if (!(Number.isInteger(vid) && vid >= 2 && vid <= 4096)) return t('VLAN ID must be between 2 and 4096')
     if (role === 'upstream') {
@@ -39,7 +46,7 @@
   function submit() {
     if (!valid) return
     const addressing = role === 'downstream' ? 'static' : 'dynamic'
-    const value = { role, ipv4: { addressing }, ipv6: { addressing } }
+    const value: Interface = { role, ipv4: { addressing }, ipv6: { addressing } }
     if (vlanOn) value.vlan = { id: vid }
     create(trimmed, value)
   }

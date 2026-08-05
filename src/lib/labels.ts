@@ -1,7 +1,7 @@
 // Human labels for schema property keys. Kept free of any schema-JSON import so
 // the i18n extraction tooling can reuse title_for without an import assertion.
 
-const LABEL_OVERRIDES = {
+const LABEL_OVERRIDES: Record<string, string> = {
   // Radio band keys are the schema's enum values; these are display-only.
   '2G': '2.4GHz',
   '5G': '5GHz',
@@ -31,7 +31,7 @@ const LABEL_OVERRIDES = {
   tailscale: 'Tailscale'
 }
 
-export function title_for(key) {
+export function title_for(key: string): string {
   if (LABEL_OVERRIDES[key]) return LABEL_OVERRIDES[key]
   return key
     .split(/[-_]/)

@@ -1,11 +1,19 @@
-<script>
+<script lang="ts">
   import CollapsibleSection from './CollapsibleSection.svelte'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Interface } from '../types/uconfig'
 
-  let { iface, interfaces, selfName, role } = $props()
+  interface Props {
+    iface: Interface
+    interfaces: Record<string, Interface>
+    selfName: string
+    role: string | undefined
+  }
+
+  let { iface, interfaces, selfName, role }: Props = $props()
 
   const vlan = $derived(iface.vlan ?? {})
   const isUpstream = $derived(role === 'upstream')
@@ -13,8 +21,8 @@
 
   // VLAN ids that a downstream interface relies on; these trunks can't be removed.
   const consumed = $derived(downstream_vlans())
-  function downstream_vlans() {
-    const s = new Set()
+  function downstream_vlans(): Set<number> {
+    const s = new Set<number>()
     for (const [n, iv] of Object.entries(interfaces)) {
       if (n === selfName) continue
       if (iv?.role === 'downstream' && iv?.vlan?.id != null) s.add(iv.vlan.id)
@@ -27,7 +35,7 @@
   const val = $derived(Number(entry))
   const error = $derived(validate())
 
-  function validate() {
+  function validate(): string {
     if (entry === '') return t('A VLAN ID is required')
     if (!Number.isInteger(val) || val < 2 || val > 4096) return t('VLAN ID must be 2 to 4096')
     if (val === vlan.id) return t('Cannot trunk the interface VLAN')
@@ -41,13 +49,15 @@
   }
   function commit() {
     if (error) return
+    if (!iface.vlan) return
     if (!Array.isArray(iface.vlan.trunks)) iface.vlan.trunks = []
     iface.vlan.trunks.push(val)
     showModal = false
   }
-  async function remove(tr) {
+  async function remove(tr: number) {
     if (consumed.has(tr)) return
     if (!(await confirm(t('Remove trunk {id}?', { id: tr })))) return
+    if (!iface.vlan?.trunks) return
     const i = iface.vlan.trunks.indexOf(tr)
     if (i >= 0) iface.vlan.trunks.splice(i, 1)
     if (!iface.vlan.trunks.length) delete iface.vlan.trunks
@@ -64,7 +74,8 @@
 
       {#if isUpstream}
         <ListBox items={trunks} label="Trunks" onAdd={open}>
-          {#snippet row(tr)}
+          {#snippet row(item: unknown)}
+            {@const tr = item as number}
             <span class="flex-1 font-mono text-xs text-zinc-800">{tr}</span>
             {#if consumed.has(tr)}
               <span class="text-[11px] text-zinc-400">{t('in use downstream')}</span>

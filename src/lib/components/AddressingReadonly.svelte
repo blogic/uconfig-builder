@@ -1,10 +1,14 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
 
-  let { obj } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+  }
+
+  let { obj }: Props = $props()
 
   const fid = $props.id()
-  const value = $derived(obj.addressing ?? 'dynamic')
+  const value = $derived((obj.addressing as string | undefined) ?? 'dynamic')
 </script>
 
 <div class="flex flex-col gap-1">

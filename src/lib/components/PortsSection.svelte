@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import CollapsibleSection from './CollapsibleSection.svelte'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
@@ -6,8 +6,16 @@
   import { device_ports } from '../capabilities.svelte.js'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Interface, InterfacePorts } from '../types/uconfig'
 
-  let { iface, interfaces, selfName, role } = $props()
+  interface Props {
+    iface: Interface
+    interfaces: Record<string, Interface>
+    selfName: string
+    role: string | undefined
+  }
+
+  let { iface, interfaces, selfName, role }: Props = $props()
 
   const ports = $derived(iface.ports ?? {})
   const assigned = $derived(Object.keys(ports))
@@ -16,25 +24,25 @@
 
   let showModal = $state(false)
   let selPort = $state('')
-  let selMode = $state('auto')
+  let selMode = $state<InterfacePorts>('auto')
 
   const selfCovered = $derived(new Set(assigned.flatMap((k) => port_cover(k, portList))))
 
-  function others_cover(p) {
-    const tags = []
+  function others_cover(p: string): string[] {
+    const tags: string[] = []
     for (const [n, iv] of Object.entries(interfaces)) {
       if (n === selfName) continue
       const ivVlan = iv?.vlan?.id != null
       for (const k of Object.keys(iv?.ports ?? {})) {
-        if (port_cover(k, portList).includes(p)) tags.push(effective_tag(iv.ports[k], iv.role, ivVlan))
+        if (port_cover(k, portList).includes(p)) tags.push(effective_tag(iv.ports![k], iv.role, ivVlan))
       }
     }
     return tags
   }
-  function taken_untagged(p) {
+  function taken_untagged(p: string): boolean {
     return others_cover(p).includes('un-tagged')
   }
-  function used_elsewhere(p) {
+  function used_elsewhere(p: string): boolean {
     return others_cover(p).length > 0
   }
 
@@ -47,7 +55,7 @@
 
   const error = $derived(validate(selPort, selMode))
 
-  function validate(port, mode) {
+  function validate(port: string, mode: InterfacePorts): string {
     if (!port) return t('Select a port')
     if (!hasVlan) return ''
     const e = effective_tag(mode, role, true)
@@ -70,17 +78,18 @@
     showModal = false
   }
 
-  async function remove(port) {
+  async function remove(port: string) {
     if (!(await confirm(t('Remove port "{port}"?', { port })))) return
-    delete iface.ports[port]
-    if (!Object.keys(iface.ports).length) delete iface.ports
+    delete iface.ports![port]
+    if (!Object.keys(iface.ports!).length) delete iface.ports
   }
 </script>
 
 <CollapsibleSection title={t('Ports')}>
   {#snippet children()}
     <ListBox items={assigned} showAdd={availablePorts.length > 0} onAdd={open}>
-      {#snippet row(port)}
+      {#snippet row(item: unknown)}
+        {@const port = item as string}
         <span class="flex-1 text-xs">
           <span class="font-mono font-semibold text-zinc-800">{port}</span>
           <span class="text-zinc-500"> — {t(effective_tag(ports[port], role, hasVlan))}</span>

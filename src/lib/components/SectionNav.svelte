@@ -1,8 +1,16 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
   import { SERVICE_ENTRIES } from '../nav.js'
+  import type { NavItem } from '../nav.js'
 
-  let { items = [], page, onSelect, changes = 0 } = $props()
+  interface Props {
+    items?: NavItem[]
+    page?: string
+    onSelect: (key: string) => void
+    changes?: number
+  }
+
+  let { items = [], page, onSelect, changes = 0 }: Props = $props()
 
   let servicesOpen = $state(true)
 

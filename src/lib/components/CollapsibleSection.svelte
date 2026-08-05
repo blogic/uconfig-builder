@@ -1,9 +1,17 @@
-<script>
+<script lang="ts">
   import { untrack } from 'svelte'
   import { accordion_get } from '../accordion.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Snippet } from 'svelte'
 
-  let { title, open = false, children, actions = null } = $props()
+  interface Props {
+    title: string
+    open?: boolean
+    children: Snippet
+    actions?: Snippet | null
+  }
+
+  let { title, open = false, children, actions = null }: Props = $props()
 
   const acc = accordion_get()
   const id = $props.id()
@@ -14,7 +22,7 @@
     untrack(() => acc?.register(id))
   })
 
-  function toggle(e) {
+  function toggle(e: MouseEvent) {
     e.preventDefault()
     if (acc) acc.toggle(id)
     else localOpen = !localOpen

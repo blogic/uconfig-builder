@@ -1,8 +1,23 @@
-<script>
+<script lang="ts">
   import { title_for } from '../schema.js'
   import { t } from '../i18n.svelte.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, key, schema, label = null, required = false, fallback = undefined, describe = null } = $props()
+  type FieldValue = string | number | boolean | (string | number)[] | undefined
+  type FieldObj = Record<string, FieldValue>
+  type FieldKind = 'enum' | 'boolean' | 'number' | 'array' | 'string' | 'scalar-union'
+
+  interface Props {
+    obj: FieldObj
+    key: string
+    schema: JsonSchemaNode
+    label?: string | null
+    required?: boolean
+    fallback?: FieldValue
+    describe?: string | null
+  }
+
+  let { obj, key, schema, label = null, required = false, fallback = undefined, describe = null }: Props = $props()
 
   const fid = $props.id()
   const value = $derived(obj[key])
@@ -10,11 +25,11 @@
   const isSecret = $derived(/password|passphrase|psk|secret/i.test(key) || key === 'key')
   let show = $state(false)
   const lbl = $derived(t(label ?? title_for(key)))
-  const desc = $derived(t(clean(describe), { value }))
+  const desc = $derived(t(clean(describe), { value: value as string | number | boolean }))
   const kind = $derived(classify(schema))
 
   const enumDefault = $derived(
-    fallback ?? schema.default ?? (Array.isArray(schema.enum) ? schema.enum[0] : undefined)
+    fallback ?? (schema.default as FieldValue) ?? (Array.isArray(schema.enum) ? (schema.enum[0] as FieldValue) : undefined)
   )
 
   // Persist defaults so the document matches what the UI shows: toggles and
@@ -22,21 +37,21 @@
   // pre-populated.
   $effect(() => {
     if (obj[key] !== undefined) return
-    if (kind === 'boolean') obj[key] = (fallback ?? schema.default) ?? false
+    if (kind === 'boolean') obj[key] = ((fallback ?? schema.default) as boolean) ?? false
     else if (kind === 'enum') {
       if (enumDefault !== undefined) obj[key] = enumDefault
     } else if (kind !== 'array') {
-      const d = fallback ?? schema.default
+      const d = fallback ?? (schema.default as FieldValue)
       if (d !== undefined) obj[key] = d
     }
   })
 
-  function clean(d) {
+  function clean(d: string | null | undefined): string {
     if (!d) return ''
     return String(d).replace(/\s+/g, ' ').trim()
   }
 
-  function classify(s) {
+  function classify(s: JsonSchemaNode): FieldKind {
     if (Array.isArray(s.enum)) return 'enum'
     if (s.type === 'boolean') return 'boolean'
     if (s.type === 'integer' || s.type === 'number') return 'number'
@@ -46,35 +61,39 @@
     return 'string'
   }
 
-  function set(v) {
+  function set(v: FieldValue) {
     if (v === '' || v === undefined || v === null) delete obj[key]
     else obj[key] = v
   }
 
-  function onText(e) {
-    set(e.target.value)
+  function onText(e: Event) {
+    set((e.currentTarget as HTMLInputElement).value)
   }
-  function onNumber(e) {
-    const v = e.target.value
+  function onNumber(e: Event) {
+    const v = (e.currentTarget as HTMLInputElement).value
     if (v === '') return set('')
     const n = Number(v)
     set(Number.isNaN(n) ? v : n)
   }
-  function onEnum(e) {
-    set(e.target.value)
+  function onEnum(e: Event) {
+    set((e.currentTarget as HTMLSelectElement).value)
   }
-  function onUnion(e) {
-    const v = e.target.value
+  function onUnion(e: Event) {
+    const v = (e.currentTarget as HTMLInputElement).value
     if (v === '') return set('')
     set(/^-?\d+$/.test(v) ? Number(v) : v)
   }
 
+  const numMin = $derived(schema.minimum as number | undefined)
+  const numMax = $derived(schema.maximum as number | undefined)
+  const maxLen = $derived(schema.maxLength as number | undefined)
+
   const itemNumeric = $derived(
-    schema.type === 'array' && /number|integer/.test(schema.items?.type ?? '')
+    schema.type === 'array' && /number|integer/.test((schema.items?.type as string) ?? '')
   )
   const arrayText = $derived(Array.isArray(value) ? value.join('\n') : '')
-  function onArray(e) {
-    const lines = e.target.value
+  function onArray(e: Event) {
+    const lines = (e.currentTarget as HTMLTextAreaElement).value
       .split('\n')
       .map((s) => s.trim())
       .filter((s) => s.length)
@@ -92,8 +111,8 @@
 
   {#if kind === 'enum'}
     <select id={fid} class="input" value={value ?? enumDefault ?? ''} onchange={onEnum}>
-      {#each schema.enum as opt}
-        <option value={opt}>{t(opt)}</option>
+      {#each (schema.enum ?? []) as opt}
+        <option value={opt as string}>{t(opt as string)}</option>
       {/each}
     </select>
   {:else if kind === 'boolean'}
@@ -120,8 +139,8 @@
       class="input"
       type="number"
       value={value ?? ''}
-      min={schema.minimum}
-      max={schema.maximum}
+      min={numMin}
+      max={numMax}
       oninput={onNumber}
     />
   {:else if kind === 'array'}
@@ -143,7 +162,7 @@
         type={show ? 'text' : 'password'}
         autocomplete="off"
         value={value ?? ''}
-        maxlength={schema.maxLength}
+        maxlength={maxLen}
         oninput={onText}
       />
       <button
@@ -170,7 +189,7 @@
       id={fid}
       class="input"
       value={value ?? ''}
-      maxlength={schema.maxLength}
+      maxlength={maxLen}
       oninput={onText}
     />
   {/if}

@@ -3,7 +3,13 @@
 // Routes are `#/<section>/<page>` with an optional third segment for a
 // drill-down, e.g. `#/config/interfaces/wan` or `#/config/service/ssh`.
 
-export const route = $state({ path: null })
+export interface Route {
+  section: string
+  page: string | null
+  openInterface?: string | null
+}
+
+export const route = $state<{ path: string | null }>({ path: null })
 
 // A cold load cannot restore a device session: the websocket is gone and the
 // document would be blank. Drop any hash left over from the previous visit at
@@ -12,7 +18,7 @@ if (globalThis.location?.hash) {
   history.replaceState(null, '', location.pathname + location.search)
 }
 
-function encode(r) {
+function encode(r: Route): string | null {
   if (!r.section) return null
   if (r.section === 'config') {
     if (r.page === 'interfaces' && r.openInterface)
@@ -23,7 +29,7 @@ function encode(r) {
 }
 
 // Returns { section, page, openInterface? } or null.
-export function route_parse(hash) {
+export function route_parse(hash: string | null | undefined): Route | null {
   const parts = (hash || '').replace(/^#\/?/, '').split('/').filter(Boolean)
   if (!parts.length) return null
 
@@ -39,7 +45,7 @@ export function route_parse(hash) {
 // The first entry of a session is pushed rather than replaced, leaving the
 // pre-session entry behind it. Backing onto that entry is what signals an
 // attempt to leave, which the app turns into a logout prompt.
-export function route_sync(current) {
+export function route_sync(current: Route) {
   const next = encode(current)
   if (next == null || next === route.path) return
   route.path = next

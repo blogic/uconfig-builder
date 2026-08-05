@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
   import { confirm } from '../confirm.svelte.js'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { Interface1 } from '../types/uconfig'
 
-  let { container, subnet } = $props()
+  interface Props {
+    container: Interface1
+    subnet?: string
+  }
+
+  let { container, subnet }: Props = $props()
 
   const KEY = 'dhcp-leases'
   const leases = $derived(container[KEY] ?? {})
@@ -36,11 +42,11 @@
   )
   const valid = $derived(!nameError && !macError && !offsetError)
 
-  function prefix_of(s) {
+  function prefix_of(s: string | undefined): number {
     const m = String(s ?? '').match(/\/(\d+)\s*$/)
     return m ? Number(m[1]) : 24
   }
-  function host_max(p) {
+  function host_max(p: number): number {
     const bits = 32 - p
     return bits < 2 ? 1 : Math.pow(2, bits) - 2
   }
@@ -64,15 +70,17 @@
     }
     showModal = false
   }
-  async function remove(k) {
+  async function remove(k: string) {
     if (!(await confirm(t('Remove lease "{name}"?', { name: k })))) return
-    delete container[KEY][k]
-    if (!Object.keys(container[KEY]).length) delete container[KEY]
+    const m = container[KEY]
+    if (!m) return
+    delete m[k]
+    if (!Object.keys(m).length) delete container[KEY]
   }
 </script>
 
 <ListBox items={keys} label="Static DHCP Leases" onAdd={open} emptyText="No static leases">
-  {#snippet row(k)}
+  {#snippet row(k: string)}
     <span class="flex-1 text-xs">
       <span class="font-mono font-semibold text-zinc-800">{k}</span>
       <span class="text-zinc-500"> — {leases[k].macaddr} · +{leases[k]['lease-offset']}</span>

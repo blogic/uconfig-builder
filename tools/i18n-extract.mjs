@@ -8,8 +8,20 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join, resolve } from 'path'
-import { title_for } from '../src/lib/labels.js'
-import { DESCRIPTIONS, PAGE_DESCRIPTIONS, SERVICE_DESCRIPTIONS } from '../src/lib/descriptions.js'
+import ts from 'typescript'
+
+const { transpileModule, ScriptTarget, ModuleKind } = ts
+// labels.ts and descriptions.ts hold data this script needs, but node cannot
+// import TypeScript. Both are plain declarations, so stripping the annotations
+// and evaluating the result keeps the single source of truth rather than
+// duplicating the tables here.
+async function ts_module_load(relPath) {
+  const src = readFileSync(new URL(relPath, import.meta.url), 'utf8')
+  const js = transpileModule(src, {
+    compilerOptions: { target: ScriptTarget.ES2022, module: ModuleKind.ESNext }
+  }).outputText
+  return import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`)
+}
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const schemaPath = join(root, 'src/lib/data/schema.json')
@@ -18,10 +30,14 @@ const srcDir = join(root, 'src')
 
 const keys = new Set()
 
+const labels = await ts_module_load('../src/lib/labels.ts')
+const descriptions = await ts_module_load('../src/lib/descriptions.ts')
+const title_for = labels.title_for
+
 // Description text lives as object values rather than in t() calls, so it has
 // to be pulled from the modules directly: field help, page intros and the
 // per-service blurbs alike.
-for (const bag of [DESCRIPTIONS, PAGE_DESCRIPTIONS, SERVICE_DESCRIPTIONS])
+for (const bag of [descriptions.DESCRIPTIONS, descriptions.PAGE_DESCRIPTIONS, descriptions.SERVICE_DESCRIPTIONS])
   for (const v of Object.values(bag)) if (v) keys.add(v)
 
 const schema = JSON.parse(readFileSync(schemaPath, 'utf8'))
@@ -54,7 +70,8 @@ function scan(dir) {
       if (name !== 'locales' && name !== 'data') scan(p)
       continue
     }
-    if (!/\.(svelte|js)$/.test(name)) continue
+    if (!/\.(svelte|js|ts)$/.test(name)) continue
+    if (name.endsWith('.d.ts')) continue
     const code = readFileSync(p, 'utf8')
     for (const re of PATTERNS) {
       re.lastIndex = 0

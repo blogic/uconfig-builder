@@ -1,17 +1,61 @@
-import { default_width } from './channels.js'
-import { SERVICES } from './services.js'
+import { default_width } from './channels'
+import { SERVICES } from './services'
+
+export interface LayoutContext {
+  role?: string
+  band?: string
+  allInterfaces?: Record<string, unknown>
+  selfName?: string
+  radios?: Record<string, unknown>
+}
+
+export interface WhenArg {
+  data: Record<string, unknown>
+  context: LayoutContext
+}
+
+export type WhenPredicate = (arg: WhenArg) => boolean
+
+export interface LayoutNode {
+  field?: string
+  describe?: string
+  widget?: string
+  label?: string
+  options?: unknown[]
+  default?: unknown
+  required?: boolean | WhenPredicate
+  when?: WhenPredicate
+  section?: string
+  children?: LayoutNode[]
+  objectSection?: string
+  title?: string
+  toggleSection?: string
+  mapSection?: string
+  keyLabel?: string
+  tabbed?: boolean
+  renamable?: boolean
+  item?: LayoutNode[]
+  vlanSection?: boolean
+  portsSection?: boolean
+  dhcpSection?: boolean
+  disallow?: string
+  multiPsk?: boolean
+  aclField?: boolean
+  mapList?: string
+}
 
 // `when` predicates receive { data, context } where data is the current object
 // and context carries { role } (interfaces) or { band } (radios).
 // describe: strings are short keys; en-GB.json holds the verbose wording.
-const up = ({ context }) => context.role === 'upstream'
-const down = ({ context }) => context.role === 'downstream'
-const eff_addr = (data, context) => data.addressing ?? (context.role === 'downstream' ? 'static' : 'dynamic')
-const isStatic = ({ data, context }) => eff_addr(data, context) === 'static'
-const isDynamic = ({ data, context }) => eff_addr(data, context) === 'dynamic'
-const upStatic = (ctx) => up(ctx) && isStatic(ctx)
+const up: WhenPredicate = ({ context }) => context.role === 'upstream'
+const down: WhenPredicate = ({ context }) => context.role === 'downstream'
+const eff_addr = (data: Record<string, unknown>, context: LayoutContext): unknown =>
+  data.addressing ?? (context.role === 'downstream' ? 'static' : 'dynamic')
+const isStatic: WhenPredicate = ({ data, context }) => eff_addr(data, context) === 'static'
+const isDynamic: WhenPredicate = ({ data, context }) => eff_addr(data, context) === 'dynamic'
+const upStatic: WhenPredicate = (ctx) => up(ctx) && isStatic(ctx)
 
-export const unitLayout = [
+export const unitLayout: LayoutNode[] = [
   { field: 'hostname', describe: 'Device hostname.' },
   { field: 'timezone', widget: 'timezone' },
   { field: 'password', describe: 'Device password (shadow hash).' },
@@ -19,7 +63,7 @@ export const unitLayout = [
   { field: 'tty-login', describe: 'Require login on serial ports.' }
 ]
 
-export const radioLayout = [
+export const radioLayout: LayoutNode[] = [
   { field: 'channel', widget: 'channel', describe: 'Wireless channel.' },
   { field: 'channel-mode', widget: 'channel-mode', describe: 'Preferred 802.11 mode.' },
   { field: 'channel-width', widget: 'channel-width', describe: 'Channel width.' },
@@ -39,11 +83,11 @@ export const radioLayout = [
     when: ({ data, context }) =>
       context.band === '5G' &&
       (data.channel == null || data.channel === 'auto') &&
-      (data['channel-width'] ?? default_width(context.band)) !== 160
+      (data['channel-width'] ?? default_width(context.band ?? '')) !== 160
   }
 ]
 
-const ipv4Layout = [
+const ipv4Layout: LayoutNode[] = [
   { field: 'addressing', widget: 'addressing', describe: 'How the IPv4 address is assigned.' },
   { field: 'subnet', required: true, when: isStatic, describe: 'Static IPv4 (CIDR).' },
   { field: 'gateway', required: true, when: upStatic, describe: 'Static IPv4 gateway.' },
@@ -51,15 +95,16 @@ const ipv4Layout = [
   { field: 'send-hostname', when: isDynamic, describe: 'Send hostname in DHCP requests.' }
 ]
 
-const ipv6Layout = [
+const ipv6Layout: LayoutNode[] = [
   { field: 'addressing', widget: 'addressing-ro', when: up },
   { field: 'dhcpv6.mode', label: 'DHCPv6 Mode', when: down, describe: 'DHCPv6 server mode.' },
   { field: 'dhcpv6.announce-dns', label: 'Announce DNS', widget: 'list', when: down, describe: 'DNS servers to announce.' }
 ]
 
-const ssidMode = (data) => data.template?.mode
+const ssidMode = (data: Record<string, unknown>): unknown =>
+  (data.template as Record<string, unknown> | undefined)?.mode
 
-const ssidLayout = [
+const ssidLayout: LayoutNode[] = [
   { field: 'ssid', describe: 'Network name.' },
   {
     field: 'bss-mode',
@@ -92,7 +137,9 @@ const ssidLayout = [
   { field: 'wifi-radios', widget: 'bands' },
   {
     multiPsk: true,
-    when: ({ data }) => data.template?.mode === 'encrypted' && data.template?.security === 'legacy'
+    when: ({ data }) =>
+      (data.template as Record<string, unknown> | undefined)?.mode === 'encrypted' &&
+      (data.template as Record<string, unknown> | undefined)?.security === 'legacy'
   },
   { aclField: true },
   { field: 'hidden-ssid', describe: 'Hide the network.' },
@@ -100,7 +147,7 @@ const ssidLayout = [
   { field: 'unicast-conversion', describe: 'Convert multicast to unicast.' }
 ]
 
-export const interfaceLayout = [
+export const interfaceLayout: LayoutNode[] = [
   { objectSection: 'ipv4', title: 'IPv4', children: ipv4Layout },
   { objectSection: 'ipv6', title: 'IPv6', children: ipv6Layout },
   { vlanSection: true },
@@ -111,7 +158,7 @@ export const interfaceLayout = [
   { disallow: 'ipv4', when: down }
 ]
 
-const serviceLayouts = {
+const serviceLayouts: Record<string, LayoutNode[]> = {
   ssh: [
     { field: 'port', describe: 'SSH server port.' },
     { field: 'cli-port', describe: 'CLI-over-SSH port.' },
@@ -152,7 +199,7 @@ const serviceLayouts = {
 
 // One always-present section per configurable service. Services with a curated
 // layout get inlined describe text; the rest auto-render from the schema.
-export const servicesLayout = SERVICES.filter((s) => s.config).map((s) => ({
-  objectSection: s.config,
-  children: serviceLayouts[s.config]
+export const servicesLayout: LayoutNode[] = SERVICES.filter((s) => s.config).map((s) => ({
+  objectSection: s.config as string,
+  children: serviceLayouts[s.config as string]
 }))

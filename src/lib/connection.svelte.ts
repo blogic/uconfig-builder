@@ -6,6 +6,39 @@
 // management targets one peer, so the address is resolved once after login and
 // applied transparently by request(); it is never surfaced in the UI.
 
+import type { UcoordStatus } from './ucoord.svelte.ts'
+
+interface Target {
+  venue: string
+  peer: string
+}
+
+interface Device extends Target {
+  model: string | null
+}
+
+interface UploadResult {
+  file_id?: string
+  error?: string
+  [key: string]: unknown
+}
+
+interface PendingEntry {
+  resolve: (value: unknown) => void
+  reject: (reason: Error) => void
+}
+
+interface RpcEvent {
+  method?: string
+  id?: never
+}
+
+interface RpcResponse {
+  id: number
+  result?: unknown
+  error?: { message?: string }
+}
+
 const READY_TIMEOUT_MS = 8000
 
 // The device closes an idle websocket ("Upstream connection timeout"), which
@@ -28,30 +61,37 @@ const ADDRESSED = new Set([
   'sysupgrade'
 ])
 
-let target = null // { venue, peer } once resolved
+let target: Target | null = null // { venue, peer } once resolved
 
-let socket = null
+let socket: WebSocket | null = null
 let next_id = 1
-const pending = new Map()
+const pending = new Map<number, PendingEntry>()
 
-let keepalive_timer = null
+let keepalive_timer: ReturnType<typeof setInterval> | null = null
 let last_send = 0
 
 // connect() resolves only once the server sends the login-required event.
-let ready_resolve = null
-let ready_reject = null
-let ready_timer = null
+let ready_resolve: (() => void) | null = null
+let ready_reject: ((reason: Error) => void) | null = null
+let ready_timer: ReturnType<typeof setTimeout> | null = null
 
-export const connection = $state({
-  status: 'idle', // 'idle' | 'connecting' | 'connected'
-  mode: null, // 'standalone' | 'ucoord'
-  device: null, // resolved { venue, peer, model } once logged in
-  lost: false, // an established session dropped; the app resets to the landing page
+export const connection = $state<{
+  status: 'idle' | 'connecting' | 'connected'
+  mode: 'standalone' | 'ucoord' | null
+  device: Device | null
+  lost: boolean
+  host: string | null
+  error: string | null
+}>({
+  status: 'idle',
+  mode: null,
+  device: null,
+  lost: false,
   host: null,
   error: null
 })
 
-function reject_pending(reason) {
+function reject_pending(reason: string) {
   for (const { reject } of pending.values()) reject(new Error(reason))
   pending.clear()
 }
@@ -69,13 +109,13 @@ function ready_resolve_now() {
   resolve?.()
 }
 
-function ready_reject_now(message) {
+function ready_reject_now(message: string) {
   const reject = ready_reject
   ready_clear()
   reject?.(new Error(message))
 }
 
-function handle_event(msg) {
+function handle_event(msg: RpcEvent) {
   if (msg.method === 'login-required') ready_resolve_now()
 }
 
@@ -97,8 +137,8 @@ function keepalive_start() {
   }, KEEPALIVE_MS)
 }
 
-function on_message(event) {
-  let msg
+function on_message(event: MessageEvent) {
+  let msg: RpcEvent | RpcResponse
   try {
     msg = JSON.parse(event.data)
   } catch {
@@ -108,20 +148,21 @@ function on_message(event) {
     handle_event(msg)
     return
   }
-  const entry = pending.get(msg.id)
+  const response = msg as RpcResponse
+  const entry = pending.get(response.id)
   if (!entry) return
-  pending.delete(msg.id)
-  if (msg.error) entry.reject(new Error(msg.error.message || 'request failed'))
-  else entry.resolve(msg.result)
+  pending.delete(response.id)
+  if (response.error) entry.reject(new Error(response.error.message || 'request failed'))
+  else entry.resolve(response.result)
 }
 
-export function request(method, params) {
-  return new Promise((resolve, reject) => {
+export function request<T = unknown>(method: string, params?: Record<string, unknown>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       reject(new Error('not connected'))
       return
     }
-    let args = params ?? {}
+    let args: Record<string, unknown> = params ?? {}
     if (ADDRESSED.has(method)) {
       if (!target) {
         reject(new Error('no device selected'))
@@ -130,19 +171,19 @@ export function request(method, params) {
       args = { ...target, ...args }
     }
     const id = next_id++
-    pending.set(id, { resolve, reject })
+    pending.set(id, { resolve: resolve as (value: unknown) => void, reject })
     last_send = Date.now()
     socket.send(JSON.stringify({ jsonrpc: '2.0', id, method, params: args }))
   })
 }
 
 // Open the socket; resolves once the server signals login-required.
-export function connect(host) {
-  return new Promise((resolve, reject) => {
+export function connect(host: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
     try {
       socket = new WebSocket(`ws://${host}/ucoord`, 'ui')
     } catch (e) {
-      reject(e)
+      reject(e as Error)
       return
     }
     connection.status = 'connecting'
@@ -206,7 +247,7 @@ export function disconnect() {
 // management picks the first connected peer; nothing is shown to the user.
 async function target_resolve() {
   target = null
-  const status = await request('status', {})
+  const status = await request<UcoordStatus>('status', {})
   for (const [venue, peers] of Object.entries(status?.venues ?? {})) {
     for (const [peer, info] of Object.entries(peers ?? {})) {
       if (info?.state !== 'connected') continue
@@ -219,8 +260,8 @@ async function target_resolve() {
 }
 
 // Authenticate over the already-open socket; returns the device mode.
-export async function login(password) {
-  const result = await request('login', { password })
+export async function login(password: string) {
+  const result = await request<{ mode?: 'standalone' | 'ucoord' }>('login', { password })
   connection.mode = result?.mode ?? 'standalone'
   await target_resolve()
   // ping requires authentication, so the keepalive can only start now.
@@ -230,9 +271,9 @@ export async function login(password) {
 
 // HTTP PUT a file to a one-shot upload URL on the device (see upload.uc);
 // resolves to the server's JSON response (incl. file_id) on 201.
-export async function upload(upload_url, file) {
+export async function upload(upload_url: string, file: Blob): Promise<UploadResult> {
   const res = await fetch(`http://${connection.host}${upload_url}`, { method: 'PUT', body: file })
-  let data = {}
+  let data: UploadResult = {}
   try {
     data = await res.json()
   } catch {

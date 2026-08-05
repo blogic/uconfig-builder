@@ -1,13 +1,19 @@
-<script>
+<script lang="ts">
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { title_for } from '../schema.js'
   import { t } from '../i18n.svelte.js'
+  import type { LayoutContext } from '../layouts'
 
-  let { obj, context } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+    context?: LayoutContext
+  }
+
+  let { obj, context }: Props = $props()
 
   const KEY = 'wifi-radios'
-  const list = $derived(Array.isArray(obj[KEY]) ? obj[KEY] : [])
+  const list = $derived(Array.isArray(obj[KEY]) ? (obj[KEY] as string[]) : [])
   const allBands = $derived(Object.keys(context?.radios ?? {}))
   const available = $derived(allBands.filter((b) => !list.includes(b)))
 
@@ -21,17 +27,18 @@
   function commit() {
     if (!sel) return
     if (!Array.isArray(obj[KEY])) obj[KEY] = []
-    obj[KEY].push(sel)
+    ;(obj[KEY] as string[]).push(sel)
     showModal = false
   }
-  function remove(b) {
-    obj[KEY].splice(obj[KEY].indexOf(b), 1)
-    if (!obj[KEY].length) delete obj[KEY]
+  function remove(b: string) {
+    const arr = obj[KEY] as string[]
+    arr.splice(arr.indexOf(b), 1)
+    if (!arr.length) delete obj[KEY]
   }
 </script>
 
 <ListBox items={list} label="WiFi Radios" showAdd={available.length > 0} onAdd={open}>
-  {#snippet row(b)}
+  {#snippet row(b: string)}
     <span class="flex-1 text-sm font-semibold text-zinc-800">{title_for(b)}</span>
     <RemoveButton onclick={() => remove(b)} />
   {/snippet}

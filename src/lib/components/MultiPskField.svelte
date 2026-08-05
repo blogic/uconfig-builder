@@ -1,13 +1,18 @@
-<script>
+<script lang="ts">
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { InterfaceSsid1 } from '../types/uconfig'
 
-  let { obj } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+  }
+
+  let { obj }: Props = $props()
 
   const KEY = 'multi-psk'
-  const map = $derived(obj[KEY] ?? {})
+  const map = $derived((obj[KEY] as Record<string, InterfaceSsid1> | undefined) ?? {})
   const keys = $derived(Object.keys(map))
 
   let showModal = $state(false)
@@ -22,7 +27,7 @@
   )
   const valid = $derived(!pskError && !macError)
 
-  function next_name() {
+  function next_name(): string {
     let n = 1
     while (map['psk' + n] !== undefined) n++
     return 'psk' + n
@@ -36,20 +41,21 @@
   function commit() {
     if (!valid) return
     if (!obj[KEY] || typeof obj[KEY] !== 'object') obj[KEY] = {}
-    const entry = { key: psk }
+    const entry: InterfaceSsid1 = { key: psk }
     if (mac) entry.mac = [mac]
-    obj[KEY][next_name()] = entry
+    ;(obj[KEY] as Record<string, InterfaceSsid1>)[next_name()] = entry
     showModal = false
   }
-  async function remove(k) {
+  async function remove(k: string) {
     if (!(await confirm(t('Remove PSK "{name}"?', { name: k })))) return
-    delete obj[KEY][k]
-    if (!Object.keys(obj[KEY]).length) delete obj[KEY]
+    const m = obj[KEY] as Record<string, InterfaceSsid1>
+    delete m[k]
+    if (!Object.keys(m).length) delete obj[KEY]
   }
 </script>
 
 <ListBox items={keys} label="Multi-PSK" onAdd={open}>
-  {#snippet row(k)}
+  {#snippet row(k: string)}
     <span class="flex-1 text-xs">
       <span class="font-mono font-semibold text-zinc-800">{k}</span>
       <span class="text-zinc-500"> — {map[k].mac?.length ? map[k].mac.join(', ') : t('any MAC')}</span>

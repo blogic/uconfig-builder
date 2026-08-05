@@ -1,7 +1,13 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
+  import type { Radio } from '../types/uconfig'
 
-  let { obj, describe = null } = $props()
+  interface Props {
+    obj: Radio
+    describe?: string | null
+  }
+
+  let { obj, describe = null }: Props = $props()
 
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
@@ -13,8 +19,8 @@
     if (obj['tx-power'] == null) obj['tx-power'] = MAX
   })
 
-  function onInput(e) {
-    obj['tx-power'] = Number(e.target.value)
+  function onInput(e: Event) {
+    obj['tx-power'] = Number((e.currentTarget as HTMLInputElement).value)
   }
 </script>
 

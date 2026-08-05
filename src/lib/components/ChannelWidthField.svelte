@@ -1,9 +1,19 @@
-<script>
+<script lang="ts">
   import { default_width } from '../channels.js'
   import { band_widths } from '../capabilities.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { Radio } from '../types/uconfig'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema, band, describe = null } = $props()
+  interface Props {
+    obj: Radio
+    schema?: JsonSchemaNode
+    band: string
+    describe?: string | null
+  }
+
+  // `schema` kept in Props for the widget call-site contract; unused here.
+  let { obj, schema: _schema, band, describe = null }: Props = $props()
 
   const fid = $props.id()
   const is5G = $derived(String(band).toUpperCase() === '5G')
@@ -16,14 +26,14 @@
   const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim()))
 
   $effect(() => {
-    if (obj['channel-width'] == null) obj['channel-width'] = default_width(band)
+    if (obj['channel-width'] == null) obj['channel-width'] = default_width(band) as Radio['channel-width']
     if (is5G && obj['channel-width'] === 160) obj['allow-dfs'] = true
   })
 
-  function onChange(e) {
-    const v = e.target.value
+  function onChange(e: Event) {
+    const v = (e.currentTarget as HTMLSelectElement).value
     if (v === '') delete obj['channel-width']
-    else obj['channel-width'] = Number(v)
+    else obj['channel-width'] = Number(v) as Radio['channel-width']
   }
 </script>
 

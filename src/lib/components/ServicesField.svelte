@@ -1,8 +1,14 @@
-<script>
+<script lang="ts">
   import ChoiceListField from './ChoiceListField.svelte'
   import { interface_services } from '../services.js'
+  import type { LayoutContext } from '../layouts'
 
-  let { obj, context } = $props()
+  interface Props {
+    obj: Record<string, unknown>
+    context?: LayoutContext
+  }
+
+  let { obj, context }: Props = $props()
 
   const options = $derived(interface_services(context?.role))
 </script>

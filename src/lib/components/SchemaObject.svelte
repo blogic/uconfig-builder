@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Field from './Field.svelte'
   import ArrayListField from './ArrayListField.svelte'
   import MapEditor from './MapEditor.svelte'
@@ -9,12 +9,29 @@
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
   import { DESCRIPTIONS } from '../descriptions.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, schema } = $props()
+  type LeafValue = string | number | boolean | (string | number)[] | undefined
+  type LeafObj = Record<string, LeafValue>
+
+  interface Props {
+    obj: Record<string, unknown>
+    schema: JsonSchemaNode
+  }
+
+  let { obj, schema }: Props = $props()
+
+  type EntryKind = 'map' | 'object' | 'array' | 'scalar'
+
+  interface Entry {
+    key: string
+    schema: JsonSchemaNode
+    kind: EntryKind
+  }
 
   const entries = $derived(build(schema))
 
-  function build(s) {
+  function build(s: JsonSchemaNode): Entry[] {
     const props = ref_resolve(s)?.properties ?? {}
     return Object.entries(props).map(([key, raw]) => {
       const sc = ref_resolve(raw)
@@ -22,7 +39,7 @@
     })
   }
 
-  function classify(s) {
+  function classify(s: JsonSchemaNode): EntryKind {
     if (s.patternProperties) return 'map'
     if (s.type === 'object' || s.properties) return 'object'
     const br = s.anyOf || s.oneOf
@@ -32,16 +49,16 @@
     return 'scalar'
   }
 
-  function objBranchSchema(s) {
+  function objBranchSchema(s: JsonSchemaNode): JsonSchemaNode {
     if (s.type === 'object' || s.properties) return s
     const br = s.anyOf || s.oneOf || []
     return br.map(ref_resolve).find((b) => b.type === 'object' || b.properties) ?? s
   }
 
-  function add_object(key) {
+  function add_object(key: string) {
     obj[key] = {}
   }
-  async function remove_object(key) {
+  async function remove_object(key: string) {
     if (!(await confirm(t('Remove "{name}"?', { name: t(title_for(key)) })))) return
     delete obj[key]
   }
@@ -50,14 +67,14 @@
 <div class="flex flex-col gap-4">
   {#each entries as e (e.key)}
     {#if e.kind === 'array'}
-      <ArrayListField {obj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
+      <ArrayListField obj={obj as LeafObj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
     {:else if e.kind === 'scalar'}
-      <Field {obj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
+      <Field obj={obj as LeafObj} key={e.key} schema={e.schema} describe={DESCRIPTIONS[e.key] ?? null} />
     {:else if e.kind === 'map'}
       {@const vs = pattern_value_schema(e.schema)}
       <MapEditor parent={obj} mapKey={e.key} valueSchema={vs}>
-        {#snippet item(entry)}
-          <Self obj={entry} schema={vs} />
+        {#snippet item(entry: Record<string, unknown>)}
+          <Self obj={entry} schema={vs ?? {}} />
         {/snippet}
       </MapEditor>
     {:else}
@@ -75,7 +92,7 @@
         </div>
         {#if child !== undefined && child !== null}
           <div class="px-3 pb-3">
-            <Self obj={obj[e.key]} schema={objBranchSchema(e.schema)} />
+            <Self obj={child as Record<string, unknown>} schema={objBranchSchema(e.schema)} />
           </div>
         {/if}
       </div>

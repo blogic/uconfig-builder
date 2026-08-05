@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import LayoutRenderer from './lib/components/LayoutRenderer.svelte'
   import MapEditor from './lib/components/MapEditor.svelte'
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
@@ -16,7 +16,7 @@
   import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
-  import { def_get, title_for } from './lib/schema.js'
+  import { def_get } from './lib/schema.js'
   import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
@@ -41,14 +41,33 @@
     doc_reset
   } from './lib/store.svelte.js'
   import { device_load, deviceApi } from './lib/device.svelte.js'
+  import type { DeviceMod } from './lib/device.svelte.js'
+  import type { UconfigDocument, Radio } from './lib/types/uconfig'
+  import type { Route } from './lib/router.svelte.js'
+  import type { CapabilitiesData } from './lib/capabilities.svelte.js'
+
+  interface NavItem {
+    key: string
+    label: string
+    icon: string
+    group?: boolean
+    whenChanges?: boolean
+  }
+
+  interface NavSection {
+    key: string
+    label: string
+    icon: string
+    items: NavItem[]
+  }
 
   // Device modules load on demand; in the editor build the branch is dropped
   // and nothing below ever runs.
-  let dev = $state(null)
-  const connection = $derived(dev?.conn.connection ?? { status: 'idle', lost: false })
+  let dev = $state<DeviceMod | null>(null)
+  const connection = $derived(dev?.conn.connection ?? { status: 'idle' as const, lost: false })
   const capabilities = $derived(dev?.caps.capabilities ?? { data: null })
 
-  async function device_ready() {
+  async function device_ready(): Promise<DeviceMod | null> {
     if (!IS_DEVICE) return null
     if (!dev) dev = await device_load()
     return dev
@@ -72,10 +91,10 @@
 
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
-  let openInterface = $state(null)
+  let openInterface = $state<string | null>(null)
 
-  function radio_defaults(band) {
-    return { 'channel-mode': 'HE', 'channel-width': default_width(band) }
+  function radio_defaults(band: string): Record<string, unknown> {
+    return { 'channel-mode': 'HE', 'channel-width': default_width(band) as Radio['channel-width'] }
   }
 
   // Top-level cards (cards view) act as a single accordion.
@@ -84,7 +103,7 @@
   // Effective theme follows the OS until the user picks one (then it's persisted).
   const mql = globalThis.matchMedia?.('(prefers-color-scheme: dark)')
   let systemDark = $state(mql?.matches ?? false)
-  mql?.addEventListener?.('change', (e) => (systemDark = e.matches))
+  mql?.addEventListener?.('change', (e: MediaQueryListEvent) => (systemDark = e.matches))
   const themeMode = $derived(settings.theme ?? (systemDark ? 'dark' : 'light'))
 
   $effect(() => {
@@ -99,12 +118,12 @@
   // Menu (sidebar) layout on desktop, stacked cards on mobile.
   const wideMql = globalThis.matchMedia?.('(min-width: 768px)')
   let wide = $state(wideMql?.matches ?? true)
-  wideMql?.addEventListener?.('change', (e) => (wide = e.matches))
+  wideMql?.addEventListener?.('change', (e: MediaQueryListEvent) => (wide = e.matches))
   $effect(() => {
     view.mode = wide ? 'menu' : 'cards'
   })
 
-  let screen = $state('welcome') // 'welcome' | 'login' | 'app'
+  let screen = $state<'welcome' | 'login' | 'app'>('welcome')
   let section = $state('config') // 'status' | 'config' | 'system'
   let deviceSession = $state(false) // logged into a device (survives idle disconnects)
   let menuOpen = $state(false)
@@ -112,11 +131,11 @@
   let welcomeSaved = $state('')
   let host = $state(settings.host ?? '')
   let password = $state('')
-  let loginError = $state(null)
-  let loadWarning = $state(null) // config-get failed, editing a blank document
+  let loginError = $state<string | null>(null)
+  let loadWarning = $state<string | null>(null) // config-get failed, editing a blank document
   let connectionLost = $state(false) // session dropped; shown on the landing page
   let loggingIn = $state(false)
-  let connState = $state('idle') // 'connecting' | 'ready' | 'error'
+  let connState = $state<'idle' | 'connecting' | 'ready' | 'error'>('idle')
   function start_default() {
     section = 'config'
     view.section = 'unit'
@@ -148,16 +167,18 @@
     screen = 'login'
     try {
       const d = await device_ready()
+      if (!d) return
       await d.conn.connect(h)
       connState = 'ready'
     } catch (e) {
       connState = 'error'
-      loginError = e?.message || String(e)
+      loginError = e instanceof Error ? e.message : String(e)
     }
   }
-  async function host_login(event) {
+  async function host_login(event: SubmitEvent) {
     event?.preventDefault()
     if (loggingIn) return
+    if (!dev) return
     loginError = null
     loadWarning = null
     loggingIn = true
@@ -165,12 +186,12 @@
       await dev.conn.login(password)
       // Pull the device's active config; a fresh device may have none yet.
       try {
-        doc_adopt(await dev.conn.request('config-get', {}), settings.host)
+        doc_adopt(await dev.conn.request<UconfigDocument>('config-get', {}), settings.host ?? '')
       } catch (e) {
-        loadWarning = e?.message || String(e)
+        loadWarning = e instanceof Error ? e.message : String(e)
       }
       try {
-        dev.caps.capabilities_set(await dev.conn.request('capabilities', {}))
+        dev.caps.capabilities_set(await dev.conn.request<CapabilitiesData>('capabilities', {}))
       } catch {
         /* device did not report capabilities; static defaults apply */
       }
@@ -184,7 +205,7 @@
       if (IS_DEVICE) await dev.poll.preload()
       screen = 'app'
     } catch (e) {
-      loginError = e?.message || String(e)
+      loginError = e instanceof Error ? e.message : String(e)
     } finally {
       loggingIn = false
     }
@@ -230,7 +251,7 @@
     route_sync({ section: activeSection, page: view.section, openInterface })
   })
 
-  function route_apply(r) {
+  function route_apply(r: Route | null) {
     if (!r) return
     // A route only makes sense once a session exists; ignore it otherwise.
     if (r.section === 'status' && !deviceSession) return
@@ -268,7 +289,7 @@
 
   // Sections available for this build and breakpoint. System and Configure are
   // desktop-only: reboot, firmware and schema editing are not phone errands.
-  const availableSections = $derived(sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession))
+  const availableSections = $derived(sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession) as NavSection[])
   const activeSection = $derived(
     availableSections.some((s) => s.key === section) ? section : (availableSections[0]?.key ?? 'config')
   )
@@ -283,13 +304,13 @@
   $effect(() => { hoisted.on = railed })
 
   // Switching section lands on its first page.
-  function section_select(key) {
+  function section_select(key: string) {
     section = key
     openInterface = null
     view.section = SECTIONS.find((s) => s.key === key)?.items?.[0]?.key ?? 'unit'
   }
 
-  function section_select_page(key) {
+  function section_select_page(key: string) {
     if (key !== 'interfaces') openInterface = null
     view.section = key
   }
@@ -350,7 +371,7 @@
     {#snippet actions()}<ChangesIndicator {changes} scope="unit" />{/snippet}
   </PageHeader>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.unit)}</p>
-  <LayoutRenderer data={store.doc.unit} schema={unitDef} layout={unitLayout} />
+  <LayoutRenderer data={store.doc.unit as Record<string, unknown> ?? {}} schema={unitDef ?? {}} layout={unitLayout} />
 {/snippet}
 
 {#snippet radiosBody()}
@@ -359,17 +380,17 @@
   </PageHeader>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.radios)}</p>
   <MapEditor
-    parent={store.doc}
+    parent={store.doc as Record<string, unknown>}
     mapKey="radios"
-    valueSchema={radioDef}
+    valueSchema={radioDef ?? null}
     keyLabel="band"
     tabbed
-    keyOptions={radioDef.properties.band.enum}
+    keyOptions={radioDef?.properties?.band.enum as string[] | undefined}
     makeValue={radio_defaults}
     locked={radiosLocked}
   >
-    {#snippet item(radio, band)}
-      <LayoutRenderer data={radio} schema={radioDef} layout={radioLayout} context={{ band }} />
+    {#snippet item(radio: Record<string, unknown>, band: string)}
+      <LayoutRenderer data={radio} schema={radioDef ?? {}} layout={radioLayout} context={{ band }} />
     {/snippet}
   </MapEditor>
 {/snippet}
@@ -378,7 +399,7 @@
   {#if openInterface != null}
     <InterfaceDetailPage name={openInterface} {changes} onBack={() => (openInterface = null)} />
   {:else}
-    <InterfaceListPage {changes} onOpen={(n) => (openInterface = n)} />
+    <InterfaceListPage {changes} onOpen={(n: string) => (openInterface = n)} />
   {/if}
 {/snippet}
 
@@ -388,7 +409,7 @@
   <ConfigurationPanel {changes} />
 {/snippet}
 
-{#snippet bodyFor(key)}
+{#snippet bodyFor(key: string | null)}
   {#if key === 'unit'}{@render unitBody()}
   {:else if key === 'radios'}{@render radiosBody()}
   {:else if key === 'interfaces'}{@render interfacesBody()}
@@ -477,7 +498,7 @@
             <span class="text-xs text-zinc-400">{t('or connect to a device')}</span>
             <span class="h-px flex-1 bg-zinc-200"></span>
           </div>
-          <form class="flex items-center gap-2" onsubmit={(e) => { e.preventDefault(); host_connect() }}>
+          <form class="flex items-center gap-2" onsubmit={(e: SubmitEvent) => { e.preventDefault(); host_connect() }}>
             <input class="input" type="text" autocomplete="off" placeholder={t('IP to connect to')} bind:value={host} />
             <button type="submit" class="btn disabled:cursor-not-allowed disabled:opacity-50" disabled={!host.trim()}>
               {t('Connect')}

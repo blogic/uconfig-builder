@@ -1,19 +1,30 @@
-<script>
+<script lang="ts">
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { title_for } from '../schema.js'
   import { t } from '../i18n.svelte.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { obj, key, schema, label = null, describe = null } = $props()
+  type ArrayValue = (string | number)[]
+
+  interface Props {
+    obj: Record<string, unknown>
+    key: string
+    schema: JsonSchemaNode
+    label?: string | null
+    describe?: string | null
+  }
+
+  let { obj, key, schema, label = null, describe = null }: Props = $props()
 
   const lbl = $derived(t(label ?? title_for(key)))
-  const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim(), { value: obj[key] }))
-  const numeric = $derived(/number|integer/.test(schema.items?.type ?? ''))
+  const desc = $derived(t((describe ?? '').replace(/\s+/g, ' ').trim(), { value: obj[key] as string }))
+  const numeric = $derived(/number|integer/.test((schema.items?.type as string) ?? ''))
   const cidr4 = $derived(schema.items?.format === 'uc-cidr4')
   const mac = $derived(schema.items?.format === 'uc-mac')
-  const items = $derived(Array.isArray(obj[key]) ? obj[key] : [])
-  const min = $derived(schema.items?.minimum)
-  const max = $derived(schema.items?.maximum)
+  const items = $derived(Array.isArray(obj[key]) ? (obj[key] as ArrayValue) : [])
+  const min = $derived(schema.items?.minimum as number | undefined)
+  const max = $derived(schema.items?.maximum as number | undefined)
 
   let showModal = $state(false)
   let entry = $state('')
@@ -21,17 +32,18 @@
   const value = $derived(numeric ? Number(entry) : entry.trim())
   const error = $derived(validate())
 
-  function validate() {
+  function validate(): string {
     if (entry === '' || entry == null) return t('A value is required')
     if (numeric) {
-      if (!Number.isInteger(value)) return t('Must be a whole number')
-      if (min != null && value < min) return t('Must be at least {min}', { min })
-      if (max != null && value > max) return t('Must be at most {max}', { max })
+      const n = value as number
+      if (!Number.isInteger(n)) return t('Must be a whole number')
+      if (min != null && n < min) return t('Must be at least {min}', { min })
+      if (max != null && n > max) return t('Must be at most {max}', { max })
     }
-    if (cidr4 && !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(value)) {
+    if (cidr4 && !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(String(value))) {
       return t('Must be a CIDR, e.g. 192.168.0.0/16')
     }
-    if (mac && !/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(value)) {
+    if (mac && !/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(String(value))) {
       return t('Must be a MAC, e.g. aa:bb:cc:dd:ee:ff')
     }
     if (items.includes(value)) return t('Already in the list')
@@ -46,19 +58,20 @@
   function commit() {
     if (error) return
     if (!Array.isArray(obj[key])) obj[key] = []
-    obj[key].push(value)
+    ;(obj[key] as ArrayValue).push(value)
     showModal = false
   }
 
-  function removeAt(i) {
-    obj[key].splice(i, 1)
-    if (obj[key].length === 0) delete obj[key]
+  function removeAt(i: number) {
+    const arr = obj[key] as ArrayValue
+    arr.splice(i, 1)
+    if (arr.length === 0) delete obj[key]
   }
 </script>
 
 <div class="flex flex-col gap-1">
   <ListBox {items} label={lbl} onAdd={open}>
-    {#snippet row(item, i)}
+    {#snippet row(item: string | number, i: number)}
       <span class="flex-1 font-mono text-xs text-zinc-800">{item}</span>
       <RemoveButton onclick={() => removeAt(i)} />
     {/snippet}

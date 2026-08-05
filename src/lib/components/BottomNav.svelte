@@ -1,8 +1,20 @@
-<script>
+<script lang="ts">
   import { t } from '../i18n.svelte.js'
 
-  // items: [{ key, label, icon, badge? }]
-  let { items, active, onSelect } = $props()
+  interface Item {
+    key: string
+    label: string
+    icon: string
+    badge?: number | string
+  }
+
+  interface Props {
+    items: Item[]
+    active: string
+    onSelect: (key: string) => void
+  }
+
+  let { items, active, onSelect }: Props = $props()
 </script>
 
 <nav class="bottom-nav">

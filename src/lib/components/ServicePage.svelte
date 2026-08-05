@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import LayoutRenderer from './LayoutRenderer.svelte'
   import SchemaObject from './SchemaObject.svelte'
   import ChangesIndicator from './ChangesIndicator.svelte'
@@ -8,18 +8,25 @@
   import { SERVICE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { serviceKey, changes = [] } = $props()
+  interface Props {
+    serviceKey: string
+    changes?: ChangeEntry[]
+  }
 
-  const schema = $derived(schema_at(def_get('service'), serviceKey))
+  let { serviceKey, changes = [] }: Props = $props()
+
+  const schema = $derived(schema_at(def_get('service') ?? {}, serviceKey))
   const node = $derived(servicesLayout.find((n) => n.objectSection === serviceKey))
 
   $effect(() => {
     if (!store.doc.services || typeof store.doc.services !== 'object') store.doc.services = {}
-    if (store.doc.services[serviceKey] == null) store.doc.services[serviceKey] = {}
+    const services = store.doc.services as Record<string, Record<string, unknown> | undefined>
+    if (services[serviceKey] == null) services[serviceKey] = {}
   })
 
-  const data = $derived(store.doc.services?.[serviceKey])
+  const data = $derived((store.doc.services as Record<string, Record<string, unknown> | undefined> | undefined)?.[serviceKey])
 </script>
 
 <PageHeader title={title_for(serviceKey)}>

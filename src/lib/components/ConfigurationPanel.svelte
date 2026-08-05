@@ -1,20 +1,25 @@
-<script>
+<script lang="ts">
   import ChangesPanel from './ChangesPanel.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
   import { doc_export, baseline_reset } from '../store.svelte.js'
   import { connection, request as ws_request } from '../connection.svelte.js'
   import { view } from '../view.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { changes } = $props()
+  interface Props {
+    changes: ChangeEntry[]
+  }
+
+  let { changes }: Props = $props()
 
   const connected = $derived(connection.status === 'connected')
   // In menu view the Configuration section has no surrounding Card, so the
   // status states supply their own card chrome (cards view already wraps them).
   const panelClass = $derived(view.mode === 'menu' ? 'rounded-base border border-zinc-200 bg-surface px-4' : '')
 
-  let applyState = $state('idle') // 'idle' | 'applying' | 'success' | 'error'
-  let applyError = $state(null)
+  let applyState = $state<'idle' | 'applying' | 'success'>('idle')
+  let applyError = $state<string | null>(null)
 
   async function apply() {
     applyState = 'applying'
@@ -24,7 +29,7 @@
       baseline_reset()
       applyState = 'success'
     } catch (e) {
-      applyError = e?.message || String(e)
+      applyError = e instanceof Error ? e.message : String(e)
       applyState = 'idle'
     }
   }

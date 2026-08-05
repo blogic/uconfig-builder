@@ -1,8 +1,12 @@
-<script>
+<script lang="ts">
   // The rounded accent square with the gear glyph, drawn as SVG rather than an
   // icon-font character so it centres by geometry and matches favicon.svg
   // exactly at any size.
-  let { size = 24 } = $props()
+  interface Props {
+    size?: number
+  }
+
+  let { size = 24 }: Props = $props()
 </script>
 
 <svg

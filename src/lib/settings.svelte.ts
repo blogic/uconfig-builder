@@ -1,8 +1,16 @@
+import type { UconfigDocument } from './types/uconfig'
+
 // Central persisted settings. Reactive $state mirrored to localStorage; add new
 // keys here as more user preferences are introduced.
 const KEY = 'uconfig-builder'
 
-function load() {
+export interface Settings {
+  theme?: 'light' | 'dark'
+  host?: string
+  configs?: Record<string, UconfigDocument>
+}
+
+function load(): Settings {
   try {
     return JSON.parse(globalThis.localStorage?.getItem(KEY) || '{}')
   } catch {
@@ -10,7 +18,7 @@ function load() {
   }
 }
 
-export const settings = $state(load())
+export const settings: Settings = $state(load())
 
 $effect.root(() => {
   $effect(() => {

@@ -1,10 +1,21 @@
-<script>
+<script lang="ts">
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
+  interface ServiceListEntry {
+    key: string
+    icon: string
+    label: string
+  }
+
+  interface Props {
+    entries: ServiceListEntry[]
+    onOpen: (key: string) => void
+  }
+
   // Mobile only: Services is a drill-down list rather than an expandable nav
   // group, matching the previous UI.
-  let { entries, onOpen } = $props()
+  let { entries, onOpen }: Props = $props()
 </script>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS['service-list'])}</p>

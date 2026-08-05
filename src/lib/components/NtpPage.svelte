@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import ArrayListField from './ArrayListField.svelte'
   import ChangesIndicator from './ChangesIndicator.svelte'
   import { rootSchema, schema_at } from '../schema.js'
@@ -6,8 +6,13 @@
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { changes = [] } = $props()
+  interface Props {
+    changes?: ChangeEntry[]
+  }
+
+  let { changes = [] }: Props = $props()
 
   const schema = schema_at(rootSchema, 'definitions.ntp-servers')
 
@@ -28,7 +33,7 @@
 
 {#if store.doc.definitions}
   <ArrayListField
-    obj={store.doc.definitions}
+    obj={store.doc.definitions as Record<string, unknown>}
     key="ntp-servers"
     {schema}
     label="NTP Server"

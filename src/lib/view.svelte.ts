@@ -2,4 +2,9 @@
 //  - 'cards': everything on one page, sections collapse into an accordion.
 //  - 'menu': top-level items become a left menu; the selected page shows each
 //    section as a plain, non-collapsible card.
-export const view = $state({ mode: 'cards', section: 'unit' })
+interface ViewState {
+  mode: 'cards' | 'menu'
+  section: string
+}
+
+export const view: ViewState = $state({ mode: 'cards', section: 'unit' })

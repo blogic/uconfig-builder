@@ -1,9 +1,15 @@
-<script>
+<script lang="ts">
   import { changes_for } from '../changes.js'
   import { scope_reset } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { changes, scope } = $props()
+  interface Props {
+    changes: ChangeEntry[]
+    scope: string
+  }
+
+  let { changes, scope }: Props = $props()
 
   const mine = $derived(changes_for(changes, scope))
   let showModal = $state(false)

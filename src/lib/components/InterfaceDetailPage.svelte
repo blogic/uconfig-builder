@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import LayoutRenderer from './LayoutRenderer.svelte'
   import ChangesIndicator from './ChangesIndicator.svelte'
   import { def_get } from '../schema.js'
@@ -8,15 +8,22 @@
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { ChangeEntry } from '../changes'
 
-  let { name, onBack, changes = [] } = $props()
+  interface Props {
+    name: string
+    onBack: () => void
+    changes?: ChangeEntry[]
+  }
+
+  let { name, onBack, changes = [] }: Props = $props()
 
   const interfaceDef = def_get('interface')
   const iface = $derived(store.doc.interfaces?.[name])
 
   async function remove() {
     if (!(await confirm(t('Remove interface "{name}"?', { name })))) return
-    delete store.doc.interfaces[name]
+    delete store.doc.interfaces![name]
     onBack()
   }
 </script>
@@ -40,8 +47,8 @@
   </div>
 
   <LayoutRenderer
-    data={iface}
-    schema={interfaceDef}
+    data={iface as Record<string, unknown>}
+    schema={interfaceDef ?? {}}
     layout={interfaceLayout}
     context={{ role: iface.role, allInterfaces: store.doc.interfaces, selfName: name, radios: store.doc.radios }}
   />

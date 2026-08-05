@@ -1,6 +1,16 @@
-<script>
+<script lang="ts" generics="T">
   import AddButton from './AddButton.svelte'
   import { t } from '../i18n.svelte.js'
+  import type { Snippet } from 'svelte'
+
+  interface Props {
+    items: T[]
+    label?: string | null
+    showAdd?: boolean
+    onAdd?: ((e: MouseEvent) => void) | null
+    emptyText?: string
+    row: Snippet<[item: T, index: number]>
+  }
 
   let {
     items,
@@ -9,7 +19,7 @@
     onAdd = null,
     emptyText = 'No entries',
     row
-  } = $props()
+  }: Props = $props()
 </script>
 
 <div class="flex flex-col gap-2">

@@ -1,19 +1,29 @@
-<script>
+<script lang="ts">
   import SchemaObject from './SchemaObject.svelte'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { title_for } from '../schema.js'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import type { JsonSchemaNode } from '../schema'
 
-  let { container, mapKey, valueSchema, keyLabel = 'entry', context = {} } = $props()
+  type MapEntry = Record<string, unknown>
 
-  const map = $derived(container[mapKey] ?? {})
+  interface Props {
+    container: Record<string, unknown>
+    mapKey: string
+    valueSchema: JsonSchemaNode | null
+    keyLabel?: string
+  }
+
+  let { container, mapKey, valueSchema, keyLabel = 'entry' }: Props = $props()
+
+  const map = $derived((container[mapKey] as Record<string, MapEntry> | undefined) ?? {})
   const keys = $derived(Object.keys(map))
 
   let showModal = $state(false)
   let name = $state('')
-  let draft = $state({})
+  let draft: MapEntry = $state({})
 
   const trimmed = $derived(name.trim())
   const nameError = $derived(
@@ -29,17 +39,18 @@
   function commit() {
     if (nameError) return
     if (!container[mapKey] || typeof container[mapKey] !== 'object') container[mapKey] = {}
-    container[mapKey][trimmed] = $state.snapshot(draft)
+    ;(container[mapKey] as Record<string, MapEntry>)[trimmed] = $state.snapshot(draft)
     showModal = false
   }
 
-  async function remove(k) {
+  async function remove(k: string) {
     if (!(await confirm(t('Remove {label} "{name}"?', { label: t(keyLabel), name: k })))) return
-    delete container[mapKey][k]
-    if (!Object.keys(container[mapKey]).length) delete container[mapKey]
+    const m = container[mapKey] as Record<string, MapEntry>
+    delete m[k]
+    if (!Object.keys(m).length) delete container[mapKey]
   }
 
-  function summary(v) {
+  function summary(v: MapEntry): string {
     return Object.entries(v)
       .filter(([, x]) => x === null || typeof x !== 'object')
       .map(([, x]) => `${x}`)
@@ -48,7 +59,7 @@
 </script>
 
 <ListBox items={keys} label={title_for(mapKey)} onAdd={open}>
-  {#snippet row(k)}
+  {#snippet row(k: string)}
     <span class="flex-1 text-xs">
       <span class="font-mono font-semibold text-zinc-800">{k}</span>
       {#if summary(map[k])}<span class="text-zinc-500"> — {summary(map[k])}</span>{/if}
@@ -77,7 +88,7 @@
             <p class="text-[11px] text-amber-600">{nameError}</p>
           {/if}
         </div>
-        <SchemaObject obj={draft} schema={valueSchema} {context} />
+        <SchemaObject obj={draft} schema={valueSchema ?? {}} />
       </div>
       <div class="mt-4 flex justify-end gap-2">
         <button type="button" class="btn-sm" onclick={() => (showModal = false)}>{t('Cancel')}</button>

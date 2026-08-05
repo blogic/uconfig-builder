@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     device_icon,
     device_name,
@@ -9,8 +9,14 @@
     signal_class
   } from '../device-icons.js'
   import { t } from '../i18n.svelte.js'
+  import type { DeviceEntry } from '../devices.svelte.js'
 
-  let { device: d, offline = false } = $props()
+  interface Props {
+    device: DeviceEntry
+    offline?: boolean
+  }
+
+  let { device: d, offline = false }: Props = $props()
 
   const traffic = $derived(device_traffic(d))
   const wifi = $derived(d.wifi)
@@ -56,10 +62,10 @@
   {#if traffic}
     <div class="flex-shrink-0 text-right font-mono text-xs text-zinc-500">
       {#if traffic.split}
-        <div>↓ {bytes_format(traffic.down)}</div>
-        <div>↑ {bytes_format(traffic.up)}</div>
+        <div>↓ {bytes_format(traffic.down ?? 0)}</div>
+        <div>↑ {bytes_format(traffic.up ?? 0)}</div>
       {:else}
-        <div>{bytes_format(traffic.total)}</div>
+        <div>{bytes_format(traffic.total ?? 0)}</div>
       {/if}
     </div>
   {/if}

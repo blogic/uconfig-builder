@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Gauge from './Gauge.svelte'
   import TrafficChart from './TrafficChart.svelte'
   import { traffic, RESOLUTIONS, rates, current, has_traffic } from '../traffic.svelte.js'
@@ -15,7 +15,7 @@
   const up = $derived(rates('up', res))
   const empty = $derived(traffic.data != null && !has_traffic())
 
-  const spans = {
+  const spans: Record<string, string> = {
     hour: '60 minutes ago',
     day: '24 hours ago',
     week: '7 days ago'
