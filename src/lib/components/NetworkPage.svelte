@@ -1,5 +1,5 @@
 <script>
-  import { deviceStore, devices_refresh } from '../devices.svelte.js'
+  import { deviceStore } from '../devices.svelte.js'
   import { device_name } from '../device-icons.js'
   import DeviceRow from './DeviceRow.svelte'
   import Spinner from './Spinner.svelte'
@@ -24,11 +24,6 @@
   // Stale ARP entries usually outnumber the live ones; keep them out of the way.
   let showOffline = $state(false)
 
-  $effect(() => {
-    devices_refresh()
-    const iv = setInterval(devices_refresh, 5000)
-    return () => clearInterval(iv)
-  })
 </script>
 
 <PageHeader title={deviceStore.data ? t('Clients ({count})', { count: online.length }) : t('Clients')}>

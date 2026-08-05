@@ -1,14 +1,7 @@
 <script>
   import Gauge from './Gauge.svelte'
   import TrafficChart from './TrafficChart.svelte'
-  import {
-    traffic,
-    traffic_refresh,
-    RESOLUTIONS,
-    rates,
-    current,
-    has_traffic
-  } from '../traffic.svelte.js'
+  import { traffic, RESOLUTIONS, rates, current, has_traffic } from '../traffic.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
   import { t } from '../i18n.svelte.js'
@@ -28,11 +21,6 @@
     week: '7 days ago'
   }
 
-  $effect(() => {
-    traffic_refresh()
-    const iv = setInterval(traffic_refresh, 10000)
-    return () => clearInterval(iv)
-  })
 </script>
 
 <PageHeader title={t('Traffic')} />

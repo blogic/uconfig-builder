@@ -1,6 +1,6 @@
 <script>
   import { capabilities } from '../capabilities.svelte.js'
-  import { sysinfo, sysinfo_refresh } from '../sysinfo.svelte.js'
+  import { sysinfo } from '../sysinfo.svelte.js'
   import { t } from '../i18n.svelte.js'
 
   // Held in a module store so re-entering the page renders the last reading
@@ -44,11 +44,6 @@
     return s && s.total ? Math.round((s.used / s.total) * 100) : 0
   }
 
-  $effect(() => {
-    sysinfo_refresh()
-    const iv = setInterval(sysinfo_refresh, 5000)
-    return () => clearInterval(iv)
-  })
 </script>
 
 {#snippet bar(pct)}

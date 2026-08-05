@@ -11,16 +11,17 @@ export const deviceApi = $state({ ready: false, pages: null })
 
 export async function device_load() {
   if (mod) return mod
-  const [conn, caps, devices, sysinfo, traffic, pages, system] = await Promise.all([
+  const [conn, caps, devices, sysinfo, traffic, pages, system, poll] = await Promise.all([
     import('./connection.svelte.js'),
     import('./capabilities.svelte.js'),
     import('./devices.svelte.js'),
     import('./sysinfo.svelte.js'),
     import('./traffic.svelte.js'),
     import('./device-pages.js'),
-    import('./system.svelte.js')
+    import('./system.svelte.js'),
+    import('./poll.svelte.js')
   ])
-  mod = { conn, caps, devices, sysinfo, traffic, pages, system }
+  mod = { conn, caps, devices, sysinfo, traffic, pages, system, poll }
   deviceApi.pages = pages
   deviceApi.ready = true
   return mod

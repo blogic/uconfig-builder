@@ -15,6 +15,7 @@
   import SectionNav from './lib/components/SectionNav.svelte'
   import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
+  import LoadingScreen from './lib/components/LoadingScreen.svelte'
   import { def_get, title_for } from './lib/schema.js'
   import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
@@ -61,9 +62,11 @@
     dev.sysinfo.sysinfo_clear()
     dev.traffic.traffic_clear()
     dev.system.system_clear()
+    dev.poll.poll_clear()
   }
 
   const DP = $derived(deviceApi.pages)
+  const loading = $derived(dev?.poll.loading ?? { active: false, done: 0, total: 1, label: null })
 
   const preview = $derived(doc_export())
 
@@ -171,12 +174,18 @@
       } catch {
         /* device did not report capabilities; static defaults apply */
       }
-      // Land on the device menu (Network is the default page); Configure opens the builder.
       password = ''
       deviceSession = true
       section = IS_DEVICE ? 'status' : 'config'
       view.section = IS_DEVICE ? 'clients' : 'unit'
       screen = 'app'
+
+      // Seed every live page before showing the UI, so navigating between
+      // Clients, Traffic and State never waits on a round trip.
+      if (IS_DEVICE) {
+        await dev.poll.preload()
+        dev.poll.polling_start()
+      }
     } catch (e) {
       loginError = e?.message || String(e)
     } finally {
@@ -530,6 +539,9 @@
       {railed}
     />
 
+    {#if loading.active}
+      <LoadingScreen done={loading.done} total={loading.total} label={loading.label} />
+    {:else}
     <div class="flex min-h-0 flex-1 overflow-hidden">
       {#if wide && sectionItems.length > 1}
         <SectionNav items={sectionItems} page={view.section} onSelect={section_select_page} changes={changes.length} />
@@ -550,6 +562,7 @@
 
     {#if !wide && sectionItems.length > 1}
       <BottomNav items={sectionItems} active={view.section} onSelect={section_select_page} />
+    {/if}
     {/if}
   {/if}
 
