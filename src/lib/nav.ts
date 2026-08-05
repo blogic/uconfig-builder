@@ -51,8 +51,7 @@ export const SERVICE_ENTRIES: NavItem[] = [
 // Pages of the Status section: what the device is doing right now.
 export const STATUS_ITEMS: NavItem[] = [
   { key: 'clients', label: 'Clients', icon: 'bi-people' },
-  { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' },
-  { key: 'state', label: 'State', icon: 'bi-speedometer2' }
+  { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' }
 ]
 
 // Pages of the ucoord section: the venue and its peers, rather than this
@@ -69,8 +68,9 @@ export const CONFIG_ITEMS: NavItem[] = [
   { key: 'json', label: 'JSON', icon: 'bi-code-square' }
 ]
 
-// One concern per page: each is a distinct, irreversible action.
+// State reports on the device; the rest are one irreversible action per page.
 export const SYSTEM_ITEMS: NavItem[] = [
+  { key: 'state', label: 'State', icon: 'bi-speedometer2' },
   { key: 'reboot', label: 'Reboot', icon: 'bi-arrow-clockwise' },
   { key: 'firmware', label: 'Firmware', icon: 'bi-cpu' },
   { key: 'factory-reset', label: 'Factory Reset', icon: 'bi-exclamation-triangle' }
