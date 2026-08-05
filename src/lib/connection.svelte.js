@@ -8,6 +8,13 @@
 
 const READY_TIMEOUT_MS = 8000
 
+// The device closes an idle websocket ("Upstream connection timeout"), which
+// signs the session out from under the user. Pages that poll keep it busy on
+// their own, but the config and system sections send nothing at all, so the
+// connection layer keeps it alive for them. Well inside the observed window.
+const KEEPALIVE_MS = 30000
+const IDLE_BEFORE_PING_MS = 25000
+
 // Methods that take a { venue, peer } address. The rest are node-local.
 const ADDRESSED = new Set([
   'config-get',
@@ -26,6 +33,9 @@ let target = null // { venue, peer } once resolved
 let socket = null
 let next_id = 1
 const pending = new Map()
+
+let keepalive_timer = null
+let last_send = 0
 
 // connect() resolves only once the server sends the login-required event.
 let ready_resolve = null
@@ -69,6 +79,24 @@ function handle_event(msg) {
   if (msg.method === 'login-required') ready_resolve_now()
 }
 
+function keepalive_stop() {
+  if (keepalive_timer) clearInterval(keepalive_timer)
+  keepalive_timer = null
+}
+
+// Ping only when the socket has actually gone quiet, so polling pages -- which
+// already keep it busy -- cost nothing extra.
+function keepalive_start() {
+  keepalive_stop()
+  keepalive_timer = setInterval(() => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return
+    if (Date.now() - last_send < IDLE_BEFORE_PING_MS) return
+    request('ping', {}).catch(() => {
+      /* a dead socket surfaces through onclose */
+    })
+  }, KEEPALIVE_MS)
+}
+
 function on_message(event) {
   let msg
   try {
@@ -103,6 +131,7 @@ export function request(method, params) {
     }
     const id = next_id++
     pending.set(id, { resolve, reject })
+    last_send = Date.now()
     socket.send(JSON.stringify({ jsonrpc: '2.0', id, method, params: args }))
   })
 }
@@ -134,6 +163,7 @@ export function connect(host) {
       connection.status = 'connected'
     }
     socket.onclose = () => {
+      keepalive_stop()
       reject_pending('connection closed')
       // An unsolicited close means the session is gone (device rebooted, link
       // dropped, idle timeout). Flag it so the app can return to the landing
@@ -152,6 +182,7 @@ export function connect(host) {
 
 export function disconnect() {
   ready_clear()
+  keepalive_stop()
   if (socket) {
     // Closing on purpose; drop the handler so onclose does not report the
     // session as lost.
@@ -192,6 +223,8 @@ export async function login(password) {
   const result = await request('login', { password })
   connection.mode = result?.mode ?? 'standalone'
   await target_resolve()
+  // ping requires authentication, so the keepalive can only start now.
+  keepalive_start()
   return connection.mode
 }
 
