@@ -534,6 +534,7 @@
       onToggleTheme={toggle_theme}
       onLogout={deviceSession ? logout : null}
       {railed}
+      aligned={wide && sectionItems.length > 1}
     />
 
     {#if loading.active}

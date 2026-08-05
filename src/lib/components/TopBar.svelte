@@ -11,16 +11,18 @@
     themeMode,
     onToggleTheme,
     onLogout = null,
-    railed = false
+    railed = false,
+    aligned = false
   } = $props()
 
   let menuOpen = $state(false)
 </script>
 
-<header class="flex flex-shrink-0 items-center border-b border-zinc-200 bg-surface px-4 {railed ? 'gap-0' : 'gap-3'}">
-  <!-- With a single section there are no tabs, so the brand takes the width of
-       the sidebar and the title lines up with the content column beside it. -->
-  <div class="flex items-center gap-2 py-2.5 {railed ? 'w-[156px] flex-shrink-0' : ''}">
+<header class="flex flex-shrink-0 items-center border-b border-zinc-200 bg-surface px-4 {aligned ? 'gap-0' : 'gap-3'}">
+  <!-- Whenever a sidebar is present the brand takes its width, so whatever
+       follows -- section tabs, or the page title in the editor -- starts on the
+       content column rather than straddling the sidebar edge. -->
+  <div class="flex items-center gap-2 py-2.5 {aligned ? 'w-[156px] flex-shrink-0' : ''}">
     <span class="grid h-6 w-6 place-items-center rounded-base bg-accent text-xs text-white">
       <i class="bi bi-gear-wide-connected"></i>
     </span>
@@ -28,7 +30,7 @@
   </div>
 
   {#if sections.length > 1}
-    <nav class="flex h-full items-stretch gap-0.5">
+    <nav class="flex h-full items-stretch gap-0.5 {aligned ? 'pl-3' : ''}">
       {#each sections as s (s.key)}
         <button
           type="button"
