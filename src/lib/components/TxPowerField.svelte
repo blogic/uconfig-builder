@@ -3,16 +3,20 @@
   import type { Radio } from '../types/uconfig'
 
   interface Props {
-    obj: Radio
+    obj: Record<string, unknown>
     describe?: string | null
   }
 
   let { obj, describe = null }: Props = $props()
 
+  // Reads go through a narrowed view; the prop itself stays the caller's
+  // object so mutations keep Svelte's ownership link.
+  const o = $derived(obj as Radio)
+
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
   const MAX = 30
-  const value = $derived(obj['tx-power'] ?? MAX)
+  const value = $derived(o['tx-power'] ?? MAX)
   const pct = $derived(Math.round((value / MAX) * 100))
 
   $effect(() => {

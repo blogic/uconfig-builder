@@ -5,7 +5,7 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
-    obj: Radio
+    obj: Record<string, unknown>
     schema?: JsonSchemaNode
     band: string
     describe?: string | null
@@ -13,8 +13,12 @@
 
   let { obj, schema, band, describe = null }: Props = $props()
 
+  // Reads go through a narrowed view; the prop itself stays the caller's
+  // object so mutations keep Svelte's ownership link.
+  const o = $derived(obj as Radio)
+
   const fid = $props.id()
-  const value = $derived(obj['channel-mode'])
+  const value = $derived(o['channel-mode'])
   const def = $derived((schema?.default as Radio['channel-mode'] | undefined) ?? 'HE')
   const options = $derived(band_modes(band))
   const fallback = $derived(options.includes(def) ? def : options[options.length - 1])

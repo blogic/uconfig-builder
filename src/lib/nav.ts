@@ -52,9 +52,12 @@ export const SERVICE_ENTRIES: NavItem[] = [
 export const STATUS_ITEMS: NavItem[] = [
   { key: 'clients', label: 'Clients', icon: 'bi-people' },
   { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' },
-  { key: 'state', label: 'State', icon: 'bi-speedometer2' },
-  { key: 'ucoord', label: 'ucoord', icon: 'bi-diagram-3' }
+  { key: 'state', label: 'State', icon: 'bi-speedometer2' }
 ]
+
+// Pages of the ucoord section: the venue and its peers, rather than this
+// device alone.
+export const UCOORD_ITEMS: NavItem[] = [{ key: 'overview', label: 'Overview', icon: 'bi-diagram-3' }]
 
 // Pages of the Configure section. Services expands into SERVICE_ENTRIES.
 export const CONFIG_ITEMS: NavItem[] = [
@@ -78,6 +81,7 @@ export const SYSTEM_ITEMS: NavItem[] = [
 // off phones, where they are not sensible errands.
 export const SECTIONS: NavSection[] = [
   { key: 'status', label: 'Status', icon: 'bi-activity', device: true, items: STATUS_ITEMS },
+  { key: 'ucoord', label: 'uCoord', icon: 'bi-diagram-3', device: true, items: UCOORD_ITEMS, desktopOnly: true },
   { key: 'config', label: 'Configure', icon: 'bi-sliders', items: CONFIG_ITEMS, desktopOnly: true },
   { key: 'system', label: 'System', icon: 'bi-wrench', device: true, items: SYSTEM_ITEMS, desktopOnly: true }
 ]

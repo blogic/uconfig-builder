@@ -5,7 +5,7 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
-    obj: Radio
+    obj: Record<string, unknown>
     schema: JsonSchemaNode
     band: string
     describe?: string | null
@@ -14,10 +14,14 @@
   // `schema` kept in Props for the widget call-site contract; unused here.
   let { obj, schema: _schema, band, describe = null }: Props = $props()
 
+  // Reads go through a narrowed view; the prop itself stays the caller's
+  // object so mutations keep Svelte's ownership link.
+  const o = $derived(obj as Radio)
+
   const fid = $props.id()
   const desc = $derived(t(describe ?? ''))
-  const value = $derived(obj.channel)
-  const width = $derived(obj['channel-width'] ?? default_width(band))
+  const value = $derived(o.channel)
+  const width = $derived(o['channel-width'] ?? default_width(band))
   const options = $derived(channel_options(band, width))
 
   // Persist the displayed value: ACS when unset, and re-ACS when a width change

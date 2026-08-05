@@ -47,7 +47,7 @@
   </div>
 
   <LayoutRenderer
-    data={iface as Record<string, unknown>}
+    data={iface}
     schema={interfaceDef ?? {}}
     layout={interfaceLayout}
     context={{ role: iface.role, allInterfaces: store.doc.interfaces, selfName: name, radios: store.doc.radios }}

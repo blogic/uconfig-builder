@@ -4,7 +4,10 @@
   import type { JsonSchemaNode } from '../schema'
 
   type FieldValue = string | number | boolean | (string | number)[] | undefined
-  type FieldObj = Record<string, FieldValue>
+  // Accepts the caller's state object as-is: casting at the call site would
+  // create a new expression and break Svelte's ownership tracking, which turns
+  // every edit into an ownership_invalid_mutation warning.
+  type FieldObj = Record<string, unknown>
   type FieldKind = 'enum' | 'boolean' | 'number' | 'array' | 'string' | 'scalar-union'
 
   interface Props {
@@ -20,7 +23,7 @@
   let { obj, key, schema, label = null, required = false, fallback = undefined, describe = null }: Props = $props()
 
   const fid = $props.id()
-  const value = $derived(obj[key])
+  const value = $derived(obj[key] as FieldValue)
   const missing = $derived(required && (value === undefined || value === null || value === ''))
   const isSecret = $derived(/password|passphrase|psk|secret/i.test(key) || key === 'key')
   let show = $state(false)

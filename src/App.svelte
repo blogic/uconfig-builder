@@ -254,7 +254,7 @@
   function route_apply(r: Route | null) {
     if (!r) return
     // A route only makes sense once a session exists; ignore it otherwise.
-    if (r.section === 'status' && !deviceSession) return
+    if (SECTIONS.find((s) => s.key === r.section)?.device && !deviceSession) return
     screen = 'app'
     if (r.section) section = r.section
     if (r.page) view.section = r.page
@@ -371,7 +371,11 @@
     {#snippet actions()}<ChangesIndicator {changes} scope="unit" />{/snippet}
   </PageHeader>
   <p class="page-description">{t(PAGE_DESCRIPTIONS.unit)}</p>
-  <LayoutRenderer data={store.doc.unit as Record<string, unknown> ?? {}} schema={unitDef ?? {}} layout={unitLayout} />
+  <!-- Guarded rather than defaulted: `?? {}` would hand the renderer a fresh
+       object each time, which Svelte does not own, so edits would not stick. -->
+  {#if store.doc.unit}
+    <LayoutRenderer data={store.doc.unit} schema={unitDef ?? {}} layout={unitLayout} />
+  {/if}
 {/snippet}
 
 {#snippet radiosBody()}
@@ -421,7 +425,7 @@
     {#if key === 'clients'}<DP.NetworkPage />
     {:else if key === 'traffic'}<DP.TrafficPage />
     {:else if key === 'state'}<DP.StatePage />
-    {:else if key === 'ucoord'}<DP.UcoordPage />
+    {:else if key === 'overview'}<DP.UcoordPage />
     {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}
       <DP.SystemBusy>
         {#snippet children()}
@@ -570,11 +574,11 @@
       onToggleTheme={toggle_theme}
       onLogout={deviceSession ? logout : null}
       {railed}
-      aligned={wide && sectionItems.length > 1}
+      aligned={wide && sectionItems.length > 0}
     />
 
     <div class="flex min-h-0 flex-1 overflow-hidden">
-      {#if wide && sectionItems.length > 1}
+      {#if wide && sectionItems.length > 0}
         <SectionNav items={sectionItems} page={view.section} onSelect={section_select_page} changes={changes.length} />
       {/if}
       <main class="min-w-0 flex-1 overflow-y-auto px-6 py-6 pr-4 {wide ? '' : 'pb-24'}">

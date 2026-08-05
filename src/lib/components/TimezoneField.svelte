@@ -4,13 +4,17 @@
   import type { Unit } from '../types/uconfig'
 
   interface Props {
-    obj: Unit
+    obj: Record<string, unknown>
   }
 
   let { obj }: Props = $props()
 
+  // Reads go through a narrowed view; the prop itself stays the caller's
+  // object so mutations keep Svelte's ownership link.
+  const o = $derived(obj as Unit)
+
   const fid = $props.id()
-  const value = $derived(obj.timezone)
+  const value = $derived(o.timezone)
   const options = $derived(value && !tz_keys.includes(value) ? [value, ...tz_keys] : tz_keys)
 
   function onChange(e: Event) {

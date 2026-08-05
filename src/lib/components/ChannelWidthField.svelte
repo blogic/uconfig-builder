@@ -6,7 +6,7 @@
   import type { JsonSchemaNode } from '../schema'
 
   interface Props {
-    obj: Radio
+    obj: Record<string, unknown>
     schema?: JsonSchemaNode
     band: string
     describe?: string | null
@@ -15,11 +15,15 @@
   // `schema` kept in Props for the widget call-site contract; unused here.
   let { obj, schema: _schema, band, describe = null }: Props = $props()
 
+  // Reads go through a narrowed view; the prop itself stays the caller's
+  // object so mutations keep Svelte's ownership link.
+  const o = $derived(obj as Radio)
+
   const fid = $props.id()
   const is5G = $derived(String(band).toUpperCase() === '5G')
-  const value = $derived(obj['channel-width'])
+  const value = $derived(o['channel-width'])
   // 160 MHz requires DFS, so hide it on 5G when DFS is explicitly disabled.
-  const dfsOff = $derived(is5G && obj['allow-dfs'] === false)
+  const dfsOff = $derived(is5G && o['allow-dfs'] === false)
   const options = $derived(dfsOff ? band_widths(band).filter((w) => w !== 160) : band_widths(band))
   const invalid = $derived(value != null && !options.includes(value))
   const shown = $derived(invalid ? [value, ...options] : options)
