@@ -496,36 +496,45 @@
           <h1 class="text-xl font-semibold tracking-tight">{t('uConfig')}</h1>
         </div>
 
-        {#if connState === 'connecting'}
-          <div class="mt-6 flex flex-col items-center gap-3 text-sm text-zinc-500">
-            <Spinner class="h-6 w-6 text-zinc-400" />
-            <span>{t('Connecting to the device…')}</span>
-          </div>
-        {:else if connState === 'error'}
-          <p class="mt-6 text-sm text-red-600">{loginError}</p>
-          <button type="button" class="btn mt-5 w-full justify-center" onclick={login_back}>{t('Back')}</button>
-        {:else if loading.active}
-          <div class="mt-6 flex flex-col items-center gap-3 text-sm text-zinc-500">
-            <Spinner class="h-6 w-6 text-zinc-400" />
-            <span>{t('Loading data…')}</span>
-          </div>
-          <div class="mt-5 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
-            <div class="h-full rounded-full bg-accent transition-all duration-300" style="width: {Math.round((loading.done / loading.total) * 100)}%"></div>
-          </div>
-        {:else}
-          <form class="mt-6 flex flex-col gap-4" onsubmit={host_login}>
-            <input type="hidden" name="username" autocomplete="username" value="admin" />
-            <label class="flex flex-col gap-1.5">
-              <input class="input text-center" type="password" name="password" autocomplete="current-password" bind:value={password} />
-              <span class="text-xs text-zinc-500">{t('Password')}</span>
-            </label>
-            {#if loginError}
-              <p class="text-sm text-red-600">{loginError}</p>
-            {/if}
-            <button type="submit" class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={loggingIn}>
-              {loggingIn ? t('Logging in…') : t('Log in')}
-            </button>
-          </form>
+        <!-- Connecting, loading and the password form differ in height by ~50px.
+             The card is vertically centred, so letting it size to its contents
+             makes it jump on every transition; reserve the tallest state's
+             height and centre the shorter ones inside it. -->
+        <div class="mt-6 flex min-h-[6.75rem] flex-col justify-center">
+          {#if connState === 'connecting'}
+            <div class="flex flex-col items-center gap-3 text-sm text-zinc-500">
+              <Spinner class="h-6 w-6 text-zinc-400" />
+              <span>{t('Connecting to the device…')}</span>
+            </div>
+          {:else if connState === 'error'}
+            <p class="text-sm text-red-600">{loginError}</p>
+            <button type="button" class="btn mt-5 w-full justify-center" onclick={login_back}>{t('Back')}</button>
+          {:else if loading.active}
+            <div class="flex flex-col items-center gap-3 text-sm text-zinc-500">
+              <Spinner class="h-6 w-6 text-zinc-400" />
+              <span>{t('Loading data…')}</span>
+            </div>
+            <div class="mt-5 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+              <div class="h-full rounded-full bg-accent transition-all duration-300" style="width: {Math.round((loading.done / loading.total) * 100)}%"></div>
+            </div>
+          {:else}
+            <form class="flex flex-col gap-4" onsubmit={host_login}>
+              <input type="hidden" name="username" autocomplete="username" value="admin" />
+              <label class="flex flex-col gap-1.5">
+                <input class="input text-center" type="password" name="password" autocomplete="current-password" bind:value={password} />
+                <span class="text-xs text-zinc-500">{t('Password')}</span>
+              </label>
+              <button type="submit" class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={loggingIn}>
+                {loggingIn ? t('Logging in…') : t('Log in')}
+              </button>
+            </form>
+          {/if}
+        </div>
+
+        <!-- Outside the fixed-height body: a wrong password would otherwise
+             push the form out of the reserved space and reintroduce the jump. -->
+        {#if connState !== 'error' && loginError}
+          <p class="mt-4 text-sm text-red-600">{loginError}</p>
         {/if}
       </div>
     </div>
