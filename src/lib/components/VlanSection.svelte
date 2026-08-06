@@ -49,7 +49,9 @@
   }
   function commit() {
     if (error) return
-    if (!iface.vlan) return
+    // An upstream may carry trunks without a VLAN of its own, so the first
+    // trunk has to be able to create the section it lives in.
+    if (!iface.vlan) iface.vlan = {}
     if (!Array.isArray(iface.vlan.trunks)) iface.vlan.trunks = []
     iface.vlan.trunks.push(val)
     showModal = false
@@ -61,16 +63,20 @@
     const i = iface.vlan.trunks.indexOf(tr)
     if (i >= 0) iface.vlan.trunks.splice(i, 1)
     if (!iface.vlan.trunks.length) delete iface.vlan.trunks
+    // Drop the container too, rather than leaving `vlan: {}` in the document.
+    if (iface.vlan.id == null && !iface.vlan.trunks) delete iface.vlan
   }
 </script>
 
 <CollapsibleSection title={t('VLAN')}>
   {#snippet children()}
     <div class="flex flex-col gap-4">
-      <div class="flex flex-col gap-1">
-        <label for="vlan-id" class="text-xs font-medium text-zinc-700">{t('VLAN ID')}</label>
-        <input id="vlan-id" class="input bg-zinc-100 text-zinc-600" value={vlan.id ?? ''} readonly />
-      </div>
+      {#if vlan.id != null}
+        <div class="flex flex-col gap-1">
+          <label for="vlan-id" class="text-xs font-medium text-zinc-700">{t('VLAN ID')}</label>
+          <input id="vlan-id" class="input bg-zinc-100 text-zinc-600" value={vlan.id} readonly />
+        </div>
+      {/if}
 
       {#if isUpstream}
         <ListBox items={trunks} label="Trunks" onAdd={open}>

@@ -254,7 +254,9 @@
           role={context.role}
         />
       {:else if node.vlanSection}
-        {#if data_obj.vlan != null}
+        <!-- An upstream carries trunks whether or not it has a VLAN of its own,
+             so the section is offered when either applies. -->
+        {#if data_obj.vlan != null || context.role === 'upstream'}
           <VlanSection
             iface={data as Interface}
             interfaces={(context.allInterfaces ?? {}) as Record<string, Interface>}
