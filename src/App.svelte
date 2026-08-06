@@ -176,6 +176,18 @@
       if (!d) return
       await d.conn.connect(h)
       connState = 'ready'
+
+      // An unconfigured device has no password yet, so it goes straight to the
+      // wizard rather than asking for one.
+      if (d.conn.connection.setupRequired) {
+        try {
+          d.caps.capabilities_set(await d.conn.request<CapabilitiesData>('capabilities', {}))
+        } catch {
+          /* radios fall back to defaults */
+        }
+        deviceSession = true
+        screen = 'wizard'
+      }
     } catch (e) {
       connState = 'error'
       loginError = e instanceof Error ? e.message : String(e)

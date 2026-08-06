@@ -59,7 +59,8 @@ const pending = new Map<number, PendingEntry>()
 let keepalive_timer: ReturnType<typeof setInterval> | null = null
 let last_send = 0
 
-// connect() resolves only once the server sends the login-required event.
+// connect() resolves once the server asks for a password, or says the device
+// has never been set up.
 let ready_resolve: (() => void) | null = null
 let ready_reject: ((reason: Error) => void) | null = null
 let ready_timer: ReturnType<typeof setTimeout> | null = null
@@ -68,6 +69,7 @@ export const connection = $state<{
   status: 'idle' | 'connecting' | 'connected'
   mode: 'standalone' | 'ucoord' | null
   modules: string[] | null // optional packages the device reports at login
+  setupRequired: boolean // device has never been configured; run the wizard
   device: Device | null
   lost: boolean
   host: string | null
@@ -76,6 +78,7 @@ export const connection = $state<{
   status: 'idle',
   mode: null,
   modules: null,
+  setupRequired: false,
   device: null,
   lost: false,
   host: null,
@@ -107,7 +110,17 @@ function ready_reject_now(message: string) {
 }
 
 function handle_event(msg: RpcEvent) {
-  if (msg.method === 'login-required') ready_resolve_now()
+  if (msg.method === 'login-required') {
+    connection.setupRequired = false
+    ready_resolve_now()
+    return
+  }
+  // An unconfigured device has no password to ask for, so it says so instead
+  // and the wizard runs first.
+  if (msg.method === 'setup-required') {
+    connection.setupRequired = true
+    ready_resolve_now()
+  }
 }
 
 function keepalive_stop() {
@@ -224,6 +237,7 @@ export function disconnect() {
   connection.status = 'idle'
   connection.mode = null
   connection.modules = null
+  connection.setupRequired = false
   connection.device = null
   connection.lost = false
 }

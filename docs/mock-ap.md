@@ -51,8 +51,13 @@ the UI, which is a different thing.
 ## Fidelity
 
 The wire protocol matches the device, so the app needs no dev-only branch:
-endpoint `/uconfig`, subprotocol `uconfig`, a `login-required` notification
-200ms after connect, and the same JSON-RPC error codes.
+endpoint `/uconfig`, subprotocol `uconfig`, a notification 200ms after connect,
+and the same JSON-RPC error codes.
+
+That notification depends on the config. With a top-level `webui` object the
+device has been set up and asks for a password, so it sends `login-required`.
+Without one it sends `setup-required` instead and treats the session as
+authenticated, since there is no password to give until the wizard sets one.
 
 The methods that act on the device are top level and take no address, since a
 device managing itself has nothing to address: `config-get`, `config-apply`,

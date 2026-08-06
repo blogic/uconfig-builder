@@ -44,22 +44,25 @@ export function wizard_defaults(): WizardData {
 }
 
 // Steps are addressed by name rather than index so inserting one does not
-// renumber the guards below.
+// renumber anything that refers to them.
 export const WIZARD_STEPS = ['mode', 'password', 'identity', 'wifi', 'guest', 'review'] as const
 export type WizardStep = (typeof WIZARD_STEPS)[number]
 
-// Guest needs a second subnet to isolate, which an access point does not own.
-export function wizard_steps(mode: WizardMode): WizardStep[] {
-  return WIZARD_STEPS.filter((s) => s !== 'guest' || mode === 'router')
+// Both modes offer a guest network: the router owns the subnet, and an access
+// point bridges onto the same VLAN.
+export function wizard_steps(_mode: WizardMode): WizardStep[] {
+  return [...WIZARD_STEPS]
 }
 
-const MIN_PASSWORD = 8
+// The device password has no length rule of its own; the Wi-Fi key does,
+// because WPA requires at least eight characters.
+const MIN_PASSWORD = 1
 const MIN_KEY = 8
 
 // The message for whatever is wrong with a step, or null when it may be left.
 export function step_error(step: WizardStep, d: WizardData): string | null {
   if (step === 'password') {
-    if (d.password.length < MIN_PASSWORD) return `Use at least ${MIN_PASSWORD} characters`
+    if (d.password.length < MIN_PASSWORD) return 'A password is required'
     if (d.password !== d.passwordRepeat) return 'The two entries do not match'
     return null
   }
@@ -111,9 +114,15 @@ function radios_for(bands: string[]): Record<string, unknown> {
   return out
 }
 
+// Guest traffic is carried on its own VLAN, so an access point can bridge it
+// to the router that owns the subnet rather than routing it itself.
+const GUEST_VLAN = 100
+const GUEST_SUBNET = '192.168.100.1/24'
+
 export function wizard_document(d: WizardData, capabilities: unknown): UconfigDocument {
   const bands = radio_bands(capabilities)
   const main = ssid_block(d.ssid, d.key, d.security, bands)
+  const guest = () => ssid_block(d.guestSsid, d.guestKey, d.guestSecurity, bands)
 
   const doc: Record<string, unknown> = {
     unit: { hostname: d.hostname.trim(), timezone: d.timezone, password: d.password },
@@ -125,9 +134,9 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
   }
 
   if (d.mode === 'ap') {
-    // One upstream carrying every port; addressing comes from the router that
-    // already runs the network.
-    doc.interfaces = {
+    // Every port on one upstream; addressing comes from the router that already
+    // runs the network.
+    const interfaces: Record<string, unknown> = {
       wan: {
         role: 'upstream',
         services: ['ssh', 'webui'],
@@ -137,46 +146,62 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
         ssids: { main }
       }
     }
+
+    if (d.guestOn) {
+      // No address of its own: the access point only bridges guest traffic onto
+      // the VLAN, and the router answers DHCP on it.
+      interfaces.guest = {
+        role: 'upstream',
+        ports: { 'wan*': 'auto', 'lan*': 'auto' },
+        vlan: { id: GUEST_VLAN },
+        ipv4: { addressing: 'none' },
+        ssids: { guest: guest() }
+      }
+    }
+
+    doc.interfaces = interfaces
     return doc as UconfigDocument
   }
 
-  const lan: Record<string, unknown> = {
-    role: 'downstream',
-    services: ['ssh', 'webui'],
-    ports: { 'lan*': 'auto' },
-    ipv4: {
-      addressing: 'static',
-      subnet: '192.168.1.1/24',
-      'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' }
-    },
-    ipv6: { addressing: 'static', dhcpv6: { mode: 'hybrid' } },
-    ssids: { main }
-  }
-
-  doc.interfaces = {
+  const interfaces: Record<string, unknown> = {
     wan: {
       role: 'upstream',
       ports: { 'wan*': 'auto' },
       ipv4: { addressing: 'dynamic' },
       ipv6: { addressing: 'dynamic' }
     },
-    lan
-  }
-
-  if (d.guestOn) {
-    // Its own subnet, and barred from reaching the networks upstream of it.
-    ;(doc.interfaces as Record<string, unknown>).guest = {
+    lan: {
       role: 'downstream',
-      ports: {},
+      services: ['ssh', 'webui'],
+      ports: { 'lan*': 'auto' },
       ipv4: {
         addressing: 'static',
-        subnet: '192.168.2.1/24',
-        'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' },
-        'disallow-upstream-subnet': true
+        subnet: '192.168.1.1/24',
+        'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' }
       },
-      ssids: { guest: ssid_block(d.guestSsid, d.guestKey, d.guestSecurity, bands) }
+      ipv6: { addressing: 'static', dhcpv6: { mode: 'hybrid' } },
+      ssids: { main }
     }
   }
 
+  if (d.guestOn) {
+    // The router owns the guest subnet and serves DHCP on the VLAN, which is
+    // what lets an access point bridge onto it. Barred from the networks
+    // upstream of it, so guests reach the internet and nothing else.
+    interfaces.guest = {
+      role: 'downstream',
+      ports: { 'lan*': 'auto' },
+      vlan: { id: GUEST_VLAN },
+      ipv4: {
+        addressing: 'static',
+        subnet: GUEST_SUBNET,
+        'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' },
+        'disallow-upstream-subnet': true
+      },
+      ssids: { guest: guest() }
+    }
+  }
+
+  doc.interfaces = interfaces
   return doc as UconfigDocument
 }

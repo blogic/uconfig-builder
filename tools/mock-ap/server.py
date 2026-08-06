@@ -75,6 +75,11 @@ def config_write(doc):
     STATE_CONFIG.write_text(json.dumps(doc, indent='\t') + '\n')
 
 
+def needs_setup():
+    """A config with no top-level `webui` object has never been through setup."""
+    return 'webui' not in config_read()
+
+
 def factory_reset():
     """Discard applied state so the first-boot flow can be replayed."""
     if STATE.exists():
@@ -287,7 +292,14 @@ async def connection(ws):
     session = Session(ws)
     log('client connected')
     await asyncio.sleep(LOGIN_PROMPT_DELAY)
-    await session.notify('login-required')
+    # An unconfigured device asks for setup rather than a password: there is no
+    # password to give until the wizard sets one.
+    if needs_setup():
+        session.authenticated = True
+        log('no webui object -> setup-required')
+        await session.notify('setup-required')
+    else:
+        await session.notify('login-required')
 
     try:
         async for raw in ws:

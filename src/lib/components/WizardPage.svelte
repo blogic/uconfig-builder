@@ -155,7 +155,7 @@
           <span class="text-xs font-medium text-zinc-700">{t('Password')}</span>
           <input class="input" type="password" autocomplete="new-password" bind:value={data.password} />
           <small class="text-[11px] leading-snug text-zinc-500">
-            {t('Used for this web interface and for SSH. At least 8 characters.')}
+            {t('Used for this web interface and for SSH.')}
           </small>
         </label>
         <label class="mb-3 flex flex-col gap-1">

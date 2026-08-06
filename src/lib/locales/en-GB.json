@@ -514,7 +514,7 @@
   "Uptime": "Uptime",
   "Usage": "Usage",
   "Use multiple-BSSID beacons.": "Broadcast the BSSs of this radio using the multiple-BSSID beacon information element.",
-  "Used for this web interface and for SSH. At least 8 characters.": "Used for this web interface and for SSH. At least 8 characters.",
+  "Used for this web interface and for SSH.": "Used for this web interface and for SSH.",
   "User password.": "User password for password-based authentication.",
   "user-defined": "user-defined",
   "Username": "Username",
