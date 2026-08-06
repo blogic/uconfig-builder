@@ -3,6 +3,7 @@
   import Button from './Button.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
+  import { request as ws_request } from '../connection.svelte.js'
   import { wizard_defaults, wizard_steps, step_error, wizard_document, MAX_SSID, MAX_KEY } from '../wizard.svelte.js'
   import type { WizardStep, WizardSecurity } from '../wizard.svelte.js'
   import type { UconfigDocument } from '../types/uconfig'
@@ -20,6 +21,7 @@
   let touched = $state(false)
   // The document the wizard produced, handed to the caller on Continue.
   let pending = $state<UconfigDocument | null>(null)
+  let applyError = $state<string | null>(null)
 
   const steps = $derived(wizard_steps(data.mode))
   const step = $derived<WizardStep>(steps[Math.min(index, steps.length - 1)])
@@ -46,13 +48,21 @@
 
   async function apply() {
     phase = 'applying'
-    // Phase 2 pushes this to the device. For now the document is built and
-    // handed back, so the flow can be exercised without touching hardware.
+    applyError = null
     // Both inputs are snapshotted: the document goes to doc_adopt, which
     // structuredClones it, and a reactive proxy cannot be cloned.
-    pending = wizard_document($state.snapshot(data), $state.snapshot(capabilities))
-    await new Promise((r) => setTimeout(r, 15000))
-    phase = 'done'
+    const doc = wizard_document($state.snapshot(data), $state.snapshot(capabilities))
+    try {
+      // Password first. A device in setup mode is already authenticated, so
+      // setting it cannot invalidate the session part-way through.
+      await ws_request('change-password', { password: data.password })
+      await ws_request('config-apply', { config: doc, includes: {} })
+      pending = doc
+      phase = 'done'
+    } catch (e) {
+      applyError = e instanceof Error ? e.message : String(e)
+      phase = 'form'
+    }
   }
 
   const SECURITY: WizardSecurity[] = ['maximum', 'compatibility']
@@ -286,6 +296,9 @@
       {#if phase === 'form'}
         {#if touched && error}
           <p class="mt-1 text-[11px] text-red-600">{t(error)}</p>
+        {/if}
+        {#if applyError}
+          <p class="mt-1 text-[11px] text-red-600">{applyError}</p>
         {/if}
         <div class="mt-auto flex gap-2 pt-4">
           <Button full disabled={index === 0} onclick={back}>{t('Back')}</Button>

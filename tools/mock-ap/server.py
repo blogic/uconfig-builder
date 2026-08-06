@@ -32,6 +32,7 @@ FIXTURES = HERE / 'fixtures.json'
 STATE = HERE / 'state'
 STATE_CONFIG = STATE / 'config.json'
 STATE_INCLUDES = STATE / 'includes'
+STATE_PASSWORD = STATE / 'password'
 
 # --no-modules omits the list from the login reply, so the client's "device
 # said nothing" path can be exercised.
@@ -44,7 +45,6 @@ INCLUDES = '--includes' in sys.argv
 
 HOST = '0.0.0.0'
 PORT = 8080
-PASSWORD = 'a'
 SUBPROTOCOL = 'uconfig'
 
 # The client waits for this before offering the password prompt; the device
@@ -117,6 +117,22 @@ def includes_write(mapping):
             log('include deleted:', name)
 
 
+def password_read():
+    """The password the wizard set, or None on a device that has none yet.
+
+    Stored under state/ so a factory reset drops it: an unconfigured device has
+    no password at all, and the wizard is what gives it one.
+    """
+    if not STATE_PASSWORD.exists():
+        return None
+    return STATE_PASSWORD.read_text().rstrip('\n')
+
+
+def password_write(password):
+    STATE.mkdir(exist_ok=True)
+    STATE_PASSWORD.write_text(password + '\n')
+
+
 def needs_setup():
     """A config with no top-level `webui` object has never been through setup."""
     return 'webui' not in config_read()
@@ -156,7 +172,10 @@ class Session:
     async def m_login(self, rid, params):
         if not isinstance(params, dict) or 'password' not in params:
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
-        if params['password'] != PASSWORD:
+        # A device with no password has not been set up, and reaches the app
+        # through the wizard rather than this method.
+        stored = password_read()
+        if stored is None or params['password'] != stored:
             return await self.fail(rid, ERROR_INVALID_PASSWORD, 'Invalid password')
         self.authenticated = True
         # The optional packages the device has installed. The client uses this
@@ -177,6 +196,11 @@ class Session:
     async def m_change_password(self, rid, params):
         if not isinstance(params, dict) or not params.get('password'):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
+        # A real device stores the /etc/shadow hash. The mock keeps the plain
+        # string: it has no shadow file, and login has to compare against
+        # whatever the wizard sent.
+        password_write(params['password'])
+        log('password set')
         await self.reply(rid, {'success': True})
 
     async def m_status(self, rid, _params):
@@ -365,7 +389,8 @@ async def connection(ws):
 
 async def main():
     state = 'applied config' if STATE_CONFIG.exists() else 'factory config'
-    log(f'serving {state}; password is {PASSWORD!r}')
+    stored = password_read()
+    log(f'serving {state}; ' + (f'password is {stored!r}' if stored else 'no password set, run the wizard'))
     if INCLUDES:
         log(f'include envelope enabled; {len(includes_read())} fragment(s) stored')
     log(f'listening on ws://localhost:{PORT}/uconfig')

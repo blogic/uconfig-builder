@@ -127,7 +127,9 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
   const guest = () => ssid_block(d.guestSsid, d.guestKey, d.guestSecurity, bands)
 
   const doc: Record<string, unknown> = {
-    unit: { hostname: d.hostname.trim(), timezone: d.timezone, password: d.password },
+    // No password here: `unit.password` is the /etc/shadow hash, which only the
+    // device can produce. The chosen password goes over `change-password`.
+    unit: { hostname: d.hostname.trim(), timezone: d.timezone },
     radios: radios_for(bands),
     services: { ssh: { port: 22 } },
     // Marks the device as set up, so the wizard does not run again, and records
