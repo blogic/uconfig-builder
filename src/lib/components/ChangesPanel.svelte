@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { store, doc_export, config_save, saved_names } from '../store.svelte.js'
+  import { store, doc_export, config_save, saved_names, changes_reset } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
   import Button from './Button.svelte'
+  import ChangesResetModal from './ChangesResetModal.svelte'
   import type { ChangeEntry } from '../changes'
 
   interface Props {
@@ -21,6 +22,13 @@
     Interfaces: 'bi-ethernet',
     Services: 'bi-hdd-network',
     Definitions: 'bi-clock'
+  }
+
+  let showReset = $state(false)
+
+  function reset_all() {
+    changes_reset()
+    showReset = false
   }
 
   let name = $state(store.loadedFrom && store.loadedFrom !== 'imported' ? store.loadedFrom : '')
@@ -92,9 +100,14 @@
 
   {#if connected}
     <div>
-      <Button variant="primary" icon="bi-upload" disabled={!changes.length} onclick={onApply}>
-        {t('Apply to device')}
-      </Button>
+      <div class="flex flex-wrap items-center gap-2">
+        <Button variant="primary" icon="bi-upload" disabled={!changes.length} onclick={onApply}>
+          {t('Apply to device')}
+        </Button>
+        <Button icon="bi-arrow-counterclockwise" disabled={!changes.length} onclick={() => (showReset = true)}>
+          {t('Reset')}
+        </Button>
+      </div>
       {#if applyError}
         <p class="mt-1 text-[11px] text-red-600">{applyError}</p>
       {/if}
@@ -102,7 +115,12 @@
   {:else}
     <div>
       <p class="mb-1 text-xs font-medium text-zinc-700">{t('Download')}</p>
-      <Button icon="bi-download" onclick={download}>{t('Download JSON')}</Button>
+      <div class="flex flex-wrap items-center gap-2">
+        <Button icon="bi-download" onclick={download}>{t('Download JSON')}</Button>
+        <Button icon="bi-arrow-counterclockwise" disabled={!changes.length} onclick={() => (showReset = true)}>
+          {t('Reset')}
+        </Button>
+      </div>
     </div>
 
     {#if changes.length}
@@ -133,3 +151,12 @@
     {/if}
   {/if}
 </div>
+
+{#if showReset}
+  <ChangesResetModal
+    title="Pending changes"
+    entries={changes}
+    onConfirm={reset_all}
+    onCancel={() => (showReset = false)}
+  />
+{/if}

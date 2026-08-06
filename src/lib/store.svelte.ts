@@ -117,6 +117,16 @@ export function scope_reset(scope: string) {
   }
 }
 
+// Discard every edit, restoring the document as it was loaded. Distinct from
+// doc_reset, which blanks the document and starts over.
+export function changes_reset() {
+  if (!store.baseline) return
+  store.doc = structuredClone($state.snapshot(store.baseline)) as UconfigDocument
+  ensure_sections()
+  unit_defaults(store.doc)
+  service_defaults(store.doc)
+}
+
 export function doc_reset() {
   store.doc = blank_doc()
   store.loadedFrom = null
