@@ -3,7 +3,7 @@
   import Button from './Button.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
-  import { request as ws_request } from '../connection.svelte.js'
+  import { request as ws_request, login as ws_login } from '../connection.svelte.js'
   import { wizard_defaults, wizard_steps, step_error, wizard_document, MAX_SSID, MAX_KEY } from '../wizard.svelte.js'
   import type { WizardStep, WizardSecurity } from '../wizard.svelte.js'
   import type { UconfigDocument } from '../types/uconfig'
@@ -22,6 +22,7 @@
   // The document the wizard produced, handed to the caller on Continue.
   let pending = $state<UconfigDocument | null>(null)
   let applyError = $state<string | null>(null)
+  let continuing = $state(false)
 
   const steps = $derived(wizard_steps(data.mode))
   const step = $derived<WizardStep>(steps[Math.min(index, steps.length - 1)])
@@ -62,6 +63,23 @@
     } catch (e) {
       applyError = e instanceof Error ? e.message : String(e)
       phase = 'form'
+    }
+  }
+
+  // Applying the config makes the device configured, which ends the unauthenticated
+  // grace the wizard ran under. Logging in with the password just set is what
+  // carries the session into the app.
+  async function continue_to_app() {
+    if (!pending || continuing) return
+    continuing = true
+    applyError = null
+    try {
+      await ws_login(data.password)
+      onDone(pending)
+    } catch (e) {
+      applyError = e instanceof Error ? e.message : String(e)
+    } finally {
+      continuing = false
     }
   }
 
@@ -128,8 +146,11 @@
             {t('If you changed the Wi-Fi name, reconnect using the new one.')}
           </p>
           <div class="mt-2 w-full">
-            <Button variant="primary" full onclick={() => pending && onDone(pending)}>{t('Continue')}</Button>
+            <Button variant="primary" full disabled={continuing} onclick={continue_to_app}>{t('Continue')}</Button>
           </div>
+          {#if applyError}
+            <p class="mt-1 text-center text-[11px] text-red-600">{applyError}</p>
+          {/if}
         </div>
       {:else if step === 'mode'}
         <p class="mb-4 text-center text-sm text-zinc-500">{t('How should this device be used?')}</p>

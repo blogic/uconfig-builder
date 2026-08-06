@@ -147,7 +147,17 @@ def factory_reset():
 class Session:
     def __init__(self, ws):
         self.ws = ws
-        self.authenticated = False
+        self.logged_in = False
+
+    def authorised(self):
+        """Whether this session may call an authenticated method.
+
+        An unconfigured device grants access so the wizard can run before any
+        password exists. That grant is evaluated per call rather than latched at
+        connect time: the moment the wizard pushes a config carrying `webui`,
+        the device is configured and the session has to log in like any other.
+        """
+        return self.logged_in or needs_setup()
 
     async def send(self, payload):
         await self.ws.send(json.dumps(payload))
@@ -177,7 +187,7 @@ class Session:
         stored = password_read()
         if stored is None or params['password'] != stored:
             return await self.fail(rid, ERROR_INVALID_PASSWORD, 'Invalid password')
-        self.authenticated = True
+        self.logged_in = True
         # The optional packages the device has installed. The client uses this
         # to hide services the device could not run; a service with no sentinel
         # ships with the base system and is never listed here.
@@ -187,7 +197,7 @@ class Session:
         await self.reply(rid, result)
 
     async def m_logout(self, rid, _params):
-        self.authenticated = False
+        self.logged_in = False
         await self.reply(rid, {'success': True})
 
     async def m_ping(self, rid, _params):
@@ -350,7 +360,7 @@ class Session:
             return await self.fail(rid, ERROR_METHOD_NOT_FOUND, 'Method not found')
 
         handler, needs_auth = entry
-        if needs_auth and not self.authenticated:
+        if needs_auth and not self.authorised():
             return await self.fail(rid, ERROR_LOGIN_REQUIRED, 'login-required')
 
         if method in ADDRESSED and (not params.get('venue') or not params.get('peer')):
@@ -370,9 +380,10 @@ async def connection(ws):
     log('client connected')
     await asyncio.sleep(LOGIN_PROMPT_DELAY)
     # An unconfigured device asks for setup rather than a password: there is no
-    # password to give until the wizard sets one.
+    # password to give until the wizard sets one. Access is granted by
+    # `authorised()` per call, not latched here, so it lapses as soon as the
+    # wizard's config lands.
     if needs_setup():
-        session.authenticated = True
         log('no webui object -> setup-required')
         await session.notify('setup-required')
     else:

@@ -239,8 +239,8 @@
     }
   }
 
-  // Phase 2 pushes the document to the device; for now it is adopted locally so
-  // the app opens on what the wizard produced.
+  // The wizard has already applied the document and logged in, so this adopts
+  // what the device is now running and opens the app on it.
   async function wizard_done(doc: UconfigDocument) {
     doc_adopt(doc, settings.host ?? '')
     section = 'status'
