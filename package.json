@@ -9,6 +9,7 @@
     "build:editor": "UCONFIG_FLAVOUR=editor vite build --outDir dist/editor",
     "build:device": "UCONFIG_FLAVOUR=device vite build --outDir dist/device",
     "preview": "vite preview",
+    "mock": "python3 tools/mock-ap/server.py",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "types:schema": "node tools/schema-types.mjs",
     "i18n:extract": "node tools/i18n-extract.mjs"

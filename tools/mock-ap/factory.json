@@ -1,0 +1,35 @@
+{
+	"unit": {
+		"hostname": "OpenWrt"
+	},
+	"interfaces": {
+		"wan": {
+			"role": "upstream",
+			"ports": {
+				"wan*": "auto"
+			},
+			"ipv4": {
+				"addressing": "dynamic"
+			}
+		},
+		"lan": {
+			"role": "downstream",
+			"ports": {
+				"lan*": "auto"
+			},
+			"ipv4": {
+				"addressing": "static",
+				"subnet": "192.168.1.1/24"
+			},
+			"services": [
+				"ssh",
+				"webui"
+			]
+		}
+	},
+	"services": {
+		"ssh": {
+			"port": 22
+		}
+	}
+}
