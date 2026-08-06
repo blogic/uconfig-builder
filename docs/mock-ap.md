@@ -71,6 +71,24 @@ The mock does not drop idle connections. A real AP closes a quiet socket after
 roughly a minute, which is why the client sends `ping`; the mock answers it but
 never hangs up.
 
+## Installed modules
+
+`login` returns `modules`, the optional packages the device has installed. The
+list here is what `/etc/uconfig/modules/` holds on the GL-MT6000:
+
+```
+adguardhome  batman-adv  lldp  mdns  qosify  tailscale  ucoord
+```
+
+Those are package names, not config keys, and the two do not always match:
+`qosify` is the package behind the `quality-of-service` config block. A service
+with no package name, such as ssh or ntp, ships with the base system and is
+always available.
+
+`--no-modules` omits the field, which is how a device that reports nothing
+behaves; the UI then offers everything. A `modules` RPC returns the same list
+for a session that wants to re-read it.
+
 ## Adding an RPC
 
 1. Add an `m_<name>` coroutine to `Session` in `server.py`.

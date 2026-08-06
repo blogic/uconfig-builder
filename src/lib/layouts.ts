@@ -1,5 +1,5 @@
 import { default_width } from './channels'
-import { SERVICES } from './services'
+import { SERVICES, available_services } from './services'
 
 export interface LayoutContext {
   role?: string
@@ -199,7 +199,17 @@ const serviceLayouts: Record<string, LayoutNode[]> = {
 
 // One always-present section per configurable service. Services with a curated
 // layout get inlined describe text; the rest auto-render from the schema.
-export const servicesLayout: LayoutNode[] = SERVICES.filter((s) => s.config).map((s) => ({
-  objectSection: s.config as string,
-  children: serviceLayouts[s.config as string]
-}))
+function layout_from(list: typeof SERVICES): LayoutNode[] {
+  return list
+    .filter((s) => s.config)
+    .map((s) => ({
+      objectSection: s.config as string,
+      children: serviceLayouts[s.config as string]
+    }))
+}
+
+export function services_layout(modules: string[] | null): LayoutNode[] {
+  return layout_from(available_services(modules))
+}
+
+export const servicesLayout: LayoutNode[] = layout_from(SERVICES)

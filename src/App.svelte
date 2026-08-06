@@ -17,7 +17,7 @@
   import Button from './lib/components/Button.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get } from './lib/schema.js'
-  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, sections_for } from './lib/nav.js'
+  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, sections_for, service_entries } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
@@ -64,7 +64,9 @@
   // Device modules load on demand; in the editor build the branch is dropped
   // and nothing below ever runs.
   let dev = $state<DeviceMod | null>(null)
-  const connection = $derived(dev?.conn.connection ?? { status: 'idle' as const, lost: false })
+  const connection = $derived(
+    dev?.conn.connection ?? { status: 'idle' as const, lost: false, modules: null as string[] | null }
+  )
   const capabilities = $derived(dev?.caps.capabilities ?? { data: null })
 
   async function device_ready(): Promise<DeviceMod | null> {
@@ -134,6 +136,12 @@
   let connectionLost = $state(false) // session dropped; shown on the landing page
   let loggingIn = $state(false)
   let connState = $state<'idle' | 'connecting' | 'ready' | 'error'>('idle')
+
+  // A connected device reports which optional packages it has; without one the
+  // whole set is offered, which is what the offline editor wants.
+  const serviceEntries = $derived(
+    deviceSession ? service_entries(connection.modules ?? null) : SERVICE_ENTRIES
+  )
   function start_default() {
     section = 'config'
     view.section = 'unit'
@@ -562,7 +570,7 @@
 
     <div class="flex min-h-0 flex-1 overflow-hidden">
       {#if wide && sectionItems.length > 0}
-        <SectionNav items={sectionItems} page={view.section} onSelect={section_select_page} changes={changes.length} />
+        <SectionNav items={sectionItems} {serviceEntries} page={view.section} onSelect={section_select_page} changes={changes.length} />
       {/if}
       <main class="min-w-0 flex-1 overflow-y-auto px-6 py-6 pr-4 {wide ? '' : 'pb-24'}">
         {#if loadWarning}
@@ -571,7 +579,7 @@
           </p>
         {/if}
         {#if !wide && activeSection === 'config' && view.section === 'services'}
-          <ServiceListPage entries={SERVICE_ENTRIES} onOpen={section_select_page} />
+          <ServiceListPage entries={serviceEntries} onOpen={section_select_page} />
         {:else}
           {@render bodyFor(view.section)}
         {/if}

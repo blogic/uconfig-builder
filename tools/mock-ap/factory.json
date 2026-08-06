@@ -10,21 +10,35 @@
 			},
 			"ipv4": {
 				"addressing": "dynamic"
+			},
+			"ipv6": {
+				"addressing": "dynamic"
 			}
 		},
 		"lan": {
 			"role": "downstream",
+			"services": [
+				"ssh",
+				"webui"
+			],
 			"ports": {
 				"lan*": "auto"
 			},
 			"ipv4": {
 				"addressing": "static",
-				"subnet": "192.168.1.1/24"
+				"subnet": "192.168.1.1/24",
+				"dhcp-pool": {
+					"lease-first": 10,
+					"lease-count": 100,
+					"lease-time": "6h"
+				}
 			},
-			"services": [
-				"ssh",
-				"webui"
-			]
+			"ipv6": {
+				"addressing": "static",
+				"dhcpv6": {
+					"mode": "hybrid"
+				}
+			}
 		}
 	},
 	"services": {

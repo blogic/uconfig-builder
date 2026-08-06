@@ -1343,5 +1343,14 @@
     1612512646
    ]
   ]
- }
+ },
+ "modules": [
+  "adguardhome",
+  "batman-adv",
+  "lldp",
+  "mdns",
+  "qosify",
+  "tailscale",
+  "ucoord"
+ ]
 }

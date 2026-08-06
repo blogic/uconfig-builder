@@ -1,16 +1,18 @@
 <script lang="ts">
   import { t } from '../i18n.svelte.js'
-  import { SERVICE_ENTRIES } from '../nav.js'
   import type { NavItem } from '../nav.js'
 
   interface Props {
     items?: NavItem[]
+    // Passed in rather than imported: a connected device narrows the list to
+    // the packages it actually has installed.
+    serviceEntries?: NavItem[]
     page?: string
     onSelect: (key: string) => void
     changes?: number
   }
 
-  let { items = [], page, onSelect, changes = 0 }: Props = $props()
+  let { items = [], serviceEntries = [], page, onSelect, changes = 0 }: Props = $props()
 
   const inServices = $derived(page?.startsWith('service:') || page === 'ntp')
 
@@ -38,7 +40,7 @@
         <i class="bi {servicesOpen ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs text-zinc-400"></i>
       </button>
       {#if servicesOpen}
-        {#each SERVICE_ENTRIES as e (e.key)}
+        {#each serviceEntries as e (e.key)}
           <button
             type="button"
             class="nav-subitem {page === e.key ? 'nav-subitem-active' : ''}"

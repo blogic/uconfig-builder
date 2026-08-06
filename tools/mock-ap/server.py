@@ -31,6 +31,10 @@ FIXTURES = HERE / 'fixtures.json'
 STATE = HERE / 'state'
 STATE_CONFIG = STATE / 'config.json'
 
+# --no-modules omits the list from the login reply, so the client's "device
+# said nothing" path can be exercised.
+NO_MODULES = '--no-modules' in sys.argv
+
 HOST = '0.0.0.0'
 PORT = 8080
 PASSWORD = 'a'
@@ -108,7 +112,13 @@ class Session:
         if params['password'] != PASSWORD:
             return await self.fail(rid, ERROR_INVALID_PASSWORD, 'Invalid password')
         self.authenticated = True
-        await self.reply(rid, {'success': True})
+        # The optional packages the device has installed. The client uses this
+        # to hide services the device could not run; a service with no sentinel
+        # ships with the base system and is never listed here.
+        result = {'success': True}
+        if not NO_MODULES:
+            result['modules'] = fixtures.get('modules', [])
+        await self.reply(rid, result)
 
     async def m_logout(self, rid, _params):
         self.authenticated = False
@@ -130,6 +140,11 @@ class Session:
 
     async def m_info(self, rid, _params):
         await self.reply(rid, fixtures['info'])
+
+    async def m_modules(self, rid, _params):
+        # Login carries the same list; a call of its own means a session can
+        # refresh it without reconnecting.
+        await self.reply(rid, fixtures.get('modules', []))
 
     async def m_devices(self, rid, _params):
         await self.reply(rid, fixtures['devices'])
@@ -218,6 +233,7 @@ class Session:
             'system-info': (self.m_info, True),
             'state': (self.m_state, True),
             'capabilities': (self.m_capabilities, True),
+            'modules': (self.m_modules, True),
             'devices': (self.m_devices, True),
             'traffic': (self.m_traffic, True),
             'config-get': (self.m_config_get, True),

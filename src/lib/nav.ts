@@ -1,7 +1,8 @@
 // Nav entries shared by the desktop sidebar and the mobile bottom bar.
 // Bootstrap Icons match the ones the previous builder used per entry.
 
-import { SERVICES } from './services.ts'
+import { SERVICES, available_services } from './services.ts'
+import type { ServiceEntry } from './services.ts'
 import { title_for } from './labels.ts'
 
 export interface NavItem {
@@ -39,14 +40,26 @@ const SERVICE_ICONS: Record<string, string> = {
 // previous UI listed it alongside the services, so it shares the group.
 const NTP_ENTRY = { key: 'ntp', label: 'NTP', icon: 'bi-clock' }
 
-export const SERVICE_ENTRIES: NavItem[] = [
-  ...SERVICES.filter((s) => s.config).map((s) => ({
-    key: `service:${s.config}`,
-    label: title_for(s.config as string),
-    icon: SERVICE_ICONS[s.config as string] ?? 'bi-gear'
-  })),
-  NTP_ENTRY
-].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+function entries_from(list: ServiceEntry[]): NavItem[] {
+  return [
+    ...list
+      .filter((s) => s.config)
+      .map((s) => ({
+        key: `service:${s.config}`,
+        label: title_for(s.config as string),
+        icon: SERVICE_ICONS[s.config as string] ?? 'bi-gear'
+      })),
+    NTP_ENTRY
+  ].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }))
+}
+
+// Narrowed to the packages a connected device reports; `null` leaves the whole
+// set, which is what the offline editor wants.
+export function service_entries(modules: string[] | null): NavItem[] {
+  return entries_from(available_services(modules))
+}
+
+export const SERVICE_ENTRIES: NavItem[] = entries_from(SERVICES)
 
 // Pages of the Status section: what the device is doing right now.
 export const STATUS_ITEMS: NavItem[] = [

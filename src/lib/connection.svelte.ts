@@ -67,6 +67,7 @@ let ready_timer: ReturnType<typeof setTimeout> | null = null
 export const connection = $state<{
   status: 'idle' | 'connecting' | 'connected'
   mode: 'standalone' | 'ucoord' | null
+  modules: string[] | null // optional packages the device reports at login
   device: Device | null
   lost: boolean
   host: string | null
@@ -74,6 +75,7 @@ export const connection = $state<{
 }>({
   status: 'idle',
   mode: null,
+  modules: null,
   device: null,
   lost: false,
   host: null,
@@ -221,6 +223,7 @@ export function disconnect() {
   reject_pending('disconnected')
   connection.status = 'idle'
   connection.mode = null
+  connection.modules = null
   connection.device = null
   connection.lost = false
 }
@@ -243,8 +246,13 @@ async function target_resolve() {
 
 // Authenticate over the already-open socket; returns the device mode.
 export async function login(password: string) {
-  const result = await request<{ mode?: 'standalone' | 'ucoord' }>('login', { password })
+  const result = await request<{ mode?: 'standalone' | 'ucoord'; modules?: string[] }>('login', {
+    password
+  })
   connection.mode = result?.mode ?? 'standalone'
+  // Null rather than [] when the device says nothing: an empty list means no
+  // optional package is installed, which is a different claim.
+  connection.modules = Array.isArray(result?.modules) ? result.modules : null
   await target_resolve()
   // ping requires authentication, so the keepalive can only start now.
   keepalive_start()
