@@ -29,6 +29,9 @@
     makeValue?: ((name: string) => V) | null
     item?: Snippet<[V, string]> | null
     locked?: boolean
+    // Bindable so a caller can drive the selection from a route; left alone it
+    // just tracks the tab the user clicked.
+    active?: string | null
   }
 
   let {
@@ -43,7 +46,8 @@
     addModal = null,
     makeValue = null,
     item = null,
-    locked = false
+    locked = false,
+    active = $bindable(null)
   }: Props = $props()
 
   const map = $derived((parent[mapKey] as Record<string, V> | undefined) ?? {})
@@ -53,7 +57,6 @@
 
   let newKey = $state('')
   let showModal = $state(false)
-  let active: string | null = $state(null)
 
   const available = $derived(keyOptions ? keyOptions.filter((o) => !keys.includes(o)) : null)
 
@@ -110,7 +113,11 @@
   async function remove(name: string) {
     const shown = keyOptions ? title_for(name) : name
     if (!(await confirm(t('Remove {label} "{name}"?', { label: t(keyLabel), name: shown })))) return
-    delete (parent[mapKey] as Record<string, V>)[name]
+    const m = parent[mapKey] as Record<string, V>
+    delete m[name]
+    // Move off the deleted entry here rather than leaving it to the fallback
+    // effect: a bound `active` is a route, and it would name something gone.
+    if (active === name) active = Object.keys(m)[0] ?? null
   }
 
   function rename(oldName: string, e: Event) {

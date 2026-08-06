@@ -8,8 +8,7 @@
   import ServicePage from './lib/components/ServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
   import NtpPage from './lib/components/NtpPage.svelte'
-  import InterfaceListPage from './lib/components/InterfaceListPage.svelte'
-  import InterfaceDetailPage from './lib/components/InterfaceDetailPage.svelte'
+  import InterfaceAddForm from './lib/components/InterfaceAddForm.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
   import TopBar from './lib/components/TopBar.svelte'
   import SectionNav from './lib/components/SectionNav.svelte'
@@ -22,7 +21,7 @@
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
-  import { unitLayout, radioLayout } from './lib/layouts.js'
+  import { unitLayout, radioLayout, interfaceLayout } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
   import { route, route_parse, route_sync, route_clear } from './lib/router.svelte.js'
   import { hoisted } from './lib/page.svelte.js'
@@ -43,7 +42,7 @@
   } from './lib/store.svelte.js'
   import { device_load, deviceApi } from './lib/device.svelte.js'
   import type { DeviceMod } from './lib/device.svelte.js'
-  import type { UconfigDocument, Radio } from './lib/types/uconfig'
+  import type { UconfigDocument, Radio, Interface } from './lib/types/uconfig'
   import type { Route } from './lib/router.svelte.js'
   import type { CapabilitiesData } from './lib/capabilities.svelte.js'
 
@@ -92,6 +91,7 @@
 
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
+  const interfaceDef = def_get('interface')
   let openInterface = $state<string | null>(null)
 
   function radio_defaults(band: string): Record<string, unknown> {
@@ -401,11 +401,32 @@
 {/snippet}
 
 {#snippet interfacesBody()}
-  {#if openInterface != null}
-    <InterfaceDetailPage name={openInterface} {changes} onBack={() => (openInterface = null)} />
-  {:else}
-    <InterfaceListPage {changes} onOpen={(n: string) => (openInterface = n)} />
-  {/if}
+  <p class="page-description">{t(PAGE_DESCRIPTIONS.interfaces)}</p>
+  <MapEditor
+    parent={store.doc as Record<string, unknown>}
+    mapKey="interfaces"
+    valueSchema={interfaceDef ?? null}
+    keyLabel="interface"
+    tabbed
+    bind:active={openInterface}
+  >
+    {#snippet item(iface: Record<string, unknown>, name: string)}
+      <LayoutRenderer
+        data={iface}
+        schema={interfaceDef ?? {}}
+        layout={interfaceLayout}
+        context={{
+          role: (iface as { role?: string }).role,
+          allInterfaces: store.doc.interfaces,
+          selfName: name,
+          radios: store.doc.radios
+        }}
+      />
+    {/snippet}
+    {#snippet addModal({ create, close, map }: { create: (name: string, value: Record<string, unknown>) => void, close: () => void, map: Record<string, unknown> })}
+      <InterfaceAddForm interfaces={map as Record<string, Interface>} create={create as (n: string, v: Interface) => void} {close} />
+    {/snippet}
+  </MapEditor>
 {/snippet}
 
 {#snippet changesBody()}
