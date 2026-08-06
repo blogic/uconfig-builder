@@ -2,7 +2,7 @@
   import CollapsibleSection from './CollapsibleSection.svelte'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
-  import { port_cover, effective_tag } from '../ports.js'
+  import { port_cover, effective_tag, port_options, port_absorbed, is_wildcard } from '../ports.js'
   import { device_ports } from '../capabilities.svelte.js'
   import { confirm } from '../confirm.svelte.js'
   import { t } from '../i18n.svelte.js'
@@ -46,10 +46,24 @@
     return others_cover(p).length > 0
   }
 
+  // A physical port is free when nothing else holds it in a conflicting way.
+  function port_free(p: string): boolean {
+    return hasVlan ? !taken_untagged(p) : !used_elsewhere(p)
+  }
+
+  // Wildcards ignore self-coverage: holding lan1 must not stop the user
+  // widening the assignment to lan*, which then absorbs it. They do require
+  // every port they cover to be free of *other* interfaces.
   const availablePorts = $derived(
-    portList.filter((p) => {
-      if (selfCovered.has(p)) return false
-      return hasVlan ? !taken_untagged(p) : !used_elsewhere(p)
+    port_options(portList).filter((key) => {
+      const covered = port_cover(key, portList)
+      if (!covered.length) return false
+      if (is_wildcard(key)) {
+        if (assigned.includes(key)) return false
+        return covered.every(port_free)
+      }
+      if (selfCovered.has(key)) return false
+      return port_free(key)
     })
   )
 
@@ -59,9 +73,12 @@
     if (!port) return t('Select a port')
     if (!hasVlan) return ''
     const e = effective_tag(mode, role, true)
-    if (e === 'un-tagged' && used_elsewhere(port))
-      return t('{port} is used by another interface; it can only be shared when tagged', { port })
-    if (e === 'tagged' && taken_untagged(port)) return t('{port} is used untagged by another interface', { port })
+    // Wildcards stand or fall on the ports they cover.
+    for (const p of port_cover(port, portList)) {
+      if (e === 'un-tagged' && used_elsewhere(p))
+        return t('{port} is used by another interface; it can only be shared when tagged', { port: p })
+      if (e === 'tagged' && taken_untagged(p)) return t('{port} is used untagged by another interface', { port: p })
+    }
     return ''
   }
 
@@ -74,6 +91,9 @@
   function commit() {
     if (error) return
     if (!iface.ports || typeof iface.ports !== 'object') iface.ports = {}
+    // A wildcard already covers the discrete ports it subsumes; leaving those
+    // behind would be a contradiction in the document.
+    for (const k of port_absorbed(selPort, Object.keys(iface.ports), portList)) delete iface.ports[k]
     iface.ports[selPort] = hasVlan ? selMode : 'auto'
     showModal = false
   }
