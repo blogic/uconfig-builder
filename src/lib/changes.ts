@@ -257,6 +257,22 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
   const baseServices = base.services as JsonObject | undefined
   for (const svc of keys_union(curServices, baseServices)) {
     const schema = svcResolved?.properties?.[svc] ? ref_resolve(svcResolved.properties[svc]) : undefined
+    // A service is enabled by being present, so its whole block appearing or
+    // disappearing is one decision, not a list of field edits.
+    const isOn = curServices?.[svc] !== undefined
+    const wasOn = baseServices?.[svc] !== undefined
+    if (isOn !== wasOn) {
+      out.push({
+        section: 'Services',
+        scope: `service:${svc}`,
+        kind: isOn ? 'added' : 'removed',
+        key: svc,
+        label: isOn
+          ? t("Enabled ''{name}''", { name: title_for(svc) })
+          : t("Disabled ''{name}''", { name: title_for(svc) })
+      })
+      continue
+    }
     out.push(
       ...diff_fields(
         strip(curServices?.[svc], schema) as JsonObject | undefined,

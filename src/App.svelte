@@ -417,7 +417,7 @@
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />
-  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} />
+  {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} toggleable={!deviceSession} />
   {:else if IS_DEVICE && DP}
     {#if key === 'clients'}<DP.NetworkPage />
     {:else if key === 'traffic'}<DP.TrafficPage />

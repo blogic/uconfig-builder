@@ -49,10 +49,12 @@ function service_defaults(doc: UconfigDocument) {
   if (!serviceDef) return
   for (const key of SERVICE_CONFIG_KEYS as string[]) {
     const sch = ref_resolve(schema_at(serviceDef, key))
+    // Presence of the block is what marks a service enabled, so defaults are
+    // seeded into one that already exists and never bring it into being.
+    if (!services[key]) continue
     for (const [prop, raw] of Object.entries(sch.properties ?? {})) {
       const ps = ref_resolve(raw)
       if (ps.default === undefined) continue
-      if (!services[key]) services[key] = {}
       if (services[key][prop] === undefined) services[key][prop] = ps.default
     }
   }
@@ -118,11 +120,50 @@ export function scope_reset(scope: string) {
     if (!store.doc.services || typeof store.doc.services !== 'object') store.doc.services = {}
     const services = store.doc.services as Record<string, unknown>
     const baseServices = base.services as Record<string, unknown> | undefined
-    services[key] = baseServices?.[key] ?? {}
+    // Absent in the baseline means the service was disabled there, so resetting
+    // has to remove it rather than restore an empty block.
+    if (baseServices?.[key] === undefined) delete services[key]
+    else services[key] = baseServices[key]
     service_defaults(store.doc)
   }
 }
 
+export function service_enabled(key: string): boolean {
+  return (store.doc.services as Record<string, unknown> | undefined)?.[key] !== undefined
+}
+
+// Schema defaults for a service, used when the running config never had it.
+function service_seed(key: string): Record<string, unknown> {
+  const serviceDef = def_get('service')
+  if (!serviceDef) return {}
+  const sch = ref_resolve(schema_at(serviceDef, key))
+  const out: Record<string, unknown> = {}
+  for (const [prop, raw] of Object.entries(sch.properties ?? {})) {
+    const ps = ref_resolve(raw)
+    if (ps.default !== undefined) out[prop] = ps.default
+  }
+  return out
+}
+
+// Re-enabling restores what the device is running rather than a blank block,
+// so toggling a service off and on again before an apply loses nothing.
+export function service_enable(key: string) {
+  if (!store.doc.services || typeof store.doc.services !== 'object') store.doc.services = {}
+  const services = store.doc.services as Record<string, unknown>
+  if (services[key] !== undefined) return
+  const base = (store.baseline?.services as Record<string, unknown> | undefined)?.[key]
+  services[key] = base !== undefined ? structuredClone($state.snapshot(base)) : service_seed(key)
+}
+
+// Interface service lists are left alone: the render pipeline ignores a
+// reference to a service that is not enabled.
+export function service_disable(key: string) {
+  const services = store.doc.services as Record<string, unknown> | undefined
+  if (services) delete services[key]
+}
+
+// Discard every edit, restoring the document as it was loaded. Distinct from
+// doc_reset, which blanks the document and starts over.
 // Discard every edit, restoring the document as it was loaded. Distinct from
 // doc_reset, which blanks the document and starts over.
 export function changes_reset() {
