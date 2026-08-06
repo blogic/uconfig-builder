@@ -37,7 +37,7 @@
 
   function validate(): string {
     if (entry === '') return t('A VLAN ID is required')
-    if (!Number.isInteger(val) || val < 2 || val > 4096) return t('VLAN ID must be 2 to 4096')
+    if (!Number.isInteger(val) || val < 1 || val > 4094) return t('VLAN ID must be 1 to 4094')
     if (val === vlan.id) return t('Cannot trunk the interface VLAN')
     if (trunks.includes(val)) return t('Already a trunk')
     return ''
@@ -101,7 +101,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onclick={() => (showModal = false)}>
     <div class="w-full max-w-xs rounded-base border border-zinc-200 bg-surface p-4 shadow-lg" onclick={(e) => e.stopPropagation()}>
       <h3 class="mb-3 text-sm font-semibold">{t('Add trunk')}</h3>
-      <input class="input" type="number" min="2" max="4096" bind:value={entry} placeholder={t('2 to 4096')} onkeydown={(e) => e.key === 'Enter' && commit()} />
+      <input class="input" type="number" min="1" max="4094" bind:value={entry} placeholder={t('1 to 4094')} onkeydown={(e) => e.key === 'Enter' && commit()} />
       {#if entry !== '' && error}<p class="mt-1 text-[11px] text-amber-600">{error}</p>{/if}
       <div class="mt-4 flex justify-end gap-2">
         <button type="button" class="btn-sm" onclick={() => (showModal = false)}>{t('Cancel')}</button>

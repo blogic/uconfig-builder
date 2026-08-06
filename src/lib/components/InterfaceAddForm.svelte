@@ -31,7 +31,7 @@
 
   function vlan_error(): string {
     if (!vlanOn) return ''
-    if (!(Number.isInteger(vid) && vid >= 2 && vid <= 4096)) return t('VLAN ID must be between 2 and 4096')
+    if (!(Number.isInteger(vid) && vid >= 1 && vid <= 4094)) return t('VLAN ID must be between 1 and 4094')
     if (role === 'upstream') {
       const dup = Object.values(interfaces).some((i) => i?.role === 'upstream' && i?.vlan?.id === vid)
       if (dup) return t('VLAN {id} is already used by an upstream interface', { id: vid })
@@ -99,10 +99,10 @@
         <input
           class="input"
           type="number"
-          min="2"
-          max="4096"
+          min="1"
+          max="4094"
           bind:value={vlanId}
-          placeholder={t('2 to 4096')}
+          placeholder={t('1 to 4094')}
           onkeydown={(e) => e.key === 'Enter' && submit()}
         />
         {#if role === 'downstream'}

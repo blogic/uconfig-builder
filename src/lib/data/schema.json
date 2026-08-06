@@ -459,14 +459,15 @@
                                 "id": {
                                         "description": "This is the pvid of the vlan that shall be assigned to the interface. The individual physical network devices contained within the interface need to be told explicitly if egress traffic shall be tagged.",
                                         "type": "integer",
-                                        "maximum": 4050
+                                        "maximum": 4094,
+                                        "minimum": 1
                                 },
                                 "trunks": {
                                         "description": "Upstream interfaces can prOvide NAT for downstream interfaces that have a different VLAN Id",
                                         "type": "array",
                                         "items": {
-                                                "type": "number",
-                                                "maximum": 4050,
+                                                "type": "integer",
+                                                "maximum": 4094,
                                                 "minimum": 1
                                         }
                                 }
@@ -546,7 +547,8 @@
                                 },
                                 "vlan-id": {
                                         "type": "integer",
-                                        "maximum": 4096,
+                                        "maximum": 4094,
+                                        "minimum": 1,
                                         "examples": [
                                                 3,
                                                 100,
