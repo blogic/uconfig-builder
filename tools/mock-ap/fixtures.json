@@ -23,7 +23,7 @@
      },
      "board": {
       "kernel": "6.18.31",
-      "hostname": "gateway",
+      "hostname": "main",
       "system": "ARMv8 Processor rev 4",
       "model": "GL.iNet GL-MT6000",
       "board_name": "glinet,gl-mt6000",
@@ -40,10 +40,10 @@
      },
      "includes": {},
      "local_macs": [
-      "94:83:c4:a3:1d:d9"
+      "00:00:5E:00:53:64"
      ]
     },
-    "door": {
+    "peer1": {
      "state": "connected",
      "ts": 1784945539,
      "capabilities": {
@@ -60,7 +60,7 @@
      },
      "board": {
       "kernel": "6.18.31",
-      "hostname": "door",
+      "hostname": "peer1",
       "system": "ARMv8 Processor rev 4",
       "model": "OpenWrt One",
       "board_name": "openwrt,one",
@@ -78,7 +78,7 @@
      "includes": {},
      "local_macs": null
     },
-    "office": {
+    "peer2": {
      "state": "connected",
      "ts": 1784945539,
      "capabilities": {
@@ -95,7 +95,7 @@
      },
      "board": {
       "kernel": "6.18.31",
-      "hostname": "office",
+      "hostname": "peer2",
       "system": "ARMv8 Processor rev 4",
       "model": "OpenWrt One",
       "board_name": "openwrt,one",
@@ -711,967 +711,407 @@
  },
  "devices": {
   "main": {
-   "04:7c:16:5d:b5:2c": {
-    "mac": "04:7c:16:5d:b5:2c",
-    "fingerprint": {
-     "vendor": "Micro-Star INTL CO., LTD."
-    },
-    "created": 1781174162,
-    "ignore": false
-   },
-   "1c:f4:3f:f0:3c:c9": {
-    "mac": "1c:f4:3f:f0:3c:c9",
-    "fingerprint": {
-     "vendor": "Arcadyan Corporation"
-    },
-    "created": 1782453996,
-    "ignore": false
-   },
-   "20:05:b6:ff:00:b5": {
-    "mac": "20:05:b6:ff:00:b5",
-    "fingerprint": {
-     "vendor": "OpenWrt"
-    },
-    "created": 1779459393,
-    "ignore": false
-   },
-   "28:04:7a:1d:8c:70": {
-    "mac": "28:04:7a:1d:8c:70",
-    "created": 1781787662,
-    "ignore": false
-   },
-   "5a:9e:94:e5:d9:6e": {
-    "mac": "5a:9e:94:e5:d9:6e",
-    "fingerprint": {
-     "vendor": "Apple"
-    },
-    "created": 1779710905,
-    "ignore": false
-   },
-   "68:07:0a:2d:38:6b": {
-    "mac": "68:07:0a:2d:38:6b",
-    "fingerprint": {
-     "vendor": "TPVision Europe B.V",
-     "os": "Android 12",
-     "os_vendor": "Google",
-     "device": "TPM191E",
-     "class": "phone",
-     "device_name": "65PUS8505/12"
-    },
-    "hostname": "65PUS8505/12",
-    "created": 1779465505,
-    "ignore": false
-   },
-   "d4:ab:cd:a6:c1:6d": {
-    "mac": "d4:ab:cd:a6:c1:6d",
-    "fingerprint": {
-     "vendor": "Hui Zhou Gaoshengda Technology Co.,LTD",
-     "os": "Android 12",
-     "os_vendor": "Google",
-     "device": "TPM191E",
-     "class": "phone",
-     "device_name": "65PUS8505/12"
-    },
-    "hostname": "65PUS8505/12",
-    "created": 1779632047,
-    "ignore": false
-   },
-   "7c:8d:9c:e0:cb:04": {
-    "mac": "7c:8d:9c:e0:cb:04",
-    "fingerprint": {
-     "vendor": "Edgecore Americas Networking Corporation",
-     "device_name": "7c8d9ce0cb04"
-    },
-    "hostname": "7c8d9ce0cb04",
-    "created": 1780913765,
-    "ignore": false
-   },
-   "90:3c:b3:bb:1c:1a": {
-    "mac": "90:3c:b3:bb:1c:1a",
-    "fingerprint": {
-     "vendor": "Edgecore Networks Corporation",
-     "device_name": "903cb3bb1c1a"
-    },
-    "hostname": "903cb3bb1c1a",
-    "created": 1779862049,
-    "ignore": false
-   },
-   "9a:47:b1:0a:7c:01": {
-    "mac": "9a:47:b1:0a:7c:01",
-    "created": 1780751464,
-    "ignore": false
-   },
-   "9a:de:78:ce:07:50": {
-    "mac": "9a:de:78:ce:07:50",
-    "created": 1780751464,
-    "ignore": false
-   },
-   "1c:91:80:d3:c2:53": {
-    "mac": "1C:91:80:D3:C2:53",
+   "00:00:5E:00:53:01": {
+    "mac": "00:00:5E:00:53:01",
     "online": true,
-    "ipv4": "192.168.42.56",
+    "ipv4": "192.168.1.10",
+    "fingerprint": {
+     "vendor": "Apple",
+     "class": "laptop",
+     "device_name": "studio-laptop",
+     "device": "MacBook Air"
+    },
+    "hostname": "studio-laptop",
+    "dhcp": "dynamic",
+    "bytes": 37000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 800000
+     },
+     "DNS": {
+      "bytes": 4200
+     }
+    },
+    "created": 1779700000,
+    "ignore": false,
     "wifi": {
      "band": "5G",
      "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 382992,
-     "tx_bytes": 416044,
+     "ssid": "uconfig-demo",
+     "rx_bytes": 300000,
+     "tx_bytes": 400000,
      "rx_rate": 57640000,
      "tx_rate": 64850000,
-     "signal": -76,
-     "host": "door",
+     "signal": -52,
+     "host": "main",
      "mode": "he"
-    },
-    "fingerprint": {
-     "vendor": "Apple",
-     "device": "MacBook Air M1",
-     "class": "laptop",
-     "device_name": "Air-von-blogic"
-    },
-    "hostname": "Air-von-blogic",
-    "dhcp": "dynamic",
-    "bytes": 3772930995,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 2782346009
-     },
-     "HTTP": {
-      "bytes": 735124681
-     },
-     "QUIC": {
-      "bytes": 178038379
-     },
-     "Apple Push Service": {
-      "bytes": 72112502
-     },
-     "ICMP": {
-      "bytes": 1740096
-     },
-     "unknown": {
-      "bytes": 249375
-     },
-     "mDNS": {
-      "bytes": 3319953
-     }
-    },
-    "created": 1779771200,
-    "ignore": false
+    }
    },
-   "b4:6a:d4:0a:6d:0c": {
-    "mac": "b4:6a:d4:0a:6d:0c",
+   "00:00:5E:00:53:02": {
+    "mac": "00:00:5E:00:53:02",
+    "online": true,
+    "ipv4": "192.168.1.11",
     "fingerprint": {
-     "vendor": "Edgecore Americas Networking Corporation",
-     "device_name": "b46ad40a6d0c"
-    },
-    "hostname": "b46ad40a6d0c",
-    "created": 1780896964,
-    "ignore": false
-   },
-   "f4:34:f0:50:44:b5": {
-    "mac": "f4:34:f0:50:44:b5",
-    "fingerprint": {
-     "vendor": "Apple",
-     "device": "HomePod mini",
-     "class": "speaker",
-     "device_name": "Bedroom"
-    },
-    "hostname": "Bedroom",
-    "created": 1779621730,
-    "ignore": false
-   },
-   "c0:a5:e8:3e:ae:7c": {
-    "mac": "c0:a5:e8:3e:ae:7c",
-    "fingerprint": {
-     "vendor": "Intel Corporate",
-     "device_name": "blogic-laptop"
-    },
-    "hostname": "blogic-laptop",
-    "created": 1784203416,
-    "ignore": false
-   },
-   "d4:57:63:d6:63:b7": {
-    "mac": "D4:57:63:D6:63:B7",
-    "ipv4": "192.168.42.16",
-    "ipv6": [
-     "fe80::10b6:716d:d48b:cf12"
-    ],
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 31721018,
-     "tx_bytes": 109091646,
-     "rx_rate": 108060000,
-     "tx_rate": 120090000,
-     "signal": -68,
-     "host": "office",
-     "mode": "he"
-    },
-    "fingerprint": {
-     "vendor": "Apple, Inc.",
-     "device": "macOS device",
-     "device_name": "blogics-Air"
-    },
-    "hostname": "blogics-Air",
-    "dhcp": "dynamic",
-    "bytes": 2455035942,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 2327064525
-     },
-     "QUIC": {
-      "bytes": 53241511
-     },
-     "Apple Push Service": {
-      "bytes": 71450343
-     },
-     "HTTP": {
-      "bytes": 340757
-     },
-     "unknown": {
-      "bytes": 19532
-     },
-     "ICMP": {
-      "bytes": 506160
-     },
-     "mDNS": {
-      "bytes": 2413114
-     }
-    },
-    "created": 1779459393,
-    "ignore": false
-   },
-   "10:00:20:0e:38:26": {
-    "mac": "10:00:20:0e:38:26",
-    "fingerprint": {
-     "vendor": "Apple",
-     "device": "iOS device",
+     "vendor": "Google",
      "class": "phone",
-     "device_name": "blogics-iPad"
+     "device_name": "handset",
+     "device": "Pixel 8"
     },
-    "hostname": "blogics-iPad",
-    "created": 1779604048,
-    "ignore": false
-   },
-   "00:0c:43:26:60:10": {
-    "mac": "00:0c:43:26:60:10",
-    "fingerprint": {
-     "vendor": "MediaTek Inc",
-     "device": "C-8 Pro",
-     "class": "home-automation-hub"
-    },
-    "hostname": "C-8 Pro",
-    "created": 1782453996,
-    "ignore": false
-   },
-   "00:0c:43:26:60:14": {
-    "mac": "00:0c:43:26:60:14",
-    "fingerprint": {
-     "vendor": "MediaTek Inc",
-     "device": "C-8 Pro",
-     "class": "home-automation-hub"
-    },
-    "hostname": "C-8 Pro",
-    "created": 1782453996,
-    "ignore": false
-   },
-   "84:70:03:5c:b7:51": {
-    "mac": "84:70:03:5c:b7:51",
-    "fingerprint": {
-     "device": "C-8 Pro",
-     "vendor": "Hubitat",
-     "class": "home-automation-hub"
-    },
-    "hostname": "C-8 Pro",
-    "created": 1783930754,
-    "ignore": false
-   },
-   "94:83:c4:e0:b1:5f": {
-    "mac": "94:83:c4:e0:b1:5f",
-    "fingerprint": {
-     "vendor": "GL Technologies (Hong Kong) Limited",
-     "device": "C-8 Pro",
-     "class": "home-automation-hub"
-    },
-    "hostname": "C-8 Pro",
-    "created": 1780751164,
-    "ignore": false
-   },
-   "ca:c8:db:11:a1:d7": {
-    "mac": "ca:c8:db:11:a1:d7",
-    "fingerprint": {
-     "vendor": "Apple"
-    },
-    "created": 1779768841,
-    "ignore": false
-   },
-   "20:05:b6:ff:00:b8": {
-    "mac": "20:05:B6:FF:00:B8",
-    "online": true,
-    "ipv4": "192.168.42.3",
-    "ipv6": [
-     "fe80::2205:b6ff:feff:b8"
-    ],
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "device_name": "door"
-    },
-    "hostname": "door",
+    "hostname": "handset",
     "dhcp": "dynamic",
-    "bytes": 6040763,
+    "bytes": 74000000,
     "traffic": {
-     "unknown": {
-      "bytes": 68704
-     },
-     "mDNS": {
-      "bytes": 5972059
-     }
-    },
-    "created": 1779708845,
-    "ignore": false
-   },
-   "e4:aa:ea:4f:cf:09": {
-    "mac": "e4:aa:ea:4f:cf:09",
-    "created": 1779933634,
-    "ignore": false
-   },
-   "80:b9:89:1d:77:3e": {
-    "mac": "80:b9:89:1d:77:3e",
-    "fingerprint": {
-     "vendor": "Apple",
-     "device_name": "EiPhone"
-    },
-    "hostname": "EiPhone",
-    "created": 1779459393,
-    "ignore": false
-   },
-   "f4:52:14:3c:db:f0": {
-    "mac": "F4:52:14:3C:DB:F0",
-    "online": true,
-    "ipv4": "192.168.42.9",
-    "ipv6": [
-     "fd57:7b6:8da7::89c",
-     "2a04:4540:1402:d0fc:fc6e:647a:62ee:bb90",
-     "fe80::5a2f:d97b:e320:bab7"
-    ],
-    "fingerprint": {
-     "vendor": "Mellanox Technologies, Inc."
-    },
-    "bytes": 22749326588,
-    "traffic": {
-     "HTTP": {
-      "bytes": 20964146569
-     },
      "HTTPS": {
-      "bytes": 1782798926
-     },
-     "unknown": {
-      "bytes": 35416
-     },
-     "mDNS": {
-      "bytes": 2345677
-     }
-    },
-    "created": 1779459393,
-    "ignore": false
-   },
-   "f4:f1:9e:3b:dd:3c": {
-    "mac": "F4:F1:9E:3B:DD:3C",
-    "online": true,
-    "ipv4": "192.168.42.6",
-    "ipv6": [
-     "fe80::f6f1:9eff:fe3b:dd3c"
-    ],
-    "fingerprint": {
-     "vendor": "Wistron InforComm (Zhongshan) Corporation"
-    },
-    "bytes": 2525995,
-    "traffic": {
-     "unknown": {
-      "bytes": 70680
-     },
-     "ICMP": {
-      "bytes": 504
+      "bytes": 1600000
      },
      "DNS": {
-      "bytes": 146
-     },
-     "mDNS": {
-      "bytes": 2454665
+      "bytes": 8400
      }
     },
-    "created": 1779464905,
-    "ignore": false
-   },
-   "94:83:c4:e0:b1:5d": {
-    "mac": "94:83:c4:e0:b1:5d",
-    "fingerprint": {
-     "vendor": "GL Technologies (Hong Kong) Limited",
-     "device": "C-8 Pro",
-     "class": "home-automation-hub",
-     "device_name": "GL-BE14000"
-    },
-    "hostname": "GL-BE14000",
-    "created": 1780755062,
-    "ignore": false
-   },
-   "2a:97:ab:be:5c:cb": {
-    "mac": "2a:97:ab:be:5c:cb",
-    "fingerprint": {
-     "device": "iOS device",
-     "vendor": "Apple",
-     "class": "phone",
-     "device_name": "iPad"
-    },
-    "hostname": "iPad",
-    "created": 1779712519,
-    "ignore": false
-   },
-   "26:62:94:6e:e9:7d": {
-    "mac": "26:62:94:6e:e9:7d",
-    "fingerprint": {
-     "device": "iOS device",
-     "vendor": "Apple",
-     "class": "phone",
-     "device_name": "iPad"
-    },
-    "hostname": "iPad",
-    "created": 1779798165,
-    "ignore": false
-   },
-   "8e:c2:5a:11:3d:d7": {
-    "mac": "8e:c2:5a:11:3d:d7",
-    "fingerprint": {
-     "device_name": "iPhone"
-    },
-    "hostname": "iPhone",
-    "created": 1781193662,
-    "ignore": false
-   },
-   "72:51:48:3f:54:51": {
-    "mac": "72:51:48:3f:54:51",
-    "fingerprint": {
-     "device_name": "iPhone"
-    },
-    "hostname": "iPhone",
-    "created": 1782458498,
-    "ignore": false
-   },
-   "6a:52:f4:0f:9c:04": {
-    "mac": "6a:52:f4:0f:9c:04",
-    "fingerprint": {
-     "device_name": "iPhone"
-    },
-    "hostname": "iPhone",
-    "created": 1779906638,
-    "ignore": false
-   },
-   "4e:a9:51:f5:7d:d8": {
-    "mac": "4e:a9:51:f5:7d:d8",
-    "fingerprint": {
-     "device": "iPhone 13 Pro",
-     "vendor": "Apple",
-     "class": "phone",
-     "device_name": "iPhone"
-    },
-    "hostname": "iPhone",
-    "created": 1779471084,
-    "ignore": false
-   },
-   "04:99:b9:94:06:9a": {
-    "mac": "04:99:B9:94:06:9A",
-    "online": true,
-    "ipv4": "192.168.42.50",
-    "ipv6": [
-     "fe80::1c8f:75c9:5f2e:3f9a",
-     "2a04:4540:1402:d0fc:6961:b3e8:75d6:b324"
-    ],
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 54580054,
-     "tx_bytes": 100815377,
-     "rx_rate": 7220000,
-     "tx_rate": 6500000,
-     "signal": -66,
-     "host": "gateway",
-     "mode": "ht"
-    },
-    "fingerprint": {
-     "vendor": "Apple",
-     "device": "HomePod mini",
-     "class": "speaker",
-     "device_name": "Kitchen"
-    },
-    "hostname": "Kitchen",
-    "dhcp": "dynamic",
-    "bytes": 16022265,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 10322410
-     },
-     "Apple Push Service": {
-      "bytes": 3396804
-     },
-     "ICMP": {
-      "bytes": 294768
-     },
-     "QUIC": {
-      "bytes": 140398
-     },
-     "mDNS": {
-      "bytes": 1867885
-     }
-    },
-    "created": 1779601990,
-    "ignore": false
-   },
-   "aa:a5:64:26:10:e8": {
-    "mac": "aa:a5:64:26:10:e8",
-    "fingerprint": {
-     "device": "MacBook Air M2",
-     "vendor": "Apple",
-     "class": "laptop",
-     "device_name": "Mac"
-    },
-    "hostname": "Mac",
-    "created": 1779982346,
-    "ignore": false
-   },
-   "a0:ce:c8:e6:21:7d": {
-    "mac": "a0:ce:c8:e6:21:7d",
-    "fingerprint": {
-     "vendor": "CE LINK LIMITED",
-     "device_name": "Mac Studio"
-    },
-    "hostname": "Mac Studio",
-    "created": 1779459393,
-    "ignore": false
-   },
-   "46:bd:23:ef:84:a7": {
-    "mac": "46:BD:23:EF:84:A7",
-    "online": true,
-    "ipv6": [
-     "fe80::c9f:f9b4:4ba6:21fc"
-    ],
-    "fingerprint": {
-     "vendor": "Apple",
-     "device": "MacBook Air M1",
-     "class": "laptop",
-     "device_name": "MacBookAir"
-    },
-    "hostname": "MacBookAir",
-    "ipv4": "192.168.42.48",
-    "dhcp": "dynamic",
-    "bytes": 152966580,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 83950081
-     },
-     "QUIC": {
-      "bytes": 47172968
-     },
-     "Apple Push Service": {
-      "bytes": 10904560
-     },
-     "XMPP": {
-      "bytes": 3190984
-     },
-     "HTTP": {
-      "bytes": 2553572
-     },
-     "ICMP": {
-      "bytes": 1050624
-     },
-     "unknown": {
-      "bytes": 62244
-     },
-     "DNS": {
-      "bytes": 35991
-     },
-     "mDNS": {
-      "bytes": 4045556
-     }
-    },
-    "created": 1779466884,
-    "ignore": false
-   },
-   "fa:ee:bb:6d:02:05": {
-    "mac": "fa:ee:bb:6d:02:05",
-    "fingerprint": {
-     "device": "MacBook Air M1",
-     "vendor": "Apple",
-     "class": "laptop",
-     "device_name": "MacBookAir"
-    },
-    "hostname": "MacBookAir",
-    "created": 1779647808,
-    "ignore": false
-   },
-   "20:05:b6:ff:06:50": {
-    "mac": "20:05:B6:FF:06:50",
-    "online": true,
-    "ipv4": "192.168.42.2",
-    "ipv6": [
-     "fe80::2205:b6ff:feff:650"
-    ],
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "device_name": "office"
-    },
-    "hostname": "office",
-    "dhcp": "dynamic",
-    "bytes": 68324,
-    "traffic": {
-     "unknown": {
-      "bytes": 68324
-     }
-    },
-    "created": 1779459393,
-    "ignore": false
-   },
-   "c4:65:16:cd:61:44": {
-    "mac": "C4:65:16:CD:61:44",
-    "online": true,
-    "ipv4": "192.168.42.41",
-    "ipv6": [
-     "fe80::c665:16ff:fecd:6144"
-    ],
-    "fingerprint": {
-     "vendor": "HP",
-     "device": "OfficeJet Pro 9010 series",
-     "class": "Printer"
-    },
-    "hostname": "OfficeJet Pro 9010 series",
-    "dhcp": "dynamic",
-    "bytes": 12157977,
-    "traffic": {
-     "unknown": {
-      "bytes": 448085
-     },
-     "mDNS": {
-      "bytes": 11709892
-     }
-    },
-    "created": 1779515324,
-    "ignore": false
-   },
-   "30:bb:7d:b2:ef:79": {
-    "mac": "30:bb:7d:b2:ef:79",
-    "fingerprint": {
-     "vendor": "OnePlus Technology (Shenzhen) Co., Ltd",
-     "device": "Android device",
-     "class": "phone",
-     "device_name": "OnePlus-11-5G"
-    },
-    "hostname": "OnePlus-11-5G",
-    "created": 1783085198,
-    "ignore": false
-   },
-   "80:af:ca:ee:09:8b": {
-    "mac": "80:af:ca:ee:09:8b",
-    "fingerprint": {
-     "vendor": "Shenzhen Cudy Technology Co., Ltd.",
-     "device_name": "OpenWrt"
-    },
-    "hostname": "OpenWrt",
-    "created": 1782144698,
-    "ignore": false
-   },
-   "28:04:7a:1d:8c:71": {
-    "mac": "28:04:7a:1d:8c:71",
-    "fingerprint": {
-     "device_name": "OpenWrt"
-    },
-    "hostname": "OpenWrt",
-    "created": 1781787062,
-    "ignore": false
-   },
-   "1c:f4:3f:f0:3c:c8": {
-    "mac": "1c:f4:3f:f0:3c:c8",
-    "fingerprint": {
-     "vendor": "Arcadyan Corporation",
-     "device_name": "OpenWRT"
-    },
-    "hostname": "OpenWRT",
-    "created": 1782454298,
-    "ignore": false
-   },
-   "20:05:b6:ff:00:24": {
-    "mac": "20:05:b6:ff:00:24",
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "device_name": "OpenWrt"
-    },
-    "hostname": "OpenWrt",
-    "created": 1782288698,
-    "ignore": false
-   },
-   "20:05:b6:ff:00:84": {
-    "mac": "20:05:b6:ff:00:84",
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "device_name": "OpenWrt"
-    },
-    "hostname": "OpenWrt",
-    "created": 1779518624,
-    "ignore": false
-   },
-   "94:83:c4:e0:b1:61": {
-    "mac": "94:83:c4:e0:b1:61",
-    "fingerprint": {
-     "vendor": "GL Technologies (Hong Kong) Limited",
-     "device_name": "OpenWrt"
-    },
-    "hostname": "OpenWrt",
-    "created": 1780756864,
-    "ignore": false
-   },
-   "b4:1f:4d:08:cb:3d": {
-    "mac": "B4:1F:4D:08:CB:3D",
-    "online": true,
-    "ipv4": "192.168.42.18",
-    "ipv6": [
-     "fe80::b61f:4dff:fe08:cb3d"
-    ],
+    "created": 1779700900,
+    "ignore": false,
     "wifi": {
      "band": "2G",
      "freq": 2412,
-     "ssid": "Cockney",
-     "rx_bytes": 2289091,
-     "tx_bytes": 1243242,
-     "rx_rate": 28670000,
-     "tx_rate": 28670000,
-     "signal": -54,
-     "host": "door",
+     "ssid": "uconfig-demo",
+     "rx_bytes": 301000,
+     "tx_bytes": 401000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -55,
+     "host": "peer1",
      "mode": "he"
-    },
+    }
+   },
+   "00:00:5E:00:53:03": {
+    "mac": "00:00:5E:00:53:03",
+    "online": true,
+    "ipv4": "192.168.1.12",
     "fingerprint": {
-     "device": "Playstation 5",
-     "vendor": "Sony",
-     "class": "game-console"
+     "vendor": "Samsung",
+     "class": "tv",
+     "device_name": "living-room-tv",
+     "device": "Smart TV"
     },
-    "hostname": "Playstation 5",
+    "hostname": "living-room-tv",
     "dhcp": "dynamic",
-    "bytes": 49446439314,
+    "bytes": 111000000,
     "traffic": {
-     "HTTP": {
-      "bytes": 45357115592
-     },
      "HTTPS": {
-      "bytes": 4088387243
+      "bytes": 2400000
      },
-     "unknown": {
-      "bytes": 1352
-     },
-     "mDNS": {
-      "bytes": 935127
+     "DNS": {
+      "bytes": 12600
      }
     },
-    "created": 1783429754,
-    "ignore": false
+    "created": 1779701800,
+    "ignore": false,
+    "wifi": {
+     "band": "5G",
+     "freq": 5180,
+     "ssid": "uconfig-demo",
+     "rx_bytes": 302000,
+     "tx_bytes": 402000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -58,
+     "host": "peer2",
+     "mode": "he"
+    }
    },
-   "c8:4a:a0:02:d0:44": {
-    "mac": "C8:4A:A0:02:D0:44",
-    "ipv4": "192.168.42.70",
+   "00:00:5E:00:53:04": {
+    "mac": "00:00:5E:00:53:04",
     "online": true,
+    "ipv4": "192.168.1.13",
+    "fingerprint": {
+     "vendor": "HP",
+     "class": "printer",
+     "device_name": "printer",
+     "device": "OfficeJet"
+    },
+    "hostname": "printer",
+    "dhcp": "dynamic",
+    "bytes": 148000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 3200000
+     },
+     "DNS": {
+      "bytes": 16800
+     }
+    },
+    "created": 1779702700,
+    "ignore": false,
     "ipv6": [
-     "fe80::ca4a:a0ff:fe02:d044"
-    ],
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 9731920,
-     "tx_bytes": 3953701,
-     "rx_rate": 600000,
-     "tx_rate": 86480000,
-     "signal": -71,
-     "host": "door",
-     "mode": "he"
-    },
-    "fingerprint": {
-     "vendor": "Sony Interactive Entertainment Inc.",
-     "device": "Playstation 5",
-     "class": "game-console"
-    },
-    "hostname": "Playstation 5",
-    "dhcp": "dynamic",
-    "bytes": 1120110,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 157735
-     },
-     "HTTP": {
-      "bytes": 24372
-     },
-     "mDNS": {
-      "bytes": 938003
-     }
-    },
-    "created": 1779466284,
-    "ignore": false
+     "fe80::200:5eff:fe00:5304"
+    ]
    },
-   "48:f1:eb:e8:45:7d": {
-    "mac": "48:F1:EB:E8:45:7D",
+   "00:00:5E:00:53:05": {
+    "mac": "00:00:5E:00:53:05",
     "online": true,
-    "ipv4": "192.168.42.24",
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 2936485,
-     "tx_bytes": 31764835,
-     "rx_rate": 72060000,
-     "tx_rate": 96070000,
-     "signal": -80,
-     "host": "door",
-     "mode": "he"
-    },
+    "ipv4": "192.168.1.14",
     "fingerprint": {
-     "device": "Switch 2",
-     "vendor": "Nintendo",
-     "class": "game-console"
+     "vendor": "Sonos",
+     "class": "speaker",
+     "device_name": "kitchen-speaker",
+     "device": "One"
     },
-    "hostname": "Switch 2",
+    "hostname": "kitchen-speaker",
     "dhcp": "dynamic",
-    "bytes": 65834617,
+    "bytes": 185000000,
     "traffic": {
      "HTTPS": {
-      "bytes": 65800760
+      "bytes": 4000000
      },
-     "HTTP": {
-      "bytes": 32961
-     },
-     "ICMP": {
-      "bytes": 896
+     "DNS": {
+      "bytes": 21000
      }
     },
-    "created": 1779459393,
-    "ignore": false
-   },
-   "c8:95:ce:5f:c1:8e": {
-    "mac": "C8:95:CE:5F:C1:8E",
-    "ipv4": "192.168.42.65",
+    "created": 1779703600,
+    "ignore": false,
     "wifi": {
      "band": "5G",
      "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 243867,
-     "tx_bytes": 24460,
-     "rx_rate": 2920000,
-     "tx_rate": 1720000,
-     "signal": -94,
-     "host": "door",
+     "ssid": "uconfig-demo",
+     "rx_bytes": 304000,
+     "tx_bytes": 404000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -64,
+     "host": "peer1",
      "mode": "he"
-    },
-    "fingerprint": {
-     "vendor": "Intel Corporate",
-     "device_name": "testbed"
-    },
-    "hostname": "testbed",
-    "dhcp": "dynamic",
-    "created": 1785391077,
-    "ignore": false
+    }
    },
-   "20:05:b6:ff:00:ac": {
-    "mac": "20:05:b6:ff:00:ac",
+   "00:00:5E:00:53:06": {
+    "mac": "00:00:5E:00:53:06",
+    "online": true,
+    "ipv4": "192.168.1.15",
     "fingerprint": {
      "vendor": "OpenWrt",
-     "device_name": "tv"
+     "class": "router",
+     "device_name": "peer1"
     },
-    "hostname": "tv",
-    "created": 1779459393,
-    "ignore": false
-   },
-   "00:0c:43:26:60:15": {
-    "mac": "00:0c:43:26:60:15",
-    "fingerprint": {
-     "vendor": "MediaTek Inc",
-     "device_name": "ubbf-router"
+    "hostname": "peer1",
+    "dhcp": "dynamic",
+    "bytes": 222000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 4800000
+     },
+     "DNS": {
+      "bytes": 25200
+     }
     },
-    "hostname": "ubbf-router",
-    "created": 1782457598,
-    "ignore": false
-   },
-   "66:e2:b3:4f:e7:4f": {
-    "mac": "66:e2:b3:4f:e7:4f",
-    "fingerprint": {
-     "device_name": "Watch"
-    },
-    "hostname": "Watch",
-    "created": 1781193662,
-    "ignore": false
-   },
-   "c6:c4:04:33:b0:80": {
-    "mac": "c6:c4:04:33:b0:80",
-    "fingerprint": {
-     "device_name": "Watch"
-    },
-    "hostname": "Watch",
-    "created": 1779864128,
-    "ignore": false
-   },
-   "ac:bc:b5:c8:64:45": {
-    "mac": "AC:BC:B5:C8:64:45",
-    "online": true,
-    "ipv4": "192.168.42.55",
+    "created": 1779704500,
+    "ignore": false,
     "ipv6": [
-     "2a04:4540:1402:d0fc:e8b1:cb4:48b6:6413",
-     "fe80::1822:500b:8ff0:ba15"
-    ],
+     "fe80::200:5eff:fe00:5306"
+    ]
+   },
+   "00:00:5E:00:53:07": {
+    "mac": "00:00:5E:00:53:07",
+    "online": true,
+    "ipv4": "192.168.1.16",
+    "fingerprint": {
+     "vendor": "OpenWrt",
+     "class": "router",
+     "device_name": "peer2"
+    },
+    "hostname": "peer2",
+    "dhcp": "dynamic",
+    "bytes": 259000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 5600000
+     },
+     "DNS": {
+      "bytes": 29400
+     }
+    },
+    "created": 1779705400,
+    "ignore": false,
+    "ipv6": [
+     "fe80::200:5eff:fe00:5307"
+    ]
+   },
+   "00:00:5E:00:53:08": {
+    "mac": "00:00:5E:00:53:08",
+    "online": true,
+    "ipv4": "192.168.1.17",
+    "fingerprint": {
+     "vendor": "Intel",
+     "class": "desktop",
+     "device_name": "workshop-pc",
+     "device": "NUC"
+    },
+    "hostname": "workshop-pc",
+    "dhcp": "dynamic",
+    "bytes": 296000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 6400000
+     },
+     "DNS": {
+      "bytes": 33600
+     }
+    },
+    "created": 1779706300,
+    "ignore": false,
+    "ipv6": [
+     "fe80::200:5eff:fe00:5308"
+    ]
+   },
+   "00:00:5E:00:53:09": {
+    "mac": "00:00:5E:00:53:09",
+    "online": true,
+    "ipv4": "192.168.1.18",
+    "fingerprint": {
+     "vendor": "Apple",
+     "class": "tablet",
+     "device_name": "tablet",
+     "device": "iPad"
+    },
+    "hostname": "tablet",
+    "dhcp": "dynamic",
+    "bytes": 333000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 7200000
+     },
+     "DNS": {
+      "bytes": 37800
+     }
+    },
+    "created": 1779707200,
+    "ignore": false,
     "wifi": {
      "band": "5G",
      "freq": 5180,
-     "ssid": "Cockney",
-     "rx_bytes": 57138151,
-     "tx_bytes": 90614597,
-     "rx_rate": 7220000,
-     "tx_rate": 6500000,
-     "signal": -73,
-     "host": "door",
-     "mode": "ht"
-    },
+     "ssid": "uconfig-demo",
+     "rx_bytes": 308000,
+     "tx_bytes": 408000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -76,
+     "host": "peer2",
+     "mode": "he"
+    }
+   },
+   "00:00:5E:00:53:0A": {
+    "mac": "00:00:5E:00:53:0A",
+    "online": true,
+    "ipv4": "192.168.1.19",
     "fingerprint": {
-     "vendor": "Apple",
-     "device": "HomePod",
-     "class": "speaker",
-     "device_name": "Wohnzimmer"
+     "vendor": "Ubiquiti",
+     "class": "camera",
+     "device_name": "doorbell",
+     "device": "G4 Doorbell"
     },
-    "hostname": "Wohnzimmer",
+    "hostname": "doorbell",
     "dhcp": "dynamic",
-    "bytes": 13279538,
+    "bytes": 370000000,
     "traffic": {
-     "Apple Push Service": {
-      "bytes": 5901760
-     },
      "HTTPS": {
-      "bytes": 4176380
+      "bytes": 8000000
      },
-     "ICMP": {
-      "bytes": 450720
-     },
-     "QUIC": {
-      "bytes": 149574
-     },
-     "mDNS": {
-      "bytes": 2601104
+     "DNS": {
+      "bytes": 42000
      }
     },
-    "created": 1779648062,
+    "created": 1779708100,
+    "ignore": false,
+    "wifi": {
+     "band": "2G",
+     "freq": 2412,
+     "ssid": "uconfig-demo",
+     "rx_bytes": 309000,
+     "tx_bytes": 409000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -79,
+     "host": "main",
+     "mode": "he"
+    }
+   },
+   "00:00:5E:00:53:0B": {
+    "mac": "00:00:5E:00:53:0B",
+    "online": true,
+    "ipv4": "192.168.1.20",
+    "fingerprint": {
+     "vendor": "Synology",
+     "class": "nas",
+     "device_name": "nas",
+     "device": "DS220+"
+    },
+    "hostname": "nas",
+    "dhcp": "dynamic",
+    "bytes": 407000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 8800000
+     },
+     "DNS": {
+      "bytes": 46200
+     }
+    },
+    "created": 1779709000,
+    "ignore": false,
+    "ipv6": [
+     "fe80::200:5eff:fe00:530b"
+    ]
+   },
+   "00:00:5E:00:53:0C": {
+    "mac": "00:00:5E:00:53:0C",
+    "online": true,
+    "ipv4": "192.168.1.21",
+    "fingerprint": {
+     "vendor": "Nintendo",
+     "class": "game-console",
+     "device_name": "console",
+     "device": "Switch"
+    },
+    "hostname": "console",
+    "dhcp": "dynamic",
+    "bytes": 444000000,
+    "traffic": {
+     "HTTPS": {
+      "bytes": 9600000
+     },
+     "DNS": {
+      "bytes": 50400
+     }
+    },
+    "created": 1779709900,
+    "ignore": false,
+    "wifi": {
+     "band": "2G",
+     "freq": 2412,
+     "ssid": "uconfig-demo",
+     "rx_bytes": 311000,
+     "tx_bytes": 411000,
+     "rx_rate": 57640000,
+     "tx_rate": 64850000,
+     "signal": -55,
+     "host": "peer2",
+     "mode": "he"
+    }
+   },
+   "00:00:5E:00:53:C8": {
+    "mac": "00:00:5E:00:53:C8",
+    "fingerprint": {
+     "vendor": "Example Corp",
+     "class": "phone"
+    },
+    "created": 1779000000,
     "ignore": false
    },
-   "1c:b3:c9:24:fd:01": {
-    "mac": "1c:b3:c9:24:fd:01",
+   "00:00:5E:00:53:C9": {
+    "mac": "00:00:5E:00:53:C9",
     "fingerprint": {
-     "vendor": "Apple",
-     "device": "Apple TV",
-     "class": "tv",
-     "device_name": "Wohnzimmer (3)"
+     "vendor": "Example Corp",
+     "class": "laptop"
     },
-    "hostname": "Wohnzimmer (3)",
-    "created": 1779632047,
+    "created": 1779001000,
     "ignore": false
    }
   }

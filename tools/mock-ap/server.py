@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """A stand-in for the ucoord websocket server on an access point.
 
-Speaks the same JSON-RPC 2.0 dialect as
-../uconfig/modules/ucoord/usr/share/ucode/ucoord/uwsd-handler.uc, so the web UI
-connects to it exactly as it connects to a device and needs no dev-only branch.
+Speaks JSON-RPC 2.0 over ws://<host>/uconfig, the endpoint a singleton device
+serves. The methods that act on the device itself are top level and take no
+address: a device managing itself has nothing to address.
 
-New RPCs are prototyped here and ported to the ucode handler once settled.
-Read-only device data comes from fixtures captured from a real GL-MT6000; the
+The venue-scoped ucoord API still exists for coordinating several devices, and
+is served here too so the uCoord page has something to read.
+
+New RPCs are prototyped here and ported to
+../uconfig/modules/ucoord/usr/share/ucode/ucoord/uwsd-handler.uc once settled.
+Device readings come from fixtures captured from a real GL-MT6000; the
 configuration is live, so applying an edit and reading it back round-trips.
 
-    npm run mock            ws://localhost:8080/ucoord
+    npm run mock            ws://localhost:8080/uconfig
 """
 
 import asyncio
@@ -30,7 +34,7 @@ STATE_CONFIG = STATE / 'config.json'
 HOST = '0.0.0.0'
 PORT = 8080
 PASSWORD = 'a'
-SUBPROTOCOL = 'ui'
+SUBPROTOCOL = 'uconfig'
 
 # The client waits for this before offering the password prompt; the device
 # sends it 200ms after the socket opens.
@@ -44,12 +48,9 @@ ERROR_INTERNAL = -32603
 ERROR_LOGIN_REQUIRED = -32001
 ERROR_INVALID_PASSWORD = -32000
 
-# Methods addressed to a peer rather than the coordinator itself. Mirrors the
-# ADDRESSED set in src/lib/connection.svelte.ts.
-ADDRESSED = {
-    'config-get', 'config-apply', 'config-test', 'capabilities',
-    'system-info', 'info', 'state', 'reboot', 'sysupgrade',
-}
+# Only the venue-scoped calls carry an address. The device's own methods are
+# top level, since a singleton has nothing to address.
+ADDRESSED = {'peer-config-get', 'peer-config-apply', 'peer-info'}
 
 fixtures = json.loads(FIXTURES.read_text())
 
@@ -167,13 +168,33 @@ class Session:
 
     async def m_reboot(self, rid, params):
         log('reboot requested (no-op)')
-        await self.reply(rid, {'ok': True, **{k: params[k] for k in ('venue', 'peer') if k in (params or {})}})
+        await self.reply(rid, {'ok': True})
 
     async def m_sysupgrade(self, rid, params):
         if not isinstance(params, dict) or not params.get('url'):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
         log('sysupgrade requested (no-op):', params['url'])
         await self.reply(rid, {'ok': True, 'upgrade': True})
+
+    # --- venue-scoped (ucoord) -------------------------------------------
+    # Kept for coordinating other devices. The singleton API above is what the
+    # UI uses for the device it is connected to.
+
+    async def m_peer_info(self, rid, params):
+        peer = params.get('peer')
+        if peer not in fixtures['status'].get('venues', {}).get(params.get('venue'), {}):
+            return await self.fail(rid, ERROR_INTERNAL, 'unknown peer')
+        await self.reply(rid, fixtures['info'])
+
+    async def m_peer_config_get(self, rid, _params):
+        await self.reply(rid, config_read())
+
+    async def m_peer_config_apply(self, rid, params):
+        doc = (params or {}).get('config')
+        if not isinstance(doc, dict):
+            return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
+        config_write(doc)
+        await self.reply(rid, {'ok': True, 'apply': True})
 
     async def m_reload(self, rid, _params):
         await self.reply(rid, {'venues': list(fixtures['status'].get('venues', {}))})
@@ -205,6 +226,9 @@ class Session:
             'factory-reset': (self.m_factory_reset, True),
             'reboot': (self.m_reboot, True),
             'sysupgrade': (self.m_sysupgrade, True),
+            'peer-info': (self.m_peer_info, True),
+            'peer-config-get': (self.m_peer_config_get, True),
+            'peer-config-apply': (self.m_peer_config_apply, True),
             'reload': (self.m_reload, True),
             'include': (self.m_include, True),
         }
@@ -261,7 +285,7 @@ async def connection(ws):
 async def main():
     state = 'applied config' if STATE_CONFIG.exists() else 'factory config'
     log(f'serving {state}; password is {PASSWORD!r}')
-    log(f'listening on ws://localhost:{PORT}/ucoord')
+    log(f'listening on ws://localhost:{PORT}/uconfig')
     async with serve(connection, HOST, PORT, subprotocols=[SUBPROTOCOL]):
         await asyncio.Future()
 

@@ -12,7 +12,7 @@ Sources:
 npm run mock
 ```
 
-Serves `ws://localhost:8080/ucoord`. Connect the UI to `localhost:8080` with
+Serves `ws://localhost:8080/uconfig`. Connect the UI to `localhost:8080` with
 password `a`, exactly as if it were a device.
 
 ## Why
@@ -29,9 +29,13 @@ factory reset each time; here it is one RPC.
 
 ## What it serves
 
-Device readings come from `fixtures.json`, captured from a real GL-MT6000, so
-the Status and uCoord pages show plausible data: three peers in venue `home`,
-58 clients, real radio capabilities and traffic history.
+Device readings come from `fixtures.json`, so the Status and uCoord pages show
+plausible data: three peers in venue `home`, fourteen clients, radio
+capabilities and traffic history.
+
+The client list is synthetic. MAC addresses are from the documentation range
+reserved by RFC 7042, and hostnames, SSIDs and addresses are generic, so the
+fixture carries nothing from the network it was captured on.
 
 The configuration is live. `config-apply` writes `state/config.json` and
 `config-get` returns it thereafter, so an edit made in the UI survives a
@@ -47,9 +51,14 @@ the UI, which is a different thing.
 ## Fidelity
 
 The wire protocol matches the device, so the app needs no dev-only branch:
-subprotocol `ui`, a `login-required` notification 200ms after connect,
-`{venue, peer}` addressing on the methods that take it, and the same JSON-RPC
-error codes.
+endpoint `/uconfig`, subprotocol `uconfig`, a `login-required` notification
+200ms after connect, and the same JSON-RPC error codes.
+
+The methods that act on the device are top level and take no address, since a
+device managing itself has nothing to address: `config-get`, `config-apply`,
+`capabilities`, `system-info`, `reboot` and the rest. The venue-scoped ucoord
+calls remain for coordinating other devices and still take `{venue, peer}`;
+they are prefixed `peer-` here to keep the two families apart.
 
 Two deliberate differences:
 

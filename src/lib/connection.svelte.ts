@@ -1,10 +1,10 @@
 // WebSocket JSON-RPC 2.0 client for a live uConfig device.
-// Endpoint: ws://<host>/ucoord, subprotocol "ui".
+// Endpoint: ws://<host>/uconfig, subprotocol "uconfig".
 //
-// The device speaks the ucoord dialect, where config-get, capabilities and the
-// other per-device methods are addressed by venue and peer. Single-AP
-// management targets one peer, so the address is resolved once after login and
-// applied transparently by request(); it is never surfaced in the UI.
+// The methods that act on the device are top level and take no address: a
+// device managing itself has nothing to address. The venue and peer are still
+// resolved after login, because the uCoord page needs to know which peer in
+// the venue is the one being managed.
 
 import type { UcoordStatus } from './ucoord.svelte.ts'
 
@@ -48,20 +48,9 @@ const READY_TIMEOUT_MS = 8000
 const KEEPALIVE_MS = 30000
 const IDLE_BEFORE_PING_MS = 25000
 
-// Methods that take a { venue, peer } address. The rest are node-local.
-const ADDRESSED = new Set([
-  'config-get',
-  'config-apply',
-  'config-test',
-  'capabilities',
-  'system-info',
-  'info',
-  'state',
-  'reboot',
-  'sysupgrade'
-])
-
-let target: Target | null = null // { venue, peer } once resolved
+// Resolved after login so the uCoord page can mark which peer in the venue is
+// the one being managed. The device's own methods do not use it.
+let target: Target | null = null
 
 let socket: WebSocket | null = null
 let next_id = 1
@@ -162,14 +151,7 @@ export function request<T = unknown>(method: string, params?: Record<string, unk
       reject(new Error('not connected'))
       return
     }
-    let args: Record<string, unknown> = params ?? {}
-    if (ADDRESSED.has(method)) {
-      if (!target) {
-        reject(new Error('no device selected'))
-        return
-      }
-      args = { ...target, ...args }
-    }
+    const args: Record<string, unknown> = params ?? {}
     const id = next_id++
     pending.set(id, { resolve: resolve as (value: unknown) => void, reject })
     last_send = Date.now()
@@ -181,7 +163,7 @@ export function request<T = unknown>(method: string, params?: Record<string, unk
 export function connect(host: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     try {
-      socket = new WebSocket(`ws://${host}/ucoord`, 'ui')
+      socket = new WebSocket(`ws://${host}/uconfig`, 'uconfig')
     } catch (e) {
       reject(e as Error)
       return
