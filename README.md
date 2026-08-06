@@ -20,7 +20,7 @@ It works two ways:
 - Vite 6
 - `@formatjs/intl` for internationalisation (catalogue in `src/lib/locales/`)
 
-Plain JavaScript, no TypeScript.
+TypeScript throughout, checked with `svelte-check`.
 
 ## Development
 
@@ -30,6 +30,8 @@ npm run dev          # http://localhost:5173 (host exposed on the LAN)
 npm run build        # production bundle in dist/
 npm run preview
 npm run i18n:extract # re-extract translatable strings into the locale catalogue
+npm run check        # svelte-check over the whole app
+npm run types:schema # regenerate src/lib/types/uconfig.d.ts from the schema
 ```
 
 ## Screens
@@ -50,10 +52,10 @@ npm run i18n:extract # re-extract translatable strings into the locale catalogue
 The connected mode talks JSON-RPC 2.0 over a websocket to the uconfig-ui server:
 
 - Endpoint `ws://<host>/uconfig`, subprotocol `ui`.
-- `src/lib/connection.svelte.js` - the client: `connect()`, `login()`, `request()`,
+- `src/lib/connection.svelte.ts` - the client: `connect()`, `login()`, `request()`,
   `upload()`, `disconnect()`. The connection resolves once the server emits its
   `login-required` event.
-- `src/lib/settings.svelte.js` - persisted `host` and `theme` (localStorage).
+- `src/lib/settings.svelte.ts` - persisted `host` and saved configs (localStorage).
 - On login the app pulls `config-get` (active config) and `capabilities` (radios, bands,
   channel widths, modes, ports); the changes section applies edits via `config-apply`.
 
@@ -65,7 +67,7 @@ Device pages under `src/lib/components/`:
   upgrade (the upload uses the websocket `upload` channel).
 - `DeviceCards.svelte` - the mobile (cards) layout of the device menu.
 
-`src/lib/capabilities.svelte.js` exposes the device capabilities so the editor can lock
+`src/lib/capabilities.svelte.ts` exposes the device capabilities so the editor can lock
 the radio/port maps to what the hardware actually has.
 
 ## The schema-driven editor
@@ -76,13 +78,13 @@ interfaces, per-service pages) with the field widgets driven by the schema.
 - `src/lib/data/schema.json` - the merged uconfig JSON Schema (draft-07, all `$ref`s
   internal as `#/$defs/...`), copied from `../uconfig/generated/schema.json`.
 - `src/lib/data/examples.json` - the shipped example configs.
-- `src/lib/schema.js` - schema access helpers (`def_get`, `$ref` resolution, `$defs`
+- `src/lib/schema.ts` - schema access helpers (`def_get`, `$ref` resolution, `$defs`
   lookup, pattern-property value schemas, titles).
-- `src/lib/layouts.js` - declarative layouts (`unitLayout`, `radioLayout`,
+- `src/lib/layouts.ts` - declarative layouts (`unitLayout`, `radioLayout`,
   `interfaceLayout`, `servicesLayout`) describing which fields appear where.
-- `src/lib/store.svelte.js` - the document `$state` (`doc`, `baseline`, `loadedFrom`),
+- `src/lib/store.svelte.ts` - the document `$state` (`doc`, `baseline`, `loadedFrom`),
   plus import/export, example/config loaders, and pruning of empty values before export.
-- `src/lib/changes.js` - the diff between the edited `doc` and its `baseline`, shown in
+- `src/lib/changes.ts` - the diff between the edited `doc` and its `baseline`, shown in
   the Configuration section.
 
 ### Components
@@ -111,13 +113,13 @@ addressing, timezone, ports, vlan, dhcp pool, multi-psk, services, ...).
 
 ## Responsive layout
 
-`src/lib/view.svelte.js` holds `view.mode`, set in `App.svelte` from
+`src/lib/view.svelte.ts` holds `view.mode`, set in `App.svelte` from
 `matchMedia('(min-width: 768px)')`:
 
 - **`menu`** (>= 768px, desktop): the 250px `Sidebar` rail plus a content pane, one page
   per nav entry.
 - **`cards`** (< 768px, mobile): a vertical stack of collapsible cards behaving as an
-  accordion (one open at a time, via `src/lib/accordion.svelte.js`).
+  accordion (one open at a time, via `src/lib/accordion.svelte.ts`).
 
 `NetworkPage` and `SystemPage` adapt their chrome to the mode so they never nest a
 bordered card inside another bordered card on mobile.
