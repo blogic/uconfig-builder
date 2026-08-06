@@ -20,6 +20,7 @@ import asyncio
 import json
 import shutil
 import sys
+import time
 from pathlib import Path
 
 import websockets
@@ -30,10 +31,16 @@ FACTORY = HERE / 'factory.json'
 FIXTURES = HERE / 'fixtures.json'
 STATE = HERE / 'state'
 STATE_CONFIG = STATE / 'config.json'
+STATE_INCLUDES = STATE / 'includes'
 
 # --no-modules omits the list from the login reply, so the client's "device
 # said nothing" path can be exercised.
 NO_MODULES = '--no-modules' in sys.argv
+
+# --includes serves the envelope carrying the main config plus its include
+# fragments. Without it the reply is the bare document a pre-includes client
+# expects, so both shapes can be tested against one build.
+INCLUDES = '--includes' in sys.argv
 
 HOST = '0.0.0.0'
 PORT = 8080
@@ -73,6 +80,41 @@ def config_read():
 def config_write(doc):
     STATE.mkdir(exist_ok=True)
     STATE_CONFIG.write_text(json.dumps(doc, indent='\t') + '\n')
+
+
+def includes_read():
+    """Every stored fragment, keyed by include name."""
+    if not STATE_INCLUDES.exists():
+        return {}
+    return {p.stem: json.loads(p.read_text()) for p in sorted(STATE_INCLUDES.glob('*.json'))}
+
+
+def includes_write(mapping):
+    """Persist the complete intended set of fragments.
+
+    A name absent from `mapping` is deleted: config-apply carries everything the
+    client knows about, so omission is how a deletion is expressed.
+
+    The uuid is assigned here rather than by the client. It orders ucoord's peer
+    sync, so it has to move only when the content actually moves; stamping every
+    apply would make every peer re-fetch every fragment.
+    """
+    stored = includes_read()
+    STATE_INCLUDES.mkdir(parents=True, exist_ok=True)
+
+    for name, content in mapping.items():
+        body = {k: v for k, v in content.items() if k != 'uuid'}
+        previous = stored.get(name, {})
+        unchanged = body == {k: v for k, v in previous.items() if k != 'uuid'}
+        uuid = previous.get('uuid') if unchanged and 'uuid' in previous else int(time.time())
+        (STATE_INCLUDES / f'{name}.json').write_text(
+            json.dumps({'uuid': uuid, **body}, indent='\t') + '\n'
+        )
+
+    for name in stored:
+        if name not in mapping:
+            (STATE_INCLUDES / f'{name}.json').unlink()
+            log('include deleted:', name)
 
 
 def needs_setup():
@@ -163,7 +205,13 @@ class Session:
         await self.fail(rid, ERROR_INTERNAL, 'ubus error: 3')
 
     async def m_config_get(self, rid, _params):
-        await self.reply(rid, config_read())
+        # The envelope carries the main document and its fragments together, so
+        # a client sees the whole config state in one call. Without --includes
+        # the reply is the bare document, which is what a pre-includes client
+        # expects.
+        if not INCLUDES:
+            return await self.reply(rid, config_read())
+        await self.reply(rid, {'config': config_read(), 'includes': includes_read()})
 
     async def m_config_test(self, rid, params):
         doc = (params or {}).get('config')
@@ -175,8 +223,17 @@ class Session:
         doc = (params or {}).get('config')
         if not isinstance(doc, dict):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
+        # Absent rather than empty means a client that predates the envelope, so
+        # the stored fragments are left alone rather than deleted wholesale.
+        fragments = (params or {}).get('includes')
+        if fragments is not None and not isinstance(fragments, dict):
+            return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
         config_write(doc)
-        log('config applied ->', STATE_CONFIG.relative_to(HERE.parent.parent))
+        if fragments is not None:
+            includes_write(fragments)
+            log('config applied with', len(fragments), 'include(s)')
+        else:
+            log('config applied ->', STATE_CONFIG.relative_to(HERE.parent.parent))
         await self.reply(rid, {'ok': True, 'apply': True})
 
     async def m_factory_reset(self, rid, _params):
@@ -207,14 +264,10 @@ class Session:
         await self.reply(rid, fixtures['info'])
 
     async def m_peer_config_get(self, rid, _params):
-        await self.reply(rid, config_read())
+        await self.m_config_get(rid, _params)
 
     async def m_peer_config_apply(self, rid, params):
-        doc = (params or {}).get('config')
-        if not isinstance(doc, dict):
-            return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
-        config_write(doc)
-        await self.reply(rid, {'ok': True, 'apply': True})
+        await self.m_config_apply(rid, params)
 
     async def m_reload(self, rid, _params):
         await self.reply(rid, {'venues': list(fixtures['status'].get('venues', {}))})
@@ -313,6 +366,8 @@ async def connection(ws):
 async def main():
     state = 'applied config' if STATE_CONFIG.exists() else 'factory config'
     log(f'serving {state}; password is {PASSWORD!r}')
+    if INCLUDES:
+        log(f'include envelope enabled; {len(includes_read())} fragment(s) stored')
     log(f'listening on ws://localhost:{PORT}/uconfig')
     async with serve(connection, HOST, PORT, subprotocols=[SUBPROTOCOL]):
         await asyncio.Future()

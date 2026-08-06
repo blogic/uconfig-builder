@@ -2,7 +2,7 @@
   import ChangesPanel from './ChangesPanel.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
-  import { doc_export, baseline_reset } from '../store.svelte.js'
+  import { payload_export, baseline_reset } from '../store.svelte.js'
   import { connection, request as ws_request } from '../connection.svelte.js'
   import { view } from '../view.svelte.js'
   import type { ChangeEntry } from '../changes'
@@ -25,7 +25,7 @@
     applyState = 'applying'
     applyError = null
     try {
-      await ws_request('config-apply', { config: JSON.parse(doc_export()) })
+      await ws_request('config-apply', payload_export())
       baseline_reset()
       applyState = 'success'
     } catch (e) {

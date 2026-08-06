@@ -1,5 +1,6 @@
-import { ref_resolve, def_get, title_for } from './schema'
+import { ref_resolve, def_get, title_for, pattern_value_schema, rootSchema } from './schema'
 import type { JsonSchemaNode } from './schema'
+import type { IncludeFragment } from './store.svelte'
 import { default_width } from './channels'
 import { t } from './i18n.svelte'
 import type { UconfigDocument, Unit, Radio, Interface, Interface4 } from './types/uconfig'
@@ -110,7 +111,11 @@ export interface ChangeContainer {
   sub?: string
 }
 
+// The document an entry belongs to: the main config, or one include fragment.
+export const MAIN = 'main'
+
 export interface ChangeEntry {
+  doc: string
   section: string
   scope: string
   kind: 'field' | 'added' | 'removed'
@@ -121,6 +126,7 @@ export interface ChangeEntry {
 interface DiffMeta {
   section: string
   scope: string
+  doc?: string
   container?: ChangeContainer
 }
 
@@ -157,6 +163,7 @@ function diff_fields(cur: JsonObject | undefined, base: JsonObject | undefined, 
       continue
     }
     out.push({
+      doc: meta.doc ?? MAIN,
       section: meta.section,
       scope: meta.scope,
       kind: 'field',
@@ -169,6 +176,7 @@ function diff_fields(cur: JsonObject | undefined, base: JsonObject | undefined, 
 
 function container_entry(meta: DiffMeta, noun: string, key: string, added: boolean): ChangeEntry {
   return {
+    doc: meta.doc ?? MAIN,
     section: meta.section,
     scope: meta.scope,
     kind: added ? 'added' : 'removed',
@@ -243,6 +251,7 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
   // untracked rather than scoped to a page that cannot reset it.
   if (!eq(strip(cur.definitions?.['ntp-servers']), strip(base.definitions?.['ntp-servers']))) {
     out.push({
+      doc: MAIN,
       section: 'Definitions',
       scope: 'ntp',
       kind: 'field',
@@ -263,6 +272,7 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
     const wasOn = baseServices?.[svc] !== undefined
     if (isOn !== wasOn) {
       out.push({
+        doc: MAIN,
         section: 'Services',
         scope: `service:${svc}`,
         kind: isOn ? 'added' : 'removed',
@@ -290,4 +300,181 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
 
 export function changes_for(list: ChangeEntry[], scope: string): ChangeEntry[] {
   return list.filter((c) => c.scope === scope)
+}
+
+// --- includes ---------------------------------------------------------------
+
+// Where a fragment is pulled into the main document. The device merges the
+// snippet into the object carrying the `include` array, and does so before
+// validation, so the merged result has to satisfy that object's schema. The
+// fragment is therefore schema-shaped; what has to be worked out is which
+// position applies, and that comes from the reference site rather than from the
+// fragment's own file root.
+export interface IncludeMount {
+  source: string
+  path: string | null
+  schema: JsonSchemaNode | undefined
+  canon: 'ssid' | 'iface' | 'radio' | 'unit' | null
+  band?: string
+}
+
+// Which canonicaliser suits a mount, chosen by the container it sits in: an
+// object inside `ssids` is an SSID however it was spelled.
+function canon_kind(container: string | null): IncludeMount['canon'] {
+  if (container === 'ssids') return 'ssid'
+  if (container === 'interfaces') return 'iface'
+  if (container === 'radios') return 'radio'
+  if (container === 'unit') return 'unit'
+  return null
+}
+
+// Walk the document for objects carrying an `include` array, recording the
+// schema position each one sits at. Descends exactly as `strip` does, through
+// `properties` for named keys and `patternProperties` for map values.
+export function include_mounts(doc: UconfigDocument | null | undefined): Record<string, IncludeMount[]> {
+  const out: Record<string, IncludeMount[]> = {}
+  if (!doc) return out
+
+  const visit = (node: unknown, schema: JsonSchemaNode | undefined, container: string | null, band?: string) => {
+    if (!node || typeof node !== 'object') return
+    if (Array.isArray(node)) {
+      const items = schema ? ref_resolve(schema).items : undefined
+      for (const child of node) visit(child, items, container, band)
+      return
+    }
+
+    const obj = node as Record<string, unknown>
+    const refs = obj.include
+    if (Array.isArray(refs)) {
+      for (const raw of refs) {
+        if (typeof raw !== 'string') continue
+        const cut = raw.indexOf('.')
+        const source = cut === -1 ? raw : raw.slice(0, cut)
+        const path = cut === -1 ? null : raw.slice(cut + 1)
+        ;(out[source] ??= []).push({ source, path, schema, canon: canon_kind(container), band })
+      }
+    }
+
+    const resolved = schema ? ref_resolve(schema) : undefined
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'include' || key === 'includes') continue
+      const named = resolved?.properties?.[key]
+      const child = named ?? (resolved ? pattern_value_schema(resolved) ?? undefined : undefined)
+      // A map value takes its key as the band, which `canon_radio` needs to
+      // know which channel width counts as the default.
+      const nextBand = named ? band : key
+      visit(value, child, named ? key : container, nextBand)
+    }
+  }
+
+  visit(doc, rootSchema as JsonSchemaNode, null)
+  return out
+}
+
+// Canonicalise a snippet the way an inline value at the same position would be,
+// so a fragment carrying nothing but schema defaults reads as no change.
+function canon_at(value: unknown, mount: IncludeMount): JsonObject | undefined {
+  if (value == null || typeof value !== 'object' || Array.isArray(value)) {
+    const s = strip(value as JsonValue, mount.schema)
+    return s && typeof s === 'object' && !Array.isArray(s) ? s : undefined
+  }
+  if (mount.canon === 'ssid') return canon_ssid(value as Interface4)
+  if (mount.canon === 'iface') return canon_iface(value as Interface)
+  if (mount.canon === 'radio') return canon_radio(value as Radio, mount.band ?? '')
+  if (mount.canon === 'unit') {
+    const s = canon_unit(value as Unit)
+    return s && typeof s === 'object' && !Array.isArray(s) ? s : undefined
+  }
+  const s = strip(value as JsonValue, mount.schema)
+  return s && typeof s === 'object' && !Array.isArray(s) ? s : undefined
+}
+
+function at_path(fragment: IncludeFragment | undefined, path: string | null): unknown {
+  if (!fragment) return undefined
+  if (!path) return fragment
+  let node: unknown = fragment
+  for (const seg of path.split('.')) {
+    if (!node || typeof node !== 'object') return undefined
+    node = (node as Record<string, unknown>)[seg]
+  }
+  return node
+}
+
+// Every fragment key a mount already accounts for, so what is left over can be
+// diffed structurally without double-reporting.
+function mounted_keys(mounts: IncludeMount[]): Set<string> {
+  const keys = new Set<string>()
+  for (const m of mounts) {
+    if (!m.path) return new Set<string>() // whole-file mount covers everything
+    keys.add(m.path.split('.')[0])
+  }
+  return keys
+}
+
+function fragment_diff(
+  cur: IncludeFragment | undefined,
+  base: IncludeFragment | undefined,
+  name: string,
+  mounts: IncludeMount[]
+): ChangeEntry[] {
+  const meta: DiffMeta = {
+    doc: `include:${name}`,
+    section: 'Includes',
+    scope: `include:${name}`,
+    container: { noun: t('include'), key: name }
+  }
+  const out: ChangeEntry[] = []
+
+  for (const mount of mounts) {
+    out.push(...diff_fields(canon_at(at_path(cur, mount.path), mount), canon_at(at_path(base, mount.path), mount), meta))
+  }
+
+  // Anything the document does not currently reference has no schema position
+  // to canonicalise against, so it is compared structurally. `uuid` is skipped
+  // outright: the device re-stamps it on every apply, and it would otherwise
+  // report every fragment as changed every time.
+  const covered = mounted_keys(mounts)
+  if (!mounts.length || covered.size) {
+    const rest = (o: IncludeFragment | undefined): JsonObject => {
+      const acc: JsonObject = {}
+      for (const [k, v] of Object.entries(o ?? {})) {
+        if (k === 'uuid' || covered.has(k)) continue
+        acc[k] = v as JsonValue
+      }
+      return acc
+    }
+    out.push(...diff_fields(rest(cur), rest(base), meta))
+  }
+
+  // One fragment referenced twice is still one edit.
+  const seen = new Set<string>()
+  return out.filter((c) => !seen.has(c.key) && seen.add(c.key))
+}
+
+export function include_changes(
+  cur: Record<string, IncludeFragment> | null | undefined,
+  base: Record<string, IncludeFragment> | null | undefined,
+  doc: UconfigDocument | null | undefined
+): ChangeEntry[] {
+  const mounts = include_mounts(doc)
+  const out: ChangeEntry[] = []
+
+  for (const name of keys_union(cur, base)) {
+    const c = cur?.[name]
+    const b = base?.[name]
+    if ((c != null) !== (b != null)) {
+      out.push(
+        container_entry(
+          { doc: `include:${name}`, section: 'Includes', scope: `include:${name}` },
+          t('Include'),
+          name,
+          c != null
+        )
+      )
+      continue
+    }
+    out.push(...fragment_diff(c, b, name, mounts[name] ?? []))
+  }
+
+  return out
 }

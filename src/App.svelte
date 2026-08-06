@@ -28,7 +28,7 @@
   import { confirm } from './lib/confirm.svelte.js'
   import { settings } from './lib/settings.svelte.js'
   import { accordion_provide } from './lib/accordion.svelte.js'
-  import { changes_list } from './lib/changes.js'
+  import { changes_list, include_changes } from './lib/changes.js'
   import { t } from './lib/i18n.svelte.js'
   import {
     store,
@@ -40,6 +40,7 @@
     doc_adopt,
     doc_reset
   } from './lib/store.svelte.js'
+  import type { ConfigPayload } from './lib/store.svelte.js'
   import { device_load, deviceApi } from './lib/device.svelte.js'
   import type { DeviceMod } from './lib/device.svelte.js'
   import type { UconfigDocument, Radio, Interface } from './lib/types/uconfig'
@@ -204,7 +205,7 @@
       await dev.conn.login(password)
       // Pull the device's active config; a fresh device may have none yet.
       try {
-        doc_adopt(await dev.conn.request<UconfigDocument>('config-get', {}), settings.host ?? '')
+        doc_adopt(await dev.conn.request<ConfigPayload>('config-get', {}), settings.host ?? '')
       } catch (e) {
         loadWarning = e instanceof Error ? e.message : String(e)
       }
@@ -323,7 +324,10 @@
   const savedConfigs = $derived(saved_names())
   // With device capabilities loaded we know the radios; lock manual add/remove.
   const radiosLocked = $derived(capabilities.data != null)
-  const changes = $derived(changes_list(store.doc, store.baseline))
+  const changes = $derived([
+    ...changes_list(store.doc, store.baseline),
+    ...include_changes(store.includes, store.includeBaselines, store.doc)
+  ])
 
   // Sections available for this build and breakpoint. System and Configure are
   // desktop-only: reboot, firmware and schema editing are not phone errands.

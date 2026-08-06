@@ -21,7 +21,8 @@
     Radios: 'bi-broadcast',
     Interfaces: 'bi-ethernet',
     Services: 'bi-hdd-network',
-    Definitions: 'bi-clock'
+    Definitions: 'bi-clock',
+    Includes: 'bi-files'
   }
 
   let showReset = $state(false)

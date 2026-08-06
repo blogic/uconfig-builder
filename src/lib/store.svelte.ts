@@ -72,18 +72,48 @@ function blank_doc(): UconfigDocument {
   return doc
 }
 
+// An include fragment: a partial document merged into the main config at the
+// point its `include` reference sits. `uuid` is assigned by the device and
+// orders ucoord's peer sync, so the client never writes it.
+export type IncludeFragment = Record<string, unknown> & { uuid?: number }
+
+// What `config-get` returns and `config-apply` accepts: the main document and
+// its fragments together, so one call carries the whole config state.
+// A type alias rather than an interface: `request()` takes a
+// Record<string, unknown>, which an interface cannot satisfy for want of an
+// index signature.
+export type ConfigPayload = {
+  config: UconfigDocument
+  includes: Record<string, IncludeFragment>
+}
+
+// A reply without a `config` key predates the envelope and is the bare
+// document, so an un-updated device still loads.
+export function payload_normalise(raw: unknown): ConfigPayload {
+  if (raw && typeof raw === 'object' && 'config' in raw) {
+    const p = raw as { config: UconfigDocument; includes?: Record<string, IncludeFragment> }
+    return { config: p.config, includes: p.includes ?? {} }
+  }
+  return { config: raw as UconfigDocument, includes: {} }
+}
+
 export const store = $state<{
   doc: UconfigDocument
+  includes: Record<string, IncludeFragment>
   baseline: UconfigDocument | null
+  includeBaselines: Record<string, IncludeFragment> | null
   loadedFrom: string | null
 }>({
   doc: blank_doc(),
+  includes: {},
   baseline: null,
+  includeBaselines: null,
   loadedFrom: null
 })
 
 function baseline_snapshot() {
   store.baseline = structuredClone($state.snapshot(store.doc))
+  store.includeBaselines = structuredClone($state.snapshot(store.includes))
 }
 baseline_snapshot()
 
@@ -97,6 +127,15 @@ export function baseline_reset() {
 // document untouched. Scopes match `changes_list`'s `scope` field.
 export function scope_reset(scope: string) {
   if (!store.baseline) return
+  // Absent in the baseline means the fragment did not exist there, so resetting
+  // removes it rather than restoring an empty one.
+  if (scope.startsWith('include:')) {
+    const name = scope.slice(8)
+    const base = store.includeBaselines?.[name]
+    if (base === undefined) delete store.includes[name]
+    else store.includes[name] = structuredClone($state.snapshot(base)) as IncludeFragment
+    return
+  }
   const base = structuredClone($state.snapshot(store.baseline)) as UconfigDocument
   if (scope === 'unit') {
     store.doc.unit = base.unit ?? {}
@@ -164,14 +203,16 @@ export function service_disable(key: string) {
 
 // Discard every edit, restoring the document as it was loaded. Distinct from
 // doc_reset, which blanks the document and starts over.
-// Discard every edit, restoring the document as it was loaded. Distinct from
-// doc_reset, which blanks the document and starts over.
 export function changes_reset() {
   if (!store.baseline) return
   store.doc = structuredClone($state.snapshot(store.baseline)) as UconfigDocument
   ensure_sections()
   unit_defaults(store.doc)
   service_defaults(store.doc)
+  store.includes = structuredClone($state.snapshot(store.includeBaselines ?? {})) as Record<
+    string,
+    IncludeFragment
+  >
 }
 
 export function doc_reset() {
@@ -202,11 +243,16 @@ export function doc_import(text: string) {
   baseline_snapshot()
 }
 
-export function doc_adopt(obj: UconfigDocument, label: string) {
-  store.doc = structuredClone($state.snapshot(obj)) as UconfigDocument
+export function doc_adopt(source: UconfigDocument | ConfigPayload, label: string) {
+  const payload = payload_normalise(source)
+  store.doc = structuredClone($state.snapshot(payload.config)) as UconfigDocument
   ensure_sections()
   unit_defaults(store.doc)
   service_defaults(store.doc)
+  // Deliberately not normalised: a fragment is a partial document, and seeding
+  // unit/radios/interfaces/services defaults into one would deep-merge every
+  // materialised key into the main config on the device.
+  store.includes = structuredClone($state.snapshot(payload.includes)) as Record<string, IncludeFragment>
   store.loadedFrom = label
   baseline_snapshot()
 }
@@ -246,6 +292,19 @@ function ensure_sections() {
 
 export function doc_export(): string {
   return JSON.stringify(prune(store.doc), null, '\t') + '\n'
+}
+
+// The whole config state for `config-apply`. The fragment set is complete:
+// omitting a name is how a deletion is expressed, so every fragment still held
+// has to be sent. `prune` drops an object that empties out, which would read as
+// an accidental deletion, so a pruned-away fragment is sent as `{}` instead.
+export function payload_export(): ConfigPayload {
+  const includes: Record<string, IncludeFragment> = {}
+  for (const [name, fragment] of Object.entries($state.snapshot(store.includes))) {
+    const pruned = prune(fragment)
+    includes[name] = (pruned && typeof pruned === 'object' ? pruned : {}) as IncludeFragment
+  }
+  return { config: prune(store.doc) as UconfigDocument, includes }
 }
 
 function prune(value: unknown): unknown {
