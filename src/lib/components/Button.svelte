@@ -12,7 +12,7 @@
     full?: boolean
     title?: string | null
     onclick?: (e: MouseEvent) => void
-    children: Snippet
+    children?: Snippet
   }
 
   let {
@@ -24,6 +24,10 @@
     title = null,
     onclick
   , children }: Props = $props()
+
+  // Icon-only buttons square off rather than keeping the label padding, so
+  // they still line up with a full-size button beside them.
+  const iconOnly = $derived(icon != null && children == null)
 
   const TONE = {
     default: 'border-zinc-300 bg-surface text-zinc-700 hover:border-accent hover:text-accent',
@@ -37,10 +41,10 @@
   {disabled}
   {title}
   {onclick}
-  class="inline-flex cursor-pointer items-center gap-1.5 rounded-base border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 {TONE[
-    variant
-  ]} {full ? 'w-full justify-center' : ''}"
+  class="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-base border py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 {iconOnly
+    ? 'w-[34px]'
+    : 'px-3'} {TONE[variant]} {full ? 'w-full' : ''}"
 >
   {#if icon}<i class="bi {icon}"></i>{/if}
-  {@render children()}
+  {#if children}{@render children()}{/if}
 </button>

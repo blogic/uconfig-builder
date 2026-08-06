@@ -12,7 +12,9 @@ export const examples = examplesJson as unknown as Record<string, UconfigDocumen
 
 export const tz_keys = Object.keys(timezones).sort()
 
-export function tz_resolve(): string {
+// The browser's zone, but only when this build knows it. Null rather than a
+// fallback, so a caller offering to sync can tell a real match from a guess.
+export function tz_browser(): string | null {
   try {
     const browser = Intl.DateTimeFormat().resolvedOptions().timeZone
     if (browser) {
@@ -23,7 +25,11 @@ export function tz_resolve(): string {
   } catch {
     /* Intl unavailable */
   }
-  return tz_keys.includes('Europe/London') ? 'Europe/London' : tz_keys[0]
+  return null
+}
+
+export function tz_resolve(): string {
+  return tz_browser() ?? (tz_keys.includes('Europe/London') ? 'Europe/London' : tz_keys[0])
 }
 
 function unit_defaults(doc: UconfigDocument) {
