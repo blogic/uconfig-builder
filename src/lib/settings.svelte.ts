@@ -5,14 +5,17 @@ import type { UconfigDocument } from './types/uconfig'
 const KEY = 'uconfig-builder'
 
 export interface Settings {
-  theme?: 'light' | 'dark'
   host?: string
   configs?: Record<string, UconfigDocument>
 }
 
 function load(): Settings {
   try {
-    return JSON.parse(globalThis.localStorage?.getItem(KEY) || '{}')
+    const saved = JSON.parse(globalThis.localStorage?.getItem(KEY) || '{}')
+    // The theme followed a manual switch that no longer exists; drop any value
+    // left by an older build so it cannot pin the UI against the system.
+    delete saved.theme
+    return saved
   } catch {
     return {}
   }

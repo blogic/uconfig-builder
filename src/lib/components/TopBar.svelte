@@ -2,6 +2,7 @@
   import { t } from '../i18n.svelte.js'
   import { page } from '../page.svelte.js'
   import BrandMark from './BrandMark.svelte'
+  import Button from './Button.svelte'
 
   interface Section {
     key: string
@@ -15,8 +16,6 @@
     onSelect: (key: string) => void
     deviceModel?: string | null
     host?: string | null
-    themeMode: 'light' | 'dark'
-    onToggleTheme: () => void
     onLogout?: (() => void) | null
     railed?: boolean
     aligned?: boolean
@@ -28,14 +27,11 @@
     onSelect,
     deviceModel = null,
     host = null,
-    themeMode,
-    onToggleTheme,
     onLogout = null,
     railed = false,
     aligned = false
   }: Props = $props()
 
-  let menuOpen = $state(false)
 </script>
 
 <header class="flex flex-shrink-0 items-center border-b border-zinc-200 bg-surface px-4 {aligned ? 'gap-0' : 'gap-3'}">
@@ -86,32 +82,11 @@
     </p>
   {/if}
 
-  <div class="relative ml-3 flex-shrink-0">
-    <button type="button" class="btn-sm" aria-label={t('Menu')} aria-haspopup="true" aria-expanded={menuOpen} onclick={() => (menuOpen = !menuOpen)}>
-      <i class="bi bi-three-dots-vertical"></i>
-    </button>
-    {#if menuOpen}
-      <button type="button" class="fixed inset-0 z-40 cursor-default" aria-label={t('Close menu')} onclick={() => (menuOpen = false)}></button>
-      <div class="absolute right-0 z-50 mt-1 w-44 overflow-hidden rounded-base border border-zinc-200 bg-surface py-1 shadow-flat-lg">
-        <button
-          type="button"
-          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
-          onclick={() => { menuOpen = false; onToggleTheme() }}
-        >
-          <i class="bi {themeMode === 'dark' ? 'bi-sun' : 'bi-moon'} text-zinc-400"></i>
-          {themeMode === 'dark' ? t('Light theme') : t('Dark theme')}
-        </button>
-        {#if onLogout}
-          <button
-            type="button"
-            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
-            onclick={() => { menuOpen = false; onLogout() }}
-          >
-            <i class="bi bi-box-arrow-left text-zinc-400"></i>
-            {t('Log out')}
-          </button>
-        {/if}
-      </div>
-    {/if}
-  </div>
+  <!-- Only rendered with a session to end: without one the control would be a
+       theme toggle alone, which does not warrant a slot in the bar. -->
+  {#if onLogout}
+    <div class="ml-3 flex-shrink-0">
+      <Button icon="bi-box-arrow-left" title={t('Log out')} onclick={onLogout} />
+    </div>
+  {/if}
 </header>

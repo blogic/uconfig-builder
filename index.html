@@ -7,11 +7,10 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>uConfig builder</title>
     <script>
-      // Apply the saved/system theme before first paint, and advertise only the
+      // Apply the system theme before first paint, and advertise only the
       // active scheme so dark-system browsers don't force-dark our light theme.
       try {
-        var s = JSON.parse(localStorage.getItem('uconfig-builder') || '{}')
-        var dark = s.theme ? s.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+        var dark = matchMedia('(prefers-color-scheme: dark)').matches
         var scheme = dark ? 'dark' : 'light'
         if (dark) document.documentElement.classList.add('dark')
         document.documentElement.style.colorScheme = scheme
