@@ -54,10 +54,13 @@ export function wizard_steps(_mode: WizardMode): WizardStep[] {
   return [...WIZARD_STEPS]
 }
 
-// The device password has no length rule of its own; the Wi-Fi key does,
-// because WPA requires at least eight characters.
+// The device password has no length rule of its own. The Wi-Fi limits come
+// from the schema: an SSID is 1 to 32 characters, and a WPA passphrase is 8 to
+// 63.
 const MIN_PASSWORD = 1
-const MIN_KEY = 8
+export const MAX_SSID = 32
+export const MIN_KEY = 8
+export const MAX_KEY = 63
 
 // The message for whatever is wrong with a step, or null when it may be left.
 export function step_error(step: WizardStep, d: WizardData): string | null {
@@ -71,17 +74,16 @@ export function step_error(step: WizardStep, d: WizardData): string | null {
     if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(d.hostname)) return 'Letters, digits and hyphens only'
     return null
   }
-  if (step === 'wifi') {
-    if (!d.ssid.trim()) return 'A network name is required'
-    if (d.key.length < MIN_KEY) return `The password needs at least ${MIN_KEY} characters`
-    return null
-  }
-  if (step === 'guest') {
-    if (!d.guestOn) return null
-    if (!d.guestSsid.trim()) return 'A network name is required'
-    if (d.guestKey.length < MIN_KEY) return `The password needs at least ${MIN_KEY} characters`
-    return null
-  }
+  if (step === 'wifi') return wifi_error(d.ssid, d.key)
+  if (step === 'guest') return d.guestOn ? wifi_error(d.guestSsid, d.guestKey) : null
+  return null
+}
+
+function wifi_error(ssid: string, key: string): string | null {
+  if (!ssid.trim()) return 'A network name is required'
+  if (ssid.length > MAX_SSID) return `A network name is at most ${MAX_SSID} characters`
+  if (key.length < MIN_KEY) return `The password needs at least ${MIN_KEY} characters`
+  if (key.length > MAX_KEY) return `The password is at most ${MAX_KEY} characters`
   return null
 }
 

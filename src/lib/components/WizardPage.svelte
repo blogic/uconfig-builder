@@ -3,7 +3,7 @@
   import Button from './Button.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
-  import { wizard_defaults, wizard_steps, step_error, wizard_document } from '../wizard.svelte.js'
+  import { wizard_defaults, wizard_steps, step_error, wizard_document, MAX_SSID, MAX_KEY } from '../wizard.svelte.js'
   import type { WizardStep, WizardSecurity } from '../wizard.svelte.js'
   import type { UconfigDocument } from '../types/uconfig'
 
@@ -56,6 +56,12 @@
   }
 
   const SECURITY: WizardSecurity[] = ['maximum', 'compatibility']
+
+  function security_hint(v: WizardSecurity): string {
+    return v === 'maximum'
+      ? 'WPA3 only. The strongest option, but devices older than about 2019 cannot join.'
+      : 'WPA2 and WPA3 together. Choose this if an older device cannot join.'
+  }
 </script>
 
 {#snippet flip(value: WizardSecurity, set: (v: WizardSecurity) => void)}
@@ -167,7 +173,7 @@
         <p class="mb-4 text-center text-sm text-zinc-500">{t('What should this device be called?')}</p>
         <label class="mb-3 flex flex-col gap-1">
           <span class="text-xs font-medium text-zinc-700">{t('Hostname')}</span>
-          <input class="input" type="text" autocomplete="off" bind:value={data.hostname} />
+          <input class="input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore bind:value={data.hostname} />
           <small class="text-[11px] leading-snug text-zinc-500">
             {t('How the device appears on the network. Letters, digits and hyphens.')}
           </small>
@@ -183,12 +189,12 @@
         <p class="mb-4 text-center text-sm text-zinc-500">{t('Your main Wi-Fi network.')}</p>
         <label class="mb-3 flex flex-col gap-1">
           <span class="text-xs font-medium text-zinc-700">{t('Network name')}</span>
-          <input class="input" type="text" autocomplete="off" bind:value={data.ssid} />
+          <input class="input" type="text" maxlength={MAX_SSID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore bind:value={data.ssid} />
           <small class="text-[11px] leading-snug text-zinc-500">{t('The name people see when choosing a network.')}</small>
         </label>
         <label class="mb-3 flex flex-col gap-1">
           <span class="text-xs font-medium text-zinc-700">{t('Password')}</span>
-          <input class="input" type="password" autocomplete="new-password" bind:value={data.key} />
+          <input class="input" type="password" maxlength={MAX_KEY} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore bind:value={data.key} />
           <small class="text-[11px] leading-snug text-zinc-500">
             {t('At least 8 characters. Shared with everyone who joins.')}
           </small>
@@ -196,9 +202,7 @@
         <label class="mb-3 flex flex-col gap-1">
           <span class="text-xs font-medium text-zinc-700">{t('Security')}</span>
           {@render flip(data.security, (v) => (data.security = v))}
-          <small class="text-[11px] leading-snug text-zinc-500">
-            {t('Maximum is WPA3. Choose compatibility if older devices cannot join.')}
-          </small>
+          <small class="text-[11px] leading-snug text-zinc-500">{t(security_hint(data.security))}</small>
         </label>
       {:else if step === 'guest'}
         <div class="mb-3 flex items-center justify-between gap-3">
@@ -223,12 +227,12 @@
         {#if data.guestOn}
           <label class="mb-3 flex flex-col gap-1">
             <span class="text-xs font-medium text-zinc-700">{t('Network name')}</span>
-            <input class="input" type="text" autocomplete="off" bind:value={data.guestSsid} />
+            <input class="input" type="text" maxlength={MAX_SSID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore bind:value={data.guestSsid} />
             <small class="text-[11px] leading-snug text-zinc-500">{t('Shown separately from your own network.')}</small>
           </label>
           <label class="mb-3 flex flex-col gap-1">
             <span class="text-xs font-medium text-zinc-700">{t('Password')}</span>
-            <input class="input" type="password" autocomplete="new-password" bind:value={data.guestKey} />
+            <input class="input" type="password" maxlength={MAX_KEY} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore bind:value={data.guestKey} />
             <small class="text-[11px] leading-snug text-zinc-500">
               {t('Safe to share. Guests cannot reach your own devices.')}
             </small>
@@ -236,9 +240,7 @@
           <label class="mb-3 flex flex-col gap-1">
             <span class="text-xs font-medium text-zinc-700">{t('Security')}</span>
             {@render flip(data.guestSecurity, (v) => (data.guestSecurity = v))}
-            <small class="text-[11px] leading-snug text-zinc-500">
-              {t('Maximum is WPA3. Choose compatibility for older visitor devices.')}
-            </small>
+            <small class="text-[11px] leading-snug text-zinc-500">{t(security_hint(data.guestSecurity))}</small>
           </label>
         {:else}
           <p class="text-[11px] leading-snug text-zinc-500">
