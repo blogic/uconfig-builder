@@ -1,6 +1,7 @@
 <script lang="ts">
   import { store, doc_export, config_save, saved_names } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
+  import Button from './Button.svelte'
   import type { ChangeEntry } from '../changes'
 
   interface Props {
@@ -91,14 +92,9 @@
 
   {#if connected}
     <div>
-      <button
-        type="button"
-        class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
-        disabled={!changes.length}
-        onclick={onApply}
-      >
+      <Button variant="primary" icon="bi-upload" disabled={!changes.length} onclick={onApply}>
         {t('Apply to device')}
-      </button>
+      </Button>
       {#if applyError}
         <p class="mt-1 text-[11px] text-red-600">{applyError}</p>
       {/if}
@@ -106,7 +102,7 @@
   {:else}
     <div>
       <p class="mb-1 text-xs font-medium text-zinc-700">{t('Download')}</p>
-      <button type="button" class="btn w-full justify-center" onclick={download}>{t('Download JSON')}</button>
+      <Button icon="bi-download" onclick={download}>{t('Download JSON')}</Button>
     </div>
 
     {#if changes.length}
@@ -125,14 +121,7 @@
           bind:value={name}
           oninput={() => (savedNote = '')}
         />
-        <button
-          type="button"
-          class="btn-primary rounded-base px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!trimmed}
-          onclick={save}
-        >
-          {t('Save')}
-        </button>
+        <Button variant="primary" disabled={!trimmed} onclick={save}>{t('Save')}</Button>
       </div>
       {#if overwrites && !savedNote}
         <p class="mt-1 text-[11px] text-amber-600">{t('Overwrites the saved configuration "{name}".', { name: trimmed })}</p>

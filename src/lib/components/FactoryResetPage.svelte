@@ -4,6 +4,7 @@
   import { systemState } from '../system.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
+  import Button from './Button.svelte'
   import { t } from '../i18n.svelte.js'
 
   async function do_factory_reset(): Promise<void> {
@@ -25,7 +26,4 @@
   {t('Every setting is erased, including the password and the network configuration. The device returns to its defaults and reboots.')}
 </p>
 
-<button type="button" class="btn-sm-danger inline-flex items-center gap-1.5" onclick={do_factory_reset}>
-  <i class="bi bi-exclamation-triangle"></i>
-  {t('Factory reset')}
-</button>
+<Button variant="danger" icon="bi-exclamation-triangle" onclick={do_factory_reset}>{t('Factory reset')}</Button>

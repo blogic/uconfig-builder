@@ -4,6 +4,7 @@
   import { systemState } from '../system.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
+  import Button from './Button.svelte'
   import { t } from '../i18n.svelte.js'
 
   let file: File | null = $state(null)
@@ -52,12 +53,7 @@
     <p class="mt-3 text-sm text-red-600">{systemState.error}</p>
   {/if}
 
-  <button
-    type="button"
-    class="btn-primary mt-5 rounded-base px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
-    disabled={!file}
-    onclick={do_upgrade}
-  >
-    {t('Flash firmware')}
-  </button>
+  <div class="mt-5">
+    <Button variant="primary" icon="bi-cpu" disabled={!file} onclick={do_upgrade}>{t('Flash firmware')}</Button>
+  </div>
 </div>

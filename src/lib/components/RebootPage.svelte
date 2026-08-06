@@ -4,6 +4,7 @@
   import { systemState } from '../system.svelte.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import PageHeader from './PageHeader.svelte'
+  import Button from './Button.svelte'
   import { t } from '../i18n.svelte.js'
 
   async function do_reboot(): Promise<void> {
@@ -21,7 +22,4 @@
 <PageHeader title={t('Reboot')} />
 <p class="page-description">{t(PAGE_DESCRIPTIONS.reboot)}</p>
 
-<button type="button" class="btn" onclick={do_reboot}>
-  <i class="bi bi-arrow-clockwise"></i>
-  {t('Reboot')}
-</button>
+<Button icon="bi-arrow-clockwise" onclick={do_reboot}>{t('Reboot')}</Button>

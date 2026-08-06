@@ -15,6 +15,7 @@
   import SectionNav from './lib/components/SectionNav.svelte'
   import ServiceListPage from './lib/components/ServiceListPage.svelte'
   import Spinner from './lib/components/Spinner.svelte'
+  import Button from './lib/components/Button.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get } from './lib/schema.js'
   import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
@@ -466,9 +467,7 @@
                   <option value={name}>{name}</option>
                 {/each}
               </select>
-              <button type="button" class="btn disabled:cursor-not-allowed disabled:opacity-50" disabled={!welcomeSaved} onclick={start_saved}>
-                {t('Open')}
-              </button>
+              <Button disabled={!welcomeSaved} onclick={start_saved}>{t('Open')}</Button>
             </div>
             <div class="flex items-center gap-2">
               <span class="h-px flex-1 bg-zinc-200"></span>
@@ -476,9 +475,7 @@
               <span class="h-px flex-1 bg-zinc-200"></span>
             </div>
           {/if}
-          <button type="button" class="btn-primary rounded-base px-3 py-2 text-sm font-medium" onclick={start_default}>
-            {t('Start with the default configuration')}
-          </button>
+          <Button variant="primary" full onclick={start_default}>{t('Start with the default configuration')}</Button>
           <div class="flex items-center gap-2">
             <span class="h-px flex-1 bg-zinc-200"></span>
             <span class="text-xs text-zinc-400">{t('or start from an example')}</span>
@@ -491,9 +488,7 @@
                 <option value={name}>{name}</option>
               {/each}
             </select>
-            <button type="button" class="btn disabled:cursor-not-allowed disabled:opacity-50" disabled={!welcomeExample} onclick={start_example}>
-              {t('Start')}
-            </button>
+            <Button disabled={!welcomeExample} onclick={start_example}>{t('Start')}</Button>
           </div>
           {#if IS_DEVICE}
           <div class="flex items-center gap-2">
@@ -503,9 +498,7 @@
           </div>
           <form class="flex items-center gap-2" onsubmit={(e: SubmitEvent) => { e.preventDefault(); host_connect() }}>
             <input class="input" type="text" autocomplete="off" placeholder={t('IP to connect to')} bind:value={host} />
-            <button type="submit" class="btn disabled:cursor-not-allowed disabled:opacity-50" disabled={!host.trim()}>
-              {t('Connect')}
-            </button>
+            <Button type="submit" disabled={!host.trim()}>{t('Connect')}</Button>
           </form>
           {/if}
         </div>
@@ -532,7 +525,7 @@
             </div>
           {:else if connState === 'error'}
             <p class="text-sm text-red-600">{loginError}</p>
-            <button type="button" class="btn mt-5 w-full justify-center" onclick={login_back}>{t('Back')}</button>
+            <div class="mt-5"><Button full onclick={login_back}>{t('Back')}</Button></div>
           {:else if loading.active}
             <div class="flex flex-col items-center gap-3 text-sm text-zinc-500">
               <Spinner class="h-6 w-6 text-zinc-400" />
@@ -548,9 +541,7 @@
                 <input class="input text-center" type="password" name="password" autocomplete="current-password" bind:value={password} />
                 <span class="text-xs text-zinc-500">{t('Password')}</span>
               </label>
-              <button type="submit" class="btn-primary w-full justify-center rounded-base px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50" disabled={loggingIn}>
-                {loggingIn ? t('Logging in…') : t('Log in')}
-              </button>
+              <Button type="submit" variant="primary" full disabled={loggingIn}>{loggingIn ? t('Logging in…') : t('Log in')}</Button>
             </form>
           {/if}
         </div>

@@ -12,9 +12,15 @@
 
   let { items = [], page, onSelect, changes = 0 }: Props = $props()
 
-  let servicesOpen = $state(true)
-
   const inServices = $derived(page?.startsWith('service:') || page === 'ntp')
+
+  // Collapsed by default: the group is long enough to bury the rest of the
+  // section. Arriving on a service page opens it so the active entry is not
+  // hidden, which also covers a deep link straight into one.
+  let servicesOpen = $state(false)
+  $effect(() => {
+    if (inServices) servicesOpen = true
+  })
   const visible = $derived(items.filter((i) => !i.whenChanges || changes > 0))
 </script>
 
