@@ -50,8 +50,8 @@ export const SERVICE_ENTRIES: NavItem[] = [
 
 // Pages of the Status section: what the device is doing right now.
 export const STATUS_ITEMS: NavItem[] = [
-  { key: 'clients', label: 'Clients', icon: 'bi-people' },
-  { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' }
+  { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' },
+  { key: 'clients', label: 'Clients', icon: 'bi-people' }
 ]
 
 // Pages of the ucoord section: the venue and its peers, rather than this
@@ -81,7 +81,9 @@ export const SYSTEM_ITEMS: NavItem[] = [
 // off phones, where they are not sensible errands.
 export const SECTIONS: NavSection[] = [
   { key: 'status', label: 'Status', icon: 'bi-activity', device: true, items: STATUS_ITEMS },
-  { key: 'ucoord', label: 'uCoord', icon: 'bi-diagram-3', device: true, items: UCOORD_ITEMS, desktopOnly: true },
+  // Reachable on mobile: it is a read-only view of the venue, not a config
+  // errand, and the bottom bar carries it beside the Status pages.
+  { key: 'ucoord', label: 'uCoord', icon: 'bi-diagram-3', device: true, items: UCOORD_ITEMS },
   { key: 'config', label: 'Configure', icon: 'bi-sliders', items: CONFIG_ITEMS, desktopOnly: true },
   { key: 'system', label: 'System', icon: 'bi-wrench', device: true, items: SYSTEM_ITEMS, desktopOnly: true }
 ]

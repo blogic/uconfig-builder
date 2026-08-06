@@ -17,7 +17,7 @@
   import Button from './lib/components/Button.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get } from './lib/schema.js'
-  import { SERVICE_ENTRIES, SECTIONS, sections_for } from './lib/nav.js'
+  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, sections_for } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
@@ -199,7 +199,9 @@
       password = ''
       deviceSession = true
       section = IS_DEVICE ? 'status' : 'config'
-      view.section = IS_DEVICE ? 'clients' : 'unit'
+      // Taken from the nav rather than named here, so reordering a section's
+      // items also moves the page a session lands on.
+      view.section = IS_DEVICE ? (STATUS_ITEMS[0]?.key ?? 'traffic') : 'unit'
 
       // Seed every live page before leaving the login card, so the app appears
       // fully populated rather than filling in behind visible chrome.
@@ -299,6 +301,24 @@
       (i) => !i.whenChanges || changes.length > 0
     )
   )
+
+  // Mobile has no section tabs, so the bottom bar spans them: the Status pages
+  // plus the venue overview, which is a read-only view worth reaching there.
+  const bottomItems = $derived(
+    availableSections
+      .filter((s) => s.key === 'status' || s.key === 'ucoord')
+      .flatMap((s) =>
+        s.key === 'ucoord' ? [{ ...s.items[0], label: s.label }] : s.items
+      )
+  )
+
+  function bottom_select(key: string) {
+    // Each bottom-bar entry names the section that owns it, so picking one has
+    // to move there rather than leaving a page orphaned in the wrong section.
+    const owner = availableSections.find((s) => s.items.some((i) => i.key === key))
+    if (owner) section = owner.key
+    section_select_page(key)
+  }
 
   // The editor has one section, so its top bar can carry the page title.
   const railed = $derived(wide && availableSections.length === 1 && sectionItems.length > 1)
@@ -576,7 +596,7 @@
     </div>
   {:else}
     <TopBar
-      sections={availableSections}
+      sections={wide ? availableSections : []}
       section={activeSection}
       onSelect={section_select}
       deviceModel={capabilities.data?.capabilities?.model ?? null}
@@ -606,8 +626,8 @@
       </main>
     </div>
 
-    {#if !wide && sectionItems.length > 1}
-      <BottomNav items={sectionItems} active={view.section} onSelect={section_select_page} />
+    {#if !wide && bottomItems.length > 1}
+      <BottomNav items={bottomItems} active={view.section} onSelect={bottom_select} />
     {/if}
   {/if}
 
