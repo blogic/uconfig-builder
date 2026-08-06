@@ -203,7 +203,7 @@ export function doc_import(text: string) {
 }
 
 export function doc_adopt(obj: UconfigDocument, label: string) {
-  store.doc = structuredClone(obj)
+  store.doc = structuredClone($state.snapshot(obj)) as UconfigDocument
   ensure_sections()
   unit_defaults(store.doc)
   service_defaults(store.doc)

@@ -124,7 +124,7 @@
     view.mode = wide ? 'menu' : 'cards'
   })
 
-  let screen = $state<'welcome' | 'login' | 'app'>('welcome')
+  let screen = $state<'welcome' | 'login' | 'wizard' | 'app'>('welcome')
   let section = $state('config') // 'status' | 'config' | 'system'
   let deviceSession = $state(false) // logged into a device (survives idle disconnects)
   let welcomeExample = $state('')
@@ -203,6 +203,13 @@
       }
       password = ''
       deviceSession = true
+
+      // A device that has never been set up has no top-level `webui` object.
+      // Its absence is the signal, so the wizard runs before the app proper.
+      if (IS_DEVICE && (store.doc as Record<string, unknown>).webui === undefined) {
+        screen = 'wizard'
+        return
+      }
       section = IS_DEVICE ? 'status' : 'config'
       // Taken from the nav rather than named here, so reordering a section's
       // items also moves the page a session lands on.
@@ -217,6 +224,16 @@
     } finally {
       loggingIn = false
     }
+  }
+
+  // Phase 2 pushes the document to the device; for now it is adopted locally so
+  // the app opens on what the wizard produced.
+  async function wizard_done(doc: UconfigDocument) {
+    doc_adopt(doc, settings.host ?? '')
+    section = 'status'
+    view.section = STATUS_ITEMS[0]?.key ?? 'traffic'
+    if (IS_DEVICE && dev) await dev.poll.preload()
+    screen = 'app'
   }
 
   function login_back() {
@@ -508,6 +525,8 @@
         </div>
       </div>
     </div>
+  {:else if screen === 'wizard' && IS_DEVICE && DP}
+    <DP.WizardPage capabilities={capabilities.data} onDone={wizard_done} />
   {:else if screen === 'login'}
     <div class="flex flex-1 items-center justify-center overflow-y-auto p-4">
       <div class="w-full max-w-sm rounded-base border border-zinc-200 bg-surface p-8 text-center shadow-flat-md">
