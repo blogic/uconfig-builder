@@ -147,6 +147,44 @@ export function scope_reset(scope: string) {
     return
   }
 
+  // A single interface, so resetting one network leaves the others alone.
+  // Absent in the baseline means it was added since, and resetting removes it.
+  if (scope.startsWith('interface:')) {
+    const name = scope.slice(10)
+    if (!store.doc.interfaces || typeof store.doc.interfaces !== 'object') store.doc.interfaces = {}
+    const ifaces = store.doc.interfaces as Record<string, Record<string, unknown>>
+    const baseIface = (base.interfaces as Record<string, Record<string, unknown>> | undefined)?.[name]
+    if (baseIface === undefined) {
+      delete ifaces[name]
+      return
+    }
+    // The SSIDs are tracked under their own scopes, so restoring the interface
+    // must leave them as they are rather than silently undoing a wireless edit.
+    const ssids = ifaces[name]?.ssids
+    ifaces[name] = baseIface
+    if (ssids !== undefined) ifaces[name].ssids = ssids
+    else delete ifaces[name].ssids
+    return
+  }
+
+  // One SSID, addressed as `<interface>/<ssid>`. Restoring it leaves the rest of
+  // the interface as it is, so a wireless page resets only the network it edits.
+  if (scope.startsWith('ssid:')) {
+    const cut = scope.indexOf('/')
+    if (cut === -1) return
+    const iface = scope.slice(5, cut)
+    const name = scope.slice(cut + 1)
+    const target = (store.doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.[iface]
+    if (!target) return
+    const baseSsids = (base.interfaces as Record<string, Record<string, unknown>> | undefined)?.[iface]
+      ?.ssids as Record<string, unknown> | undefined
+    if (!target.ssids || typeof target.ssids !== 'object') target.ssids = {}
+    const ssids = target.ssids as Record<string, unknown>
+    if (baseSsids?.[name] === undefined) delete ssids[name]
+    else ssids[name] = baseSsids[name]
+    return
+  }
+
   if (scope === 'ntp') {
     if (!store.doc.definitions || typeof store.doc.definitions !== 'object') store.doc.definitions = {}
     const servers = base.definitions?.['ntp-servers']

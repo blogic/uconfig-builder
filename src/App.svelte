@@ -459,9 +459,9 @@
   </MapEditor>
 {/snippet}
 
-{#snippet networkPage(title: string, description: string, body: import('svelte').Snippet)}
+{#snippet networkPage(title: string, description: string, scope: string, body: import('svelte').Snippet)}
   <PageHeader {title}>
-    {#snippet actions()}<ChangesIndicator {changes} scope="interfaces" />{/snippet}
+    {#snippet actions()}<ChangesIndicator {changes} {scope} />{/snippet}
   </PageHeader>
   {#if description}
     <p class="page-description">{t(description)}</p>
@@ -483,7 +483,7 @@
       <p class="text-sm text-zinc-500">{t('This device has no Wi-Fi network configured yet.')}</p>
     {/if}
   {/snippet}
-  {@render networkPage(t('Wireless'), PAGE_DESCRIPTIONS.wireless, inner)}
+  {@render networkPage(t('Wireless'), PAGE_DESCRIPTIONS.wireless, `ssid:${primary?.[0] ?? 'lan'}/main`, inner)}
 {/snippet}
 
 {#snippet netRadiosBody()}
@@ -511,7 +511,7 @@
 
 {#snippet guestBody()}
   {#snippet inner()}<GuestSection />{/snippet}
-  {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS.guest, inner)}
+  {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS.guest, 'interface:guest', inner)}
 {/snippet}
 
 {#snippet wanBody()}
@@ -523,7 +523,7 @@
       <p class="text-sm text-zinc-500">{t('This device has no uplink interface configured.')}</p>
     {/if}
   {/snippet}
-  {@render networkPage(t('WAN'), PAGE_DESCRIPTIONS.wan, inner)}
+  {@render networkPage(t('WAN'), PAGE_DESCRIPTIONS.wan, 'interface:wan', inner)}
 {/snippet}
 
 {#snippet lanBody()}
@@ -544,7 +544,7 @@
       </p>
     {/if}
   {/snippet}
-  {@render networkPage(t('LAN'), PAGE_DESCRIPTIONS.lan, inner)}
+  {@render networkPage(t('LAN'), PAGE_DESCRIPTIONS.lan, `interface:${primary?.[0] ?? 'lan'}`, inner)}
 {/snippet}
 
 {#snippet changesBody()}

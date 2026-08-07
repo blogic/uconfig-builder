@@ -217,10 +217,14 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
     )
   }
 
-  const ifaceMeta = { section: 'Interfaces', scope: 'interfaces' }
+  // One scope per interface, and a separate one per SSID, so a page that owns a
+  // single network can show and reset only its own edits. An interface appearing
+  // or disappearing is attributed to the interface rather than to the map, so
+  // adding a guest network resets from the Guest page.
   for (const name of keys_union(cur.interfaces, base.interfaces)) {
     const ci = cur.interfaces?.[name]
     const bi = base.interfaces?.[name]
+    const ifaceMeta = { section: 'Interfaces', scope: `interface:${name}` }
     if ((ci != null) !== (bi != null)) {
       out.push(container_entry(ifaceMeta, t('Interface'), name, ci != null))
       continue
@@ -234,13 +238,16 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
     for (const ssid of keys_union(ci?.ssids, bi?.ssids)) {
       const cs = ci?.ssids?.[ssid]
       const bs = bi?.ssids?.[ssid]
+      // The SSID is what a wireless page edits, so it is tracked apart from the
+      // interface that carries it.
+      const ssidMeta = { section: 'Interfaces', scope: `ssid:${name}/${ssid}` }
       if ((cs != null) !== (bs != null)) {
-        out.push(container_entry(ifaceMeta, t('SSID'), `${name}/${ssid}`, cs != null))
+        out.push(container_entry(ssidMeta, t('SSID'), `${name}/${ssid}`, cs != null))
         continue
       }
       out.push(
         ...diff_fields(canon_ssid(cs), canon_ssid(bs), {
-          ...ifaceMeta,
+          ...ssidMeta,
           container: { noun: t('interface'), key: name, sub: ssid }
         })
       )

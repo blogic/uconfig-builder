@@ -24,11 +24,31 @@
     ntp: { label: 'System › Time', icon: 'bi-clock' }
   }
 
-  // Prefixed scopes carry a name after the colon, so they group by family.
+  // Interfaces the Network section gives a page of their own, so an edit reads
+  // as belonging to the page that made it. Anything else keeps its own name.
+  const IFACE_GROUPS: Record<string, { label: string; icon: string }> = {
+    guest: { label: 'Network › Guest', icon: 'bi-people' },
+    wan: { label: 'Network › WAN', icon: 'bi-globe' },
+    lan: { label: 'Network › LAN', icon: 'bi-ethernet' }
+  }
+
+  // Prefixed scopes carry a name after the colon, so they group by what they own.
   function group_for(c: ChangeEntry): { label: string; icon: string } {
     if (SCOPE_GROUPS[c.scope]) return SCOPE_GROUPS[c.scope]
     if (c.scope.startsWith('service:')) return { label: 'System › Services', icon: 'bi-hdd-network' }
     if (c.scope.startsWith('include:')) return { label: 'Network › Wireless', icon: 'bi-wifi' }
+    if (c.scope.startsWith('interface:')) {
+      const name = c.scope.slice(10)
+      return IFACE_GROUPS[name] ?? { label: `Network › ${name}`, icon: 'bi-ethernet' }
+    }
+    // An SSID belongs to the page that edits that network: the guest one to
+    // Guest, every other to Wireless.
+    if (c.scope.startsWith('ssid:')) {
+      const iface = c.scope.slice(5, c.scope.indexOf('/'))
+      return iface === 'guest'
+        ? { label: 'Network › Guest', icon: 'bi-people' }
+        : { label: 'Network › Wireless', icon: 'bi-wifi' }
+    }
     // Anything unmapped keeps the document domain, so a new scope degrades to
     // the old behaviour rather than landing in a blank group.
     return { label: c.section, icon: 'bi-sliders' }
