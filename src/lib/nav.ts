@@ -22,6 +22,9 @@ export interface NavSection {
   items: NavItem[]
   device?: boolean
   desktopOnly?: boolean
+  // Mirrors NavItem.whenChanges: the section is offered only while the document
+  // has pending edits.
+  whenChanges?: boolean
 }
 
 const SERVICE_ICONS: Record<string, string> = {
@@ -81,6 +84,23 @@ export const CONFIG_ITEMS: NavItem[] = [
   { key: 'json', label: 'JSON', icon: 'bi-code-square' }
 ]
 
+// Pages of the Network section: what the network does, rather than how the
+// document is shaped. `net-radios` rather than `radios` because page keys share
+// one flat namespace and `radios` already names the Configure page.
+export const NETWORK_ITEMS: NavItem[] = [
+  { key: 'wireless', label: 'Wireless', icon: 'bi-wifi' },
+  { key: 'guest', label: 'Guest', icon: 'bi-people' },
+  { key: 'net-radios', label: 'Radios', icon: 'bi-broadcast' },
+  { key: 'wan', label: 'WAN', icon: 'bi-globe' },
+  { key: 'lan', label: 'LAN', icon: 'bi-ethernet' }
+]
+
+// Edits arrive from several sections, so the pending list is a section of its
+// own rather than an item inside whichever one happened to own it.
+export const CHANGES_ITEMS: NavItem[] = [
+  { key: 'changes', label: 'Pending', icon: 'bi-exclamation-circle' }
+]
+
 // State reports on the device; the rest are one irreversible action per page.
 export const SYSTEM_ITEMS: NavItem[] = [
   { key: 'state', label: 'State', icon: 'bi-speedometer2' },
@@ -97,13 +117,31 @@ export const SECTIONS: NavSection[] = [
   // Reachable on mobile: it is a read-only view of the venue, not a config
   // errand, and the bottom bar carries it beside the Status pages.
   { key: 'ucoord', label: 'uCoord', icon: 'bi-diagram-3', device: true, items: UCOORD_ITEMS },
+  { key: 'network', label: 'Network', icon: 'bi-diagram-2', device: true, items: NETWORK_ITEMS, desktopOnly: true },
   { key: 'config', label: 'Configure', icon: 'bi-sliders', items: CONFIG_ITEMS, desktopOnly: true },
-  { key: 'system', label: 'System', icon: 'bi-wrench', device: true, items: SYSTEM_ITEMS, desktopOnly: true }
+  { key: 'system', label: 'System', icon: 'bi-wrench', device: true, items: SYSTEM_ITEMS, desktopOnly: true },
+  // Last, so it appears at the end of the bar on the occasions it appears at all.
+  {
+    key: 'changes',
+    label: 'Changes',
+    icon: 'bi-exclamation-circle',
+    device: true,
+    items: CHANGES_ITEMS,
+    desktopOnly: true,
+    whenChanges: true
+  }
 ]
 
 // Sections available for this build and breakpoint.
-export function sections_for(isDevice: boolean, isEditor: boolean, wide: boolean, connected: boolean): NavSection[] {
+export function sections_for(
+  isDevice: boolean,
+  isEditor: boolean,
+  wide: boolean,
+  connected: boolean,
+  hasChanges = false
+): NavSection[] {
   return SECTIONS.filter((s) => {
+    if (s.whenChanges && !hasChanges) return false
     if (s.device && !isDevice) return false
     if (s.device && !connected) return false
     if (!s.device && !isEditor) return false

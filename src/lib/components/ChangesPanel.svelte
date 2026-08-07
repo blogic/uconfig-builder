@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { store, doc_export, config_save, saved_names, changes_reset } from '../store.svelte.js'
+  import { store, doc_export, config_save, saved_names, changes_reset, scope_reset } from '../store.svelte.js'
   import { t } from '../i18n.svelte.js'
   import Button from './Button.svelte'
   import ChangesResetModal from './ChangesResetModal.svelte'
@@ -14,15 +14,24 @@
 
   let { changes, connected = false, applyError = null, onApply }: Props = $props()
 
-  // Matched to the sidebar entry for each domain, so a change reads as
-  // belonging to the page it was made on.
-  const SECTION_ICONS: Record<string, string> = {
-    Unit: 'bi-shield-check',
-    Radios: 'bi-broadcast',
-    Interfaces: 'bi-ethernet',
-    Services: 'bi-hdd-network',
-    Definitions: 'bi-clock',
-    Includes: 'bi-files'
+  // Grouped by the page an edit was made on rather than by the document domain
+  // it landed in, so the heading names the menu entry the user clicked. Keyed on
+  // ChangeEntry.scope, which already identifies the owning page.
+  const SCOPE_GROUPS: Record<string, { label: string; icon: string }> = {
+    unit: { label: 'System › Device', icon: 'bi-shield-check' },
+    radios: { label: 'Network › Radios', icon: 'bi-broadcast' },
+    interfaces: { label: 'Network › Interfaces', icon: 'bi-ethernet' },
+    ntp: { label: 'System › Time', icon: 'bi-clock' }
+  }
+
+  // Prefixed scopes carry a name after the colon, so they group by family.
+  function group_for(c: ChangeEntry): { label: string; icon: string } {
+    if (SCOPE_GROUPS[c.scope]) return SCOPE_GROUPS[c.scope]
+    if (c.scope.startsWith('service:')) return { label: 'System › Services', icon: 'bi-hdd-network' }
+    if (c.scope.startsWith('include:')) return { label: 'Network › Wireless', icon: 'bi-wifi' }
+    // Anything unmapped keeps the document domain, so a new scope degrades to
+    // the old behaviour rather than landing in a blank group.
+    return { label: c.section, icon: 'bi-sliders' }
   }
 
   let showReset = $state(false)
@@ -35,16 +44,36 @@
   let name = $state(store.loadedFrom && store.loadedFrom !== 'imported' ? store.loadedFrom : '')
   let savedNote = $state('')
 
-  // Entries keep their document order within a domain; domains appear in the
-  // order they are first seen (Unit, Radios, Interfaces, Services).
+  // Entries keep their document order within a group; groups appear in the order
+  // they are first seen. Scopes are carried so a group can reset only its own.
+  interface Group {
+    label: string
+    icon: string
+    scopes: Set<string>
+    items: ChangeEntry[]
+  }
+
   const grouped = $derived.by(() => {
-    const map = new Map<string, ChangeEntry[]>()
+    const map = new Map<string, Group>()
     for (const c of changes) {
-      if (!map.has(c.section)) map.set(c.section, [])
-      map.get(c.section)!.push(c)
+      const { label, icon } = group_for(c)
+      if (!map.has(label)) map.set(label, { label, icon, scopes: new Set(), items: [] })
+      const g = map.get(label)!
+      g.scopes.add(c.scope)
+      g.items.push(c)
     }
-    return [...map]
+    return [...map.values()]
   })
+
+  // A group may span several scopes (every service, every include), so resetting
+  // it restores each one rather than only the first.
+  let resetGroup = $state<Group | null>(null)
+
+  function group_reset() {
+    if (!resetGroup) return
+    for (const scope of resetGroup.scopes) scope_reset(scope)
+    resetGroup = null
+  }
 
   const existing = $derived(saved_names())
   const trimmed = $derived(name.trim())
@@ -71,20 +100,28 @@
 <div class="flex flex-col gap-5">
   {#if changes.length}
     <ul class="divide-y divide-zinc-200 border-b border-zinc-200">
-      {#each grouped as [section, items] (section)}
+      {#each grouped as g (g.label)}
         <li class="flex items-start gap-3 py-3">
-          <i class="bi {SECTION_ICONS[section] ?? 'bi-sliders'} mt-0.5 flex-shrink-0 text-lg text-zinc-600"></i>
+          <i class="bi {g.icon} mt-0.5 flex-shrink-0 text-lg text-zinc-600"></i>
 
           <div class="min-w-0 flex-1">
             <div class="flex items-baseline gap-2">
-              <span class="truncate text-sm font-semibold text-zinc-900">{t(section)}</span>
+              <span class="truncate text-sm font-semibold text-zinc-900">{t(g.label)}</span>
               <span class="text-xs text-zinc-400">
-                {t('{count, plural, one {# change} other {# changes}}', { count: items.length })}
+                {t('{count, plural, one {# change} other {# changes}}', { count: g.items.length })}
               </span>
+              <span class="flex-1"></span>
+              <button
+                type="button"
+                class="flex-shrink-0 text-xs font-medium text-accent hover:underline"
+                onclick={() => (resetGroup = g)}
+              >
+                {t('Reset')}
+              </button>
             </div>
 
             <ul class="mt-1">
-              {#each items as c}
+              {#each g.items as c}
                 <li class="flex items-center gap-2 py-0.5 text-xs text-zinc-500">
                   <span class="inline-block h-1 w-1 flex-shrink-0 rounded-full bg-accent"></span>
                   {c.label}
@@ -159,5 +196,14 @@
     entries={changes}
     onConfirm={reset_all}
     onCancel={() => (showReset = false)}
+  />
+{/if}
+
+{#if resetGroup}
+  <ChangesResetModal
+    title={resetGroup.label}
+    entries={resetGroup.items}
+    onConfirm={group_reset}
+    onCancel={() => (resetGroup = null)}
   />
 {/if}

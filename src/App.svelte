@@ -331,7 +331,9 @@
 
   // Sections available for this build and breakpoint. System and Configure are
   // desktop-only: reboot, firmware and schema editing are not phone errands.
-  const availableSections = $derived(sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession) as NavSection[])
+  const availableSections = $derived(
+    sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession, changes.length > 0) as NavSection[]
+  )
   const activeSection = $derived(
     availableSections.some((s) => s.key === section) ? section : (availableSections[0]?.key ?? 'config')
   )
