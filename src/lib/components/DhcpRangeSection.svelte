@@ -10,10 +10,12 @@
   // longer than /24 falls back to editing the stored numbers rather than
   // computing a range that would be wrong.
   import Field from './Field.svelte'
+  import LeasesField from './LeasesField.svelte'
   import { def_get, ref_resolve } from '../schema.js'
   import { t } from '../i18n.svelte.js'
   import { DESCRIPTIONS } from '../descriptions.js'
   import type { JsonSchemaNode } from '../schema'
+  import type { Interface1 } from '../types/uconfig'
 
   interface Props {
     ipv4: Record<string, unknown>
@@ -88,7 +90,7 @@
 <div class="flex flex-col gap-4">
   {#if base}
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-medium text-zinc-700">{t('Address range')}</span>
+      <span class="text-xs font-medium text-zinc-700">{t('DHCP Address range')}</span>
       <div class="flex items-center gap-2">
         <input
           class="input"
@@ -132,8 +134,13 @@
   <Field
     obj={pool}
     key="lease-time"
+    label={t('DHCP Lease Time')}
     onset={pool_set}
     schema={poolProps['lease-time'] ?? {}}
     describe={DESCRIPTIONS['lease-time']}
   />
+
+  <!-- Addresses reserved for a particular device, kept beside the pool they sit
+       outside of. Addressed rather than offset-based, matching the range above. -->
+  <LeasesField container={ipv4 as Interface1} subnet={ipv4.subnet as string | undefined} addressed />
 </div>

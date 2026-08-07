@@ -8,15 +8,38 @@
   interface Props {
     container: Interface1
     subnet?: string
+    // Ask for a full address rather than a host offset. The document stores the
+    // offset either way; this only changes what the user types and reads, so a
+    // page showing its DHCP range in addresses stays in one vocabulary.
+    addressed?: boolean
   }
 
-  let { container, subnet }: Props = $props()
+  let { container, subnet, addressed = false }: Props = $props()
 
   const KEY = 'dhcp-leases'
   const leases = $derived(container[KEY] ?? {})
   const keys = $derived(Object.keys(leases))
   const prefix = $derived(prefix_of(subnet))
   const maxOffset = $derived(host_max(prefix))
+
+  // The first three octets, when the subnet leaves the last one free to vary.
+  // Without them an offset cannot be named as an address, so the numeric input
+  // stands in rather than showing something wrong.
+  const base = $derived.by(() => {
+    if (!addressed) return null
+    const m = String(subnet ?? '').match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}\/(\d{1,2})$/)
+    if (!m) return null
+    const octets = [Number(m[1]), Number(m[2]), Number(m[3])]
+    if (octets.some((o) => o > 255)) return null
+    const p = Number(m[4])
+    if (p < 8 || p > 24) return null
+    return octets.join('.')
+  })
+
+  const asAddress = $derived(base != null)
+  function addr_of(off: number | undefined): string {
+    return base && off ? `${base}.${off}` : ''
+  }
 
   let showModal = $state(false)
   let name = $state('')
@@ -32,12 +55,24 @@
   const macError = $derived(
     !mac ? t('MAC is required') : !/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(mac) ? t('Invalid MAC address') : ''
   )
-  const offNum = $derived(Number(offset))
+  // In address mode the field holds a dotted quad, and the offset is its last
+  // octet: the same conversion the DHCP range performs, in reverse.
+  const offNum = $derived.by(() => {
+    if (!asAddress) return Number(offset)
+    const m = offset.trim().match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+    if (!m) return NaN
+    if (`${m[1]}.${m[2]}.${m[3]}` !== base) return NaN
+    return Number(m[4])
+  })
   const offsetError = $derived(
     offset === ''
-      ? t('Offset is required')
+      ? asAddress
+        ? t('An address is required')
+        : t('Offset is required')
       : !Number.isInteger(offNum) || offNum < 1 || offNum > maxOffset
-        ? t('Offset must be 1 to {max}', { max: maxOffset })
+        ? asAddress
+          ? t('Enter an address on {base}.0/{prefix}', { base: base ?? '', prefix })
+          : t('Offset must be 1 to {max}', { max: maxOffset })
         : ''
   )
   const valid = $derived(!nameError && !macError && !offsetError)
@@ -83,7 +118,9 @@
   {#snippet row(k: string)}
     <span class="flex-1 text-xs">
       <span class="font-mono font-semibold text-zinc-800">{k}</span>
-      <span class="text-zinc-500"> — {leases[k].macaddr} · +{leases[k]['lease-offset']}</span>
+      <span class="text-zinc-500">
+        — {leases[k].macaddr} · {asAddress ? addr_of(leases[k]['lease-offset']) : `+${leases[k]['lease-offset']}`}
+      </span>
     </span>
     <RemoveButton onclick={() => remove(k)} />
   {/snippet}
@@ -107,9 +144,18 @@
           {#if mac && macError}<p class="text-[11px] text-amber-600">{macError}</p>{/if}
         </div>
         <div class="flex flex-col gap-1">
-          <label for="lz-offset" class="text-xs font-medium text-zinc-700">{t('Lease offset')}</label>
-          <input id="lz-offset" class="input" type="number" min="1" max={maxOffset} bind:value={offset} />
-          <p class="text-[11px] text-zinc-500">{t('Host offset within the /{prefix} subnet (1 to {max}).', { prefix, max: maxOffset })}</p>
+          <label for="lz-offset" class="text-xs font-medium text-zinc-700">
+            {asAddress ? t('Address') : t('Lease offset')}
+          </label>
+          {#if asAddress}
+            <input id="lz-offset" class="input font-mono" placeholder="{base}.50" bind:value={offset} />
+            <p class="text-[11px] text-zinc-500">
+              {t('The address this device always receives. Choose one outside the pool above.')}
+            </p>
+          {:else}
+            <input id="lz-offset" class="input" type="number" min="1" max={maxOffset} bind:value={offset} />
+            <p class="text-[11px] text-zinc-500">{t('Host offset within the /{prefix} subnet (1 to {max}).', { prefix, max: maxOffset })}</p>
+          {/if}
           {#if offset !== '' && offsetError}<p class="text-[11px] text-amber-600">{offsetError}</p>{/if}
         </div>
         <div class="flex flex-col gap-1">
