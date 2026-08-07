@@ -44,6 +44,14 @@ subnet, and `disallow-upstream-subnet`. Presenting it as one switch with
 consequences is the clearest case of the vocabulary shift: the user decides
 "visitors get their own network", and the page writes four objects.
 
+### No live status readouts
+
+The mockups show a lease card on WAN and a channel-in-use panel on Radios.
+Neither was built: nothing in the RPC surface returns a per-interface address
+or a radio's operating state. `status` is ucoord topology, `system-info` is
+host resources, and `devices` is client-side. Both need a device-side method
+that does not exist yet.
+
 ### Advanced disclosures
 
 Fields with no plain-language equivalent (`channel-mode`, `allow-dfs`,
@@ -60,7 +68,8 @@ omission has to be a decision rather than an oversight.
 No intent phrasing yet, and no page: `multi-psk`, `access-control-list`,
 `rate-limit`, `roaming`, `bss-mode`, `bssid`, `vendor-elements`,
 `ieee8021x-ports`, `quality-of-service`, `broad-band`, `dhcp-leases`, and port
-and VLAN-trunk assignment.
+and VLAN-trunk assignment. Ports show read-only on WAN; assignment stays in
+Configure for now.
 
 Two of these look like pages in their own right rather than Advanced fodder:
 
@@ -97,12 +106,13 @@ that grouping moves off `ChangeEntry.section` — currently `Unit`, `Radios`,
 `Interfaces` — onto the owning page. Per-group Reset reuses `scope_reset(scope)`
 unchanged.
 
-### One transition to handle
+### The disappearing section needed no special handling
 
-The section disappears when the last change is applied or reset, so the page
-the user is looking at vanishes under them. Either fall back to the previous
-section on that transition, or keep the entry while it is the active section
-and drop it on the next navigation. Unresolved.
+The section vanishes when the last change is applied or reset, so the page the
+user is on goes with it. That turned out to need no new code: `activeSection`
+already falls back to the first available section when `section` names one that
+is gone, the validity effect corrects `view.section` to match, and `route_sync`
+follows `activeSection` rather than the stale value. The app lands on Status.
 
 ## Open questions
 
