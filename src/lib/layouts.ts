@@ -38,6 +38,9 @@ export interface LayoutNode {
   vlanSection?: boolean
   portsSection?: boolean
   dhcpSection?: boolean
+  // The pool as a first/last address pair rather than the stored offset and
+  // count. Derived, so it needs a component rather than a field node.
+  dhcpRange?: boolean
   disallow?: string
   multiPsk?: boolean
   aclField?: boolean
@@ -156,6 +159,119 @@ export const interfaceLayout: LayoutNode[] = [
   { section: 'Services', children: [{ field: 'services', widget: 'services' }] },
   { dhcpSection: true, when: down },
   { disallow: 'ipv4', when: down }
+]
+
+// --- Network section --------------------------------------------------------
+//
+// Intent-shaped views over the same document the Configure pages edit raw. Each
+// asks what the network should do and leaves the schema shape to the renderer,
+// so a page names a network rather than an interface.
+
+// The interface carrying the main SSIDs: the downstream one on a router, and on
+// an access point the single upstream that bridges everything. Resolved by role
+// rather than by name, which is how the rest of the layouts already work and
+// which avoids depending on `webui.profile`.
+export function primary_iface(
+  interfaces: Record<string, unknown> | undefined
+): [string, Record<string, unknown>] | null {
+  const entries = Object.entries(interfaces ?? {}) as [string, Record<string, unknown>][]
+  const named = (n: string) => entries.find(([k]) => k === n)
+  const byRole = (r: string) => entries.find(([, v]) => v?.role === r)
+  // A guest network is downstream too, so prefer the conventional name before
+  // falling back to whichever downstream interface exists.
+  return named('lan') ?? byRole('downstream') ?? named('wan') ?? byRole('upstream') ?? null
+}
+
+// Wireless: the network people join, without the interface that carries it.
+export const wirelessLayout: LayoutNode[] = [
+  { field: 'ssid', describe: 'The name people see when choosing a network.' },
+  {
+    field: 'template.key',
+    label: 'Password',
+    describe: 'At least 8 characters. Shared with everyone who joins.'
+  },
+  {
+    field: 'template.security',
+    label: 'Security',
+    options: ['maximum', 'compatibility'],
+    default: 'maximum',
+    describe: 'Encryption strength.'
+  },
+  { field: 'wifi-radios', label: 'Bands', widget: 'bands' },
+  { field: 'hidden-ssid', describe: 'Hide the network.' },
+  { field: 'isolate-clients', describe: 'Isolate clients from each other.' }
+]
+
+// Radios: channel and power in plain terms, with the band-level settings that
+// have no everyday phrasing kept together behind one disclosure.
+export const radioIntentLayout: LayoutNode[] = [
+  { field: 'channel', widget: 'channel', describe: 'Wireless channel.' },
+  { field: 'channel-width', widget: 'channel-width', describe: 'Channel width.' },
+  { field: 'tx-power', widget: 'tx-power', describe: 'Transmit power (dBm).' },
+  {
+    section: 'Advanced',
+    children: [
+      { field: 'channel-mode', widget: 'channel-mode', describe: 'Preferred 802.11 mode.' },
+      {
+        field: 'he-multiple-bssid',
+        describe: 'Use multiple-BSSID beacons.',
+        when: ({ data }) => {
+          const m = data['channel-mode'] ?? 'HE'
+          return m === 'HE' || m === 'EHT'
+        }
+      },
+      { field: 'legacy-rates', describe: 'Allow legacy 802.11b rates.', when: ({ context }) => context.band === '2G' },
+      {
+        field: 'allow-dfs',
+        describe: 'Allow DFS channels.',
+        when: ({ data, context }) =>
+          context.band === '5G' &&
+          (data.channel == null || data.channel === 'auto') &&
+          (data['channel-width'] ?? default_width(context.band ?? '')) !== 160
+      },
+      { field: 'maximum-clients', describe: 'Maximum associated clients.' }
+    ]
+  }
+]
+
+// WAN: how the device reaches the internet. Ports stay on the Configure page;
+// this asks only where the address comes from.
+export const wanLayout: LayoutNode[] = [
+  {
+    objectSection: 'ipv4',
+    title: 'IPv4',
+    children: [
+      { field: 'addressing', widget: 'addressing', describe: 'How the IPv4 address is assigned.' },
+      { field: 'subnet', required: true, when: isStatic, describe: 'Static IPv4 (CIDR).' },
+      { field: 'gateway', required: true, when: isStatic, describe: 'Static IPv4 gateway.' },
+      { field: 'use-dns', widget: 'list', describe: 'DNS servers to use.' },
+      { field: 'send-hostname', when: isDynamic, describe: 'Send hostname in DHCP requests.' }
+    ]
+  },
+  {
+    objectSection: 'ipv6',
+    title: 'IPv6',
+    children: [{ field: 'addressing', widget: 'addressing-ro' }]
+  }
+]
+
+// LAN: the addresses handed to everything that joins. The pool is expressed as
+// a range rather than the document's offset-and-count.
+export const lanLayout: LayoutNode[] = [
+  {
+    objectSection: 'ipv4',
+    title: 'Addresses',
+    children: [
+      { field: 'subnet', required: true, label: 'Router address', describe: 'Static IPv4 (CIDR).' },
+      { dhcpRange: true }
+    ]
+  },
+  {
+    objectSection: 'ipv6',
+    title: 'IPv6',
+    children: [{ field: 'dhcpv6.mode', label: 'DHCPv6 Mode', describe: 'DHCPv6 server mode.' }]
+  },
+  { field: 'isolate-hosts', describe: 'Isolate clients from each other.' }
 ]
 
 const serviceLayouts: Record<string, LayoutNode[]> = {

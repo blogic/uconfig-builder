@@ -43,8 +43,16 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   firmware: 'Upload a firmware image and flash it. The device reboots once the image is written.',
   'factory-reset': 'Erase the configuration and return the device to its defaults.',
   ntp: 'Configure NTP (Network Time Protocol) servers for time synchronisation. NTP keeps the device clock accurate by synchronising with reliable time servers.',
-  changes: 'Review the edits pending since this configuration was loaded, grouped by the part of the document they affect.',
-  json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.'
+  changes: 'Everything edited since this configuration was loaded, grouped by where you changed it.',
+  json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.',
+
+  // Network section: what the network does, rather than how the document is
+  // shaped. Deliberately shorter than the Configure pages above.
+  wireless: 'The Wi-Fi network your own devices join. Changes apply to every radio the device has.',
+  guest: 'A separate network for visitors. Guests reach the internet, and nothing else on your network.',
+  'net-radios': 'The radios your Wi-Fi networks run on. Channel and power settings per band.',
+  wan: 'How this device reaches the internet.',
+  lan: 'Your own network: the addresses this device hands out to everything that joins.'
 }
 
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,

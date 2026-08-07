@@ -631,7 +631,8 @@
                         "properties": {
                                 "disable": {
                                         "description": "Allows disabling an SSID from the UI.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "purpose": {
                                         "description": "An SSID can have a special purpose such as the hidden on-boarding BSS. All purposes other than \"user-defined\" are static pre-defined configurations.",
@@ -716,15 +717,18 @@
                                 },
                                 "hidden-ssid": {
                                         "description": "Disables the broadcasting of beacon frames if set to 1 and,in doing so, hides the ESSID.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "isolate-clients": {
                                         "description": "Isolates wireless clients from each other on this BSS.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "unicast-conversion": {
                                         "description": "Convert multicast traffic to unicast on this BSS.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "vendor-elements": {
                                         "description": "This option allows embedding custom vendor specific IEs inside the beacons of a BSS in AP mode.",
@@ -854,7 +858,8 @@
                                 },
                                 "disable": {
                                         "description": "Allows disabling an SSID from the UI.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "ipv4": {
                                         "$ref": "#/$defs/interface.ipv4"
@@ -893,7 +898,8 @@
                                 },
                                 "isolate-hosts": {
                                         "description": "This option makes sure that any traffic leaving this interface is isolated and all local IP ranges are blocked. It essentially enforces \"guest network\" firewall settings.",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "broad-band": {
                                         "$ref": "#/$defs/interface.broad-band"
@@ -1189,7 +1195,8 @@
                                 },
                                 "dns-intercept": {
                                         "description": "Intercept/redirect all DNS traffic on enabled interfaces",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "default": false
                                 },
                                 "servers": {
                                         "description": "A list of upstream servers the requests get forwarded to",

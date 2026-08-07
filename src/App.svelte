@@ -4,6 +4,7 @@
   import ConfirmModal from './lib/components/ConfirmModal.svelte'
   import ConfigurationPanel from './lib/components/ConfigurationPanel.svelte'
   import ChangesIndicator from './lib/components/ChangesIndicator.svelte'
+  import GuestSection from './lib/components/GuestSection.svelte'
   import PageHeader from './lib/components/PageHeader.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
@@ -21,7 +22,16 @@
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
-  import { unitLayout, radioLayout, interfaceLayout } from './lib/layouts.js'
+  import {
+    unitLayout,
+    radioLayout,
+    interfaceLayout,
+    wirelessLayout,
+    radioIntentLayout,
+    wanLayout,
+    lanLayout,
+    primary_iface
+  } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
   import { route, route_parse, route_sync, route_clear } from './lib/router.svelte.js'
   import { hoisted } from './lib/page.svelte.js'
@@ -95,6 +105,7 @@
   const unitDef = def_get('unit')
   const radioDef = def_get('radio')
   const interfaceDef = def_get('interface')
+  const ssidDef = def_get('interface.ssid')
   let openInterface = $state<string | null>(null)
 
   function radio_defaults(band: string): Record<string, unknown> {
@@ -448,6 +459,94 @@
   </MapEditor>
 {/snippet}
 
+{#snippet networkPage(title: string, description: string, body: import('svelte').Snippet)}
+  <PageHeader {title}>
+    {#snippet actions()}<ChangesIndicator {changes} scope="interfaces" />{/snippet}
+  </PageHeader>
+  {#if description}
+    <p class="page-description">{t(description)}</p>
+  {/if}
+  {@render body()}
+{/snippet}
+
+{#snippet wirelessBody()}
+  {@const primary = primary_iface(store.doc.interfaces as Record<string, unknown>)}
+  {#snippet inner()}
+    {#if primary?.[1]?.ssids && (primary[1].ssids as Record<string, unknown>).main}
+      <LayoutRenderer
+        data={(primary[1].ssids as Record<string, Record<string, unknown>>).main}
+        schema={ssidDef ?? {}}
+        layout={wirelessLayout}
+        context={{ radios: store.doc.radios }}
+      />
+    {:else}
+      <p class="text-sm text-zinc-500">{t('This device has no Wi-Fi network configured yet.')}</p>
+    {/if}
+  {/snippet}
+  {@render networkPage(t('Wireless'), PAGE_DESCRIPTIONS.wireless, inner)}
+{/snippet}
+
+{#snippet netRadiosBody()}
+  <PageHeader title={t('Radios')}>
+    {#snippet actions()}<ChangesIndicator {changes} scope="radios" />{/snippet}
+  </PageHeader>
+  {#if PAGE_DESCRIPTIONS['net-radios']}
+    <p class="page-description">{t(PAGE_DESCRIPTIONS['net-radios'])}</p>
+  {/if}
+  <MapEditor
+    parent={store.doc as Record<string, unknown>}
+    mapKey="radios"
+    valueSchema={radioDef ?? null}
+    keyLabel="band"
+    tabbed
+    keyOptions={radioDef?.properties?.band.enum as string[] | undefined}
+    makeValue={radio_defaults}
+    locked
+  >
+    {#snippet item(radio: Record<string, unknown>, band: string)}
+      <LayoutRenderer data={radio} schema={radioDef ?? {}} layout={radioIntentLayout} context={{ band }} />
+    {/snippet}
+  </MapEditor>
+{/snippet}
+
+{#snippet guestBody()}
+  {#snippet inner()}<GuestSection />{/snippet}
+  {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS.guest, inner)}
+{/snippet}
+
+{#snippet wanBody()}
+  {@const wan = (store.doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.wan}
+  {#snippet inner()}
+    {#if wan}
+      <LayoutRenderer data={wan} schema={interfaceDef ?? {}} layout={wanLayout} context={{ role: wan.role as string }} />
+    {:else}
+      <p class="text-sm text-zinc-500">{t('This device has no uplink interface configured.')}</p>
+    {/if}
+  {/snippet}
+  {@render networkPage(t('WAN'), PAGE_DESCRIPTIONS.wan, inner)}
+{/snippet}
+
+{#snippet lanBody()}
+  {@const primary = primary_iface(store.doc.interfaces as Record<string, unknown>)}
+  {#snippet inner()}
+    {#if primary && primary[1].role === 'downstream'}
+      <LayoutRenderer
+        data={primary[1]}
+        schema={interfaceDef ?? {}}
+        layout={lanLayout}
+        context={{ role: 'downstream' }}
+      />
+    {:else}
+      <!-- An access point bridges rather than routes, so the upstream router
+           owns the addresses and there is nothing here to set. -->
+      <p class="text-sm text-zinc-500">
+        {t('This device bridges its local network, so the router upstream of it owns these settings.')}
+      </p>
+    {/if}
+  {/snippet}
+  {@render networkPage(t('LAN'), PAGE_DESCRIPTIONS.lan, inner)}
+{/snippet}
+
 {#snippet changesBody()}
   <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
   <ConfigurationPanel {changes} />
@@ -457,6 +556,11 @@
   {#if key === 'unit'}{@render unitBody()}
   {:else if key === 'radios'}{@render radiosBody()}
   {:else if key === 'interfaces'}{@render interfacesBody()}
+  {:else if key === 'wireless'}{@render wirelessBody()}
+  {:else if key === 'guest'}{@render guestBody()}
+  {:else if key === 'net-radios'}{@render netRadiosBody()}
+  {:else if key === 'wan'}{@render wanBody()}
+  {:else if key === 'lan'}{@render lanBody()}
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />

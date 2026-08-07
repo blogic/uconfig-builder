@@ -96,7 +96,7 @@ function ssid_block(name: string, key: string, security: WizardSecurity, radios:
 }
 
 // Bands the device actually has, so the wizard never asks about radios.
-function radio_bands(capabilities: unknown): string[] {
+export function radio_bands(capabilities: unknown): string[] {
   const wiphy = (capabilities as { wiphy?: { bands?: Record<string, unknown> }[] } | null)?.wiphy
   if (!Array.isArray(wiphy)) return ['2G', '5G']
   const bands = new Set<string>()
@@ -118,8 +118,8 @@ function radios_for(bands: string[]): Record<string, unknown> {
 
 // Guest traffic is carried on its own VLAN, so an access point can bridge it
 // to the router that owns the subnet rather than routing it itself.
-const GUEST_VLAN = 100
-const GUEST_SUBNET = '192.168.100.1/24'
+export const GUEST_VLAN = 100
+export const GUEST_SUBNET = '192.168.100.1/24'
 
 export function wizard_document(d: WizardData, capabilities: unknown): UconfigDocument {
   const bands = radio_bands(capabilities)
