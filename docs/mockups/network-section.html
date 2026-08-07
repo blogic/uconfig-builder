@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network section mockups</title>
+
+<!-- Mockups for the live app's Network section and consolidated Changes menu.
+     See ../live-app-navigation.md for the decisions these illustrate.
+     Self-contained: open directly in a browser, no build step. -->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --accent: #3498db;
+    --accent-dark: #2980b9;
+    --accent-ink: #ffffff;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --ok: #28a745;
+    --warn: #f0ad4e;
+    --warn-ink: #856404;
+    --warn-bg: #fff3cd;
+    --danger: #e74c3c;
+    --radius: 4px;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface: #22303c;
+      --page: #1a252f;
+      --nav-active: #2c3e50;
+      --ink: #ecf0f1;
+      --ink-soft: #dfe6e9;
+      --muted: #95a5a6;
+      --faint: #7f8c8d;
+      --line: #34495e;
+      --line-strong: #3d566e;
+      --note-bg: #1f2b36;
+      --note-ink: #b6c2cd;
+      --warn-bg: #4a3f1a;
+      --warn-ink: #ffd97a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #22303c;
+    --page: #1a252f;
+    --nav-active: #2c3e50;
+    --ink: #ecf0f1;
+    --ink-soft: #dfe6e9;
+    --muted: #95a5a6;
+    --faint: #7f8c8d;
+    --line: #34495e;
+    --line-strong: #3d566e;
+    --note-bg: #1f2b36;
+    --note-ink: #b6c2cd;
+    --warn-bg: #4a3f1a;
+    --warn-ink: #ffd97a;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+    --warn-bg: #fff3cd;
+    --warn-ink: #856404;
+  }
+
+  body {
+    margin: 0;
+    padding: 2rem 1.25rem 4rem;
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.doc { margin-bottom: 2.5rem; }
+  header.doc h1 { font-size: 1.55rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  header.doc p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+  h2.sec {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); margin: 3rem 0 .35rem; font-weight: 600;
+  }
+  h2.sec:first-of-type { margin-top: 2rem; }
+  .sec-lead { margin: 0 0 1rem; color: var(--muted); max-width: 68ch; font-size: .9rem; }
+
+  /* ---- app frame ---- */
+  .frame {
+    border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .frame-scroll { overflow-x: auto; }
+  .app { display: flex; flex-direction: column; min-width: 860px; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 1.5rem;
+    border-bottom: 1px solid var(--line); padding: 0 1rem; height: 44px;
+    background: var(--surface);
+  }
+  .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: .95rem; }
+  .brand-mark {
+    width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-size: .7rem;
+  }
+  .tabs { display: flex; gap: 1.25rem; font-size: .85rem; height: 100%; align-items: stretch; }
+  .tab {
+    display: flex; align-items: center; gap: .35rem; color: var(--muted);
+    border-bottom: 2px solid transparent; padding: 0 .1rem;
+  }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .host { margin-left: auto; font-size: .72rem; color: var(--muted); }
+  .host b { color: var(--ink); }
+
+  .body { display: flex; min-height: 340px; }
+
+  .side {
+    width: 172px; flex-shrink: 0; border-right: 1px solid var(--line);
+    background: var(--surface); padding: 0;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .55rem; padding: .62rem .75rem;
+    font-size: .82rem; color: var(--ink-soft); border-left: 3px solid transparent;
+  }
+  .nav-item .ico { width: 1rem; text-align: center; color: var(--muted); font-size: .8rem; }
+  .nav-item.on {
+    background: var(--nav-active); color: var(--accent);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  .nav-item.on .ico { color: var(--accent); }
+  .badge {
+    margin-left: auto; background: var(--accent); color: var(--accent-ink);
+    border-radius: 999px; font-size: .62rem; font-weight: 700;
+    min-width: 1.05rem; height: 1.05rem; display: grid; place-items: center; padding: 0 .3rem;
+  }
+
+  .content { flex: 1; padding: 1.1rem 1.35rem; min-width: 0; }
+  .lead { color: var(--muted); font-size: .84rem; margin: 0 0 1.1rem; max-width: 70ch; }
+
+  /* ---- form vocabulary ---- */
+  .field { margin-bottom: 1rem; }
+  .label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .3rem; }
+  .input {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: .42rem .55rem; font-size: .84rem;
+    background: var(--surface); color: var(--ink);
+  }
+  .input.ro { background: var(--page); color: var(--muted); }
+  .hint { font-size: .71rem; color: var(--muted); margin-top: .25rem; }
+  .row { display: flex; gap: .85rem; }
+  .row > * { flex: 1; min-width: 0; }
+
+  .seg { display: flex; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+  .seg span { padding: .34rem .85rem; font-size: .78rem; color: var(--ink-soft); }
+  .seg span.on { background: var(--accent); color: #fff; font-weight: 600; }
+
+  .toggle { width: 34px; height: 19px; border-radius: 999px; background: var(--faint); position: relative; flex-shrink: 0; }
+  .toggle.on { background: var(--accent); }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+  .toggle.on::after { left: auto; right: 2px; }
+  .toggle-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem; }
+  .toggle-row .t { font-size: .82rem; font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius);
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    padding: .36rem .8rem; font-size: .8rem; font-weight: 500;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem; margin-bottom: .8rem; }
+  .card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .1rem; }
+  .card-title { font-weight: 600; font-size: .87rem; }
+  .pill {
+    font-size: .64rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px;
+    background: var(--page); color: var(--muted); border: 1px solid var(--line);
+  }
+  .pill.live { background: #e8f6ec; color: #1e7e34; border-color: #c9e7d2; }
+  .pill.vlan { background: var(--nav-active); color: var(--accent-dark); border-color: #cfe6f7; }
+  @media (prefers-color-scheme: dark) {
+    .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+    .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+  }
+  :root[data-theme="dark"] .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+  :root[data-theme="dark"] .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+
+  .kv { display: flex; justify-content: space-between; font-size: .78rem; padding: .18rem 0; }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-variant-numeric: tabular-nums; }
+
+  /* Pending-changes tab: present only when something is pending, so it carries
+     the amber cue on its own rather than needing a count. */
+  .tab.pending { color: var(--warn-ink); }
+  .tab.pending.on { color: var(--warn-ink); border-bottom-color: var(--warn); font-weight: 600; }
+
+  .chg-group { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .7rem; }
+  .chg-head {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .55rem .85rem; border-bottom: 1px solid var(--line);
+  }
+  .chg-head .ico { font-size: .82rem; }
+  .chg-title { font-weight: 600; font-size: .84rem; }
+  .chg-count { font-size: .71rem; color: var(--muted); }
+  .chg-reset {
+    margin-left: auto; font-size: .74rem; color: var(--accent); font-weight: 500;
+  }
+  .chg-item {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .32rem .85rem; font-size: .79rem; color: var(--muted);
+  }
+  .chg-item:first-of-type { padding-top: .5rem; }
+  .chg-item:last-child { padding-bottom: .55rem; }
+  .chg-item .dot {
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+  }
+
+  .disclosure {
+    display: flex; align-items: center; gap: .45rem; padding: .5rem 0;
+    border-top: 1px solid var(--line); margin-top: .4rem;
+    font-size: .82rem; font-weight: 600; color: var(--ink-soft);
+  }
+  .disclosure .ico { color: var(--muted); font-size: .7rem; }
+  .disclosure-note { font-weight: 400; font-size: .71rem; color: var(--muted); margin-left: .1rem; }
+
+  .tabs-inline { display: flex; gap: .3rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  .tabs-inline span { padding: .4rem .75rem; font-size: .8rem; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs-inline span.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .note {
+    background: var(--note-bg); border-left: 3px solid var(--accent);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; color: var(--note-ink); margin: .9rem 0 0;
+  }
+  .note b { color: var(--ink); }
+  .note ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .note li { margin: .2rem 0; }
+
+  .warn {
+    background: var(--warn-bg); color: var(--warn-ink); border-left: 3px solid var(--warn);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; margin: .9rem 0 0;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8em;
+    background: var(--page); padding: .08em .35em; border-radius: 3px; border: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: dark) { code { background: #1a252f; } }
+  :root[data-theme="dark"] code { background: #1a252f; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="doc">
+  <h1>Network section — mockups</h1>
+  <p>A new top-level <b>Network</b> menu with five sidebar pages: Wireless, Guest, Radios, WAN and LAN.
+     Every page is intent-shaped — it asks what you want the network to do and works out the schema fields itself,
+     rather than presenting the document's own structure.
+     Palette, spacing and controls are taken from <code>src/app.css</code>, so these read as the real app.</p>
+</header>
+
+<!-- ========================= WIRELESS ========================= -->
+<h2 class="sec">1 — Network › Wireless</h2>
+<p class="sec-lead">The main Wi-Fi network. Edits <code>interfaces.lan.ssids.main</code> in router mode
+   (<code>interfaces.wan.ssids.main</code> in AP mode), so the page never asks which interface owns it.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab on">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item on"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Guest</div>
+        <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+        <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+      </div>
+      <div class="content">
+        <p class="lead">The Wi-Fi network your own devices join. Changes apply to every radio the device has.</p>
+
+        <div class="field">
+          <label class="label">Network name</label>
+          <input class="input" value="home-network" readonly>
+          <div class="hint">The name people see when choosing a network. 1 to 32 characters.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Password</label>
+          <input class="input" type="password" value="wifipass123" readonly>
+          <div class="hint">At least 8 characters. Shared with everyone who joins.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Security</label>
+          <div class="seg"><span class="on">Maximum</span><span>Compatibility</span></div>
+          <div class="hint">WPA3 only. The strongest option, but devices older than about 2019 cannot join.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle"></span><span class="t">Hide this network</span></div>
+          <div class="hint">The name is not broadcast. Devices must be told it exactly.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle"></span><span class="t">Isolate clients</span></div>
+          <div class="hint">Devices on this network cannot reach each other.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Bands</label>
+          <div class="row">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">2.4 GHz</span></div></div>
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">5 GHz</span></div></div>
+          </div>
+          <div class="hint">Read from the device. Turning one off leaves the radio running for other networks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> Every control writes a schema field, so this is a lens on the same document:
+  <ul>
+    <li>Network name → <code>ssids.main.ssid</code>, password → <code>ssids.main.template.key</code></li>
+    <li>Security → <code>template.security</code> (<code>maximum</code> / <code>compatibility</code>), with <code>template.mode: encrypted</code> fixed</li>
+    <li>Hide → <code>hidden-ssid</code>, Isolate → <code>isolate-clients</code>, Bands → <code>wifi-radios</code></li>
+  </ul>
+</div>
+
+<!-- ========================= GUEST ========================= -->
+<h2 class="sec">2 — Network › Guest</h2>
+<p class="sec-lead">Guest is a whole interface, not just an SSID: its own VLAN, its own subnet, and barred from the
+   networks upstream of it. The page presents that as one switch with consequences, rather than four separate objects.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab on">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item on"><span class="ico">👥</span> Guest</div>
+        <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+        <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+      </div>
+      <div class="content">
+        <p class="lead">A separate network for visitors. Guests reach the internet, and nothing else on your network.</p>
+
+        <div class="toggle-row" style="margin-bottom:1rem">
+          <span class="toggle on"></span><span class="t">Guest network</span>
+          <span class="pill vlan" style="margin-left:.4rem">VLAN 100</span>
+        </div>
+
+        <div class="field">
+          <label class="label">Network name</label>
+          <input class="input" value="home-guest" readonly>
+          <div class="hint">Shown separately from your own network.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Password</label>
+          <input class="input" type="password" value="guestpass123" readonly>
+          <div class="hint">Safe to share. Guests cannot reach your own devices.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Security</label>
+          <div class="seg"><span class="on">Maximum</span><span>Compatibility</span></div>
+          <div class="hint">WPA3 only. The strongest option, but devices older than about 2019 cannot join.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Guest addresses</label>
+          <input class="input ro" value="192.168.100.1/24" readonly>
+          <div class="hint">The router owns this subnet and answers DHCP on it. Access points bridge onto the same VLAN.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Overlap to resolve.</b> Guest is also a Wi-Fi network, so its SSID fields appear both here and on Wireless
+  if that page ever lists more than the main network. Two ways out, and this needs your call:
+  <b>(a)</b> Wireless owns the main network only and Guest owns its own — the split shown here; or
+  <b>(b)</b> Wireless lists every SSID and Guest holds only the switch, VLAN and subnet.
+</div>
+
+<!-- ========================= WAN ========================= -->
+<h2 class="sec">3 — Network › WAN</h2>
+<p class="sec-lead">The uplink. Mostly a question of how the address is obtained, so the page leads with that
+   and reveals the static fields only when they are needed.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab on">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Guest</div>
+        <div class="nav-item on"><span class="ico">🌐</span> WAN</div>
+        <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+      </div>
+      <div class="content">
+        <p class="lead">How this device reaches the internet.</p>
+
+        <div class="tabs-inline"><span class="on">IPv4</span><span>IPv6</span></div>
+
+        <div class="field">
+          <label class="label">Addressing</label>
+          <div class="seg"><span class="on">Automatic</span><span>Static</span><span>None</span></div>
+          <div class="hint">Automatic asks the upstream network for an address. Most connections use this.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Ports</label>
+          <input class="input ro" value="wan*" readonly>
+          <div class="hint">Every port the device labels as WAN.</div>
+        </div>
+
+        <div class="card" style="margin-top:1.2rem">
+          <div class="card-head">
+            <span class="card-title">Current lease</span>
+            <span class="pill live">Connected</span>
+          </div>
+          <div class="kv"><span class="k">Address</span><span class="v">192.168.8.149/24</span></div>
+          <div class="kv"><span class="k">Gateway</span><span class="v">192.168.8.1</span></div>
+          <div class="kv"><span class="k">DNS</span><span class="v">192.168.8.1</span></div>
+          <div class="kv"><span class="k">Uptime</span><span class="v">4d 6h 12m</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Live data, not config.</b> The lease card reads from <code>status</code>, which the Status pages already poll.
+  It is read-only and does not participate in change tracking. Selecting <b>Static</b> swaps the card for
+  address, gateway and DNS inputs writing <code>ipv4.subnet</code> and <code>ipv4.gateway</code>.
+</div>
+
+<!-- ========================= LAN ========================= -->
+<h2 class="sec">4 — Network › LAN</h2>
+<p class="sec-lead">The local network: its address range and the pool handed to devices. DHCP is expressed as a
+   usable range rather than the schema's first/count pair, which is the main piece of vocabulary translation here.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab on">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Guest</div>
+        <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+        <div class="nav-item on"><span class="ico">🖧</span> LAN</div>
+      </div>
+      <div class="content">
+        <p class="lead">Your own network: the addresses this device hands out to everything that joins.</p>
+
+        <div class="tabs-inline"><span class="on">IPv4</span><span>IPv6</span></div>
+
+        <div class="field">
+          <label class="label">Router address</label>
+          <input class="input" value="192.168.1.1/24" readonly>
+          <div class="hint">This device's own address, and the size of the network behind it.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">Hand out addresses (DHCP)</span></div>
+          <div class="hint">Devices that join are given an address automatically.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Address range</label>
+          <div class="row">
+            <div>
+              <input class="input" value="192.168.1.10" readonly>
+              <div class="hint">First</div>
+            </div>
+            <div>
+              <input class="input" value="192.168.1.109" readonly>
+              <div class="hint">Last</div>
+            </div>
+            <div>
+              <input class="input" value="6 hours" readonly>
+              <div class="hint">Lease time</div>
+            </div>
+          </div>
+          <div class="hint">100 addresses available.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle"></span><span class="t">Isolate hosts</span></div>
+          <div class="hint">Devices on this network cannot reach each other.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Vocabulary translation.</b> The schema stores <code>dhcp-pool.lease-first: 10</code> and
+  <code>lease-count: 100</code>. Showing <code>192.168.1.10</code> to <code>192.168.1.109</code> means the page
+  computes both ways against <code>ipv4.subnet</code>. That arithmetic is the whole point of an intent page: the
+  stored form is an offset and a count, and nobody thinks about their network that way.
+</div>
+
+<!-- ========================= RADIOS ========================= -->
+<h2 class="sec">5 — Network › Radios</h2>
+<p class="sec-lead">The hardware behind the networks. One tab per band the device reports, matching the tab pattern
+   used elsewhere in the app. Channel, width and power in plain language, with the specialised band settings behind
+   a disclosure so they stay reachable without crowding the page.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab on">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Guest</div>
+        <div class="nav-item on"><span class="ico">📡</span> Radios</div>
+        <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+        <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+      </div>
+      <div class="content">
+        <p class="lead">The radios your Wi-Fi networks run on. Both bands carry every network unless you change it under Wireless.</p>
+
+        <div class="tabs-inline"><span class="on">2.4 GHz</span><span>5 GHz</span></div>
+
+        <div class="field">
+          <label class="label">Channel</label>
+          <div class="seg"><span class="on">Automatic</span><span>Choose</span></div>
+          <div class="hint">The device picks the quietest channel when it starts. Currently on channel 6.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Channel width</label>
+          <div class="seg"><span>20 MHz</span><span class="on">40 MHz</span></div>
+          <div class="hint">Wider is faster but overlaps more with neighbouring networks. 40 MHz is unusual at 2.4 GHz.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Transmit power</label>
+          <div class="seg"><span class="on">Maximum</span><span>High</span><span>Medium</span><span>Low</span></div>
+          <div class="hint">Lower power shrinks the coverage area. Useful when several access points share a space.</div>
+        </div>
+
+        <div class="disclosure">
+          <span class="ico">▸</span> Advanced
+          <span class="disclosure-note">802.11 mode, DFS, legacy rates, client limit</span>
+        </div>
+
+        <div class="card" style="margin-top:1.2rem">
+          <div class="card-head">
+            <span class="card-title">Radio status</span>
+            <span class="pill live">Up</span>
+            <span class="pill">802.11ax</span>
+          </div>
+          <div class="kv"><span class="k">Channel in use</span><span class="v">6 (2437 MHz)</span></div>
+          <div class="kv"><span class="k">Width</span><span class="v">40 MHz</span></div>
+          <div class="kv"><span class="k">Connected clients</span><span class="v">9</span></div>
+          <div class="kv"><span class="k">Networks</span><span class="v">home-network, home-guest</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b>
+  <ul>
+    <li>Channel → <code>radios.2G.channel</code> (<code>auto</code> or a number), width → <code>channel-width</code></li>
+    <li>Transmit power → <code>tx-power</code> in dBm, presented as four named steps rather than a number.
+        <b>Maximum</b> writes 30, which is also the schema default, so choosing it clears the field.</li>
+    <li>Behind <b>Advanced</b>: <code>channel-mode</code>, <code>require-mode</code>, <code>he-multiple-bssid</code>,
+        <code>legacy-rates</code>, <code>allow-dfs</code>, <code>maximum-clients</code>, <code>rates</code>.
+        Present but collapsed, so the default view stays plain without putting anything out of reach.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <b>Advanced is the open question here.</b> The band-level fields above have no plain-language equivalent, so they
+  either sit behind a disclosure on this page or become unreachable. I have drawn the disclosure; the alternative is
+  a deliberate decision that this UI does not set them at all.
+</div>
+
+<!-- ========================= NAV ========================= -->
+<h2 class="sec">6 — Where the section sits</h2>
+<p class="sec-lead">Network follows the read-only views. Five pages, no groups — short enough that nothing needs
+   collapsing. Two open questions about its scope.</p>
+
+<div class="split">
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">uCoord</span>
+            <span class="tab on">Network</span>
+            <span class="tab">Configure</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:150px">
+          <div class="side" style="width:150px">
+            <div class="nav-item on"><span class="ico">📶</span> Wireless</div>
+            <div class="nav-item"><span class="ico">👥</span> Guest</div>
+            <div class="nav-item"><span class="ico">📡</span> Radios</div>
+            <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+            <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0">Five pages, no groups.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">uCoord</span>
+            <span class="tab on">Network</span>
+            <span class="tab">Configure</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:150px">
+          <div class="side" style="width:150px">
+            <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+            <div class="nav-item on"><span class="ico">👥</span> Guest</div>
+            <div class="nav-item"><span class="ico">📡</span> Radios</div>
+            <div class="nav-item"><span class="ico">🌐</span> WAN</div>
+            <div class="nav-item"><span class="ico">🖧</span> LAN</div>
+            <div class="nav-item"><span class="ico">⚠</span> Changes <span class="badge">2</span></div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0">With its own Changes entry and apply, scoped to the pages in this
+               section.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Two decisions before building.</b>
+  <ul>
+    <li><b>Changes and Apply.</b> These pages edit one document, so a single pending set and one apply is the
+        honest model. A Changes entry inside Network is fine; two independent apply buttons over the same
+        document would not be.</li>
+    <li><b>AP mode.</b> In AP mode there is no LAN interface and WAN carries every port, so LAN and much of WAN
+        do not apply. Either hide the pages, or show them explaining that the upstream router owns those settings.</li>
+  </ul>
+</div>
+
+<!-- ========================= CHANGES ========================= -->
+<h2 class="sec">7 — Changes as a top-level menu</h2>
+<p class="sec-lead">Edits now come from several sections, so a pending-changes item buried in one sidebar no longer
+   works. <b>Changes</b> becomes a top-level menu entry that is rendered only when something is pending, and is absent
+   the rest of the time. No badge: the presence of the item is the signal.</p>
+
+<div class="split" style="margin-bottom:1.25rem">
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">uCoord</span>
+            <span class="tab on">Network</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:120px">
+          <div class="side" style="width:150px">
+            <div class="nav-item on"><span class="ico">📶</span> Wireless</div>
+            <div class="nav-item"><span class="ico">👥</span> Guest</div>
+            <div class="nav-item"><span class="ico">📡</span> Radios</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Nothing pending.</b> No Changes entry anywhere.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">uCoord</span>
+            <span class="tab on">Network</span>
+            <span class="tab">System</span>
+            <span class="tab pending">⚠ Changes</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:120px">
+          <div class="side" style="width:150px">
+            <div class="nav-item on"><span class="ico">📶</span> Wireless</div>
+            <div class="nav-item"><span class="ico">👥</span> Guest</div>
+            <div class="nav-item"><span class="ico">📡</span> Radios</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Edits pending.</b> The entry appears last in the bar, and the
+               sidebars carry nothing extra.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="sec-lead">The page itself groups by where each edit was made, so a list spanning several sections stays
+   readable. Each group resets on its own; one Apply commits the document.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Network</span>
+        <span class="tab">System</span>
+        <span class="tab on pending">⚠ Changes</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="content" style="padding:1.1rem 1.35rem">
+        <p class="lead">Everything edited since this configuration was loaded, grouped by where you changed it.</p>
+
+        <div class="chg-group">
+          <div class="chg-head">
+            <span class="ico">📶</span>
+            <span class="chg-title">Network › Wireless</span>
+            <span class="chg-count">2 changes</span>
+            <span class="chg-reset">Reset</span>
+          </div>
+          <div class="chg-item"><span class="dot"></span> Changed SSID on include ‘wifi-home’</div>
+          <div class="chg-item"><span class="dot"></span> Changed security on include ‘wifi-home’</div>
+        </div>
+
+        <div class="chg-group">
+          <div class="chg-head">
+            <span class="ico">👥</span>
+            <span class="chg-title">Network › Guest</span>
+            <span class="chg-count">1 change</span>
+            <span class="chg-reset">Reset</span>
+          </div>
+          <div class="chg-item"><span class="dot"></span> Interface guest added</div>
+        </div>
+
+        <div class="chg-group">
+          <div class="chg-head">
+            <span class="ico">🖧</span>
+            <span class="chg-title">Network › LAN</span>
+            <span class="chg-count">1 change</span>
+            <span class="chg-reset">Reset</span>
+          </div>
+          <div class="chg-item"><span class="dot"></span> Changed IPv4 on interface ‘lan’</div>
+        </div>
+
+        <div class="chg-group">
+          <div class="chg-head">
+            <span class="ico">🔧</span>
+            <span class="chg-title">System › Device</span>
+            <span class="chg-count">1 change</span>
+            <span class="chg-reset">Reset</span>
+          </div>
+          <div class="chg-item"><span class="dot"></span> Changed hostname</div>
+        </div>
+
+        <div style="display:flex;gap:.5rem;margin-top:1.1rem">
+          <span class="btn primary">⬆ Apply to device</span>
+          <span class="btn">↺ Reset all</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>What this needs.</b> The entries already carry everything required — <code>ChangeEntry</code> has a
+  <code>scope</code> (the page that owns it) and a <code>doc</code> (main config or a named include), so grouping by
+  origin is a regrouping of data that exists, not new tracking.
+  <ul>
+    <li><code>SECTIONS</code> gains a <code>changes</code> entry with no sidebar items, filtered out by
+        <code>sections_for()</code> when the count is zero — the same <code>whenChanges</code> rule that governs the
+        current sidebar item, lifted to the top level.</li>
+    <li>Grouping moves from <code>ChangeEntry.section</code> (‘Unit’, ‘Radios’, …) to the owning page, so the labels
+        match the menu the user actually clicked.</li>
+    <li>Per-group Reset reuses <code>scope_reset(scope)</code> unchanged.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <b>One thing to decide.</b> The section disappears the moment the last change is reset or applied — so the page
+  you are looking at vanishes under you. Either fall back to the previous section on the transition, or keep the
+  entry visible while it is the active section and drop it on the next navigation.
+</div>
+
+<h2 class="sec">8 — Still to place</h2>
+<p class="sec-lead">Fields with no plain-language equivalent yet, and no page of their own in this set. Each either
+   earns intent phrasing, sits behind a per-page <b>Advanced</b> disclosure as drawn on Radios, or is a deliberate
+   decision that this UI does not set it.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">Per network (SSID)</span></div>
+    <div class="kv"><span class="k">multi-psk</span><span class="v">a password per device</span></div>
+    <div class="kv"><span class="k">access-control-list</span><span class="v">allow/deny by MAC</span></div>
+    <div class="kv"><span class="k">rate-limit</span><span class="v">cap per client</span></div>
+    <div class="kv"><span class="k">roaming</span><span class="v">802.11r fast transition</span></div>
+    <div class="kv"><span class="k">bss-mode, bssid</span><span class="v">AP / mesh, fixed BSSID</span></div>
+    <div class="kv"><span class="k">vendor-elements</span><span class="v">raw beacon data</span></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Per interface</span></div>
+    <div class="kv"><span class="k">ports</span><span class="v">which sockets belong here</span></div>
+    <div class="kv"><span class="k">vlan / vlan-trunks</span><span class="v">tagging</span></div>
+    <div class="kv"><span class="k">ieee8021x-ports</span><span class="v">port authentication</span></div>
+    <div class="kv"><span class="k">quality-of-service</span><span class="v">traffic priority</span></div>
+    <div class="kv"><span class="k">broad-band</span><span class="v">upstream link type</span></div>
+    <div class="kv"><span class="k">dhcp-leases</span><span class="v">fixed address per device</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Two of these look like intent pages in their own right.</b> <code>dhcp-leases</code> is really "always give this
+  device the same address", which belongs beside the client list rather than in a form. <code>access-control-list</code>
+  and <code>multi-psk</code> are both per-device Wi-Fi policy and might share one page. The rest read as Advanced.
+</div>
+
+</div>
+
+</body>
+</html>
