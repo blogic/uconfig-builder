@@ -169,6 +169,11 @@ body {
   .section-header.is-closed::before {
     transform: rotate(-90deg);
   }
+  /* The same title and rule without the marker or the pointer affordance, for a
+     section that is always open. */
+  .section-header-static {
+    @apply flex items-center border-b-2 border-accent pb-2.5;
+  }
   .section-title {
     @apply m-0 flex-1 text-lg font-semibold text-zinc-900;
   }

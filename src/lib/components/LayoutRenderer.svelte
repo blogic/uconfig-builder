@@ -16,6 +16,7 @@
   import DhcpRangeSection from './DhcpRangeSection.svelte'
   import MapEditor from './MapEditor.svelte'
   import CollapsibleSection from './CollapsibleSection.svelte'
+  import PlainSection from './PlainSection.svelte'
   import ToggleSection from './ToggleSection.svelte'
   import NameAddForm from './NameAddForm.svelte'
   import BandsField from './BandsField.svelte'
@@ -185,15 +186,17 @@
           {/if}
         {/if}
       {:else if node.section}
-        <CollapsibleSection title={node.section}>
+        {@const Section = node.plain ? PlainSection : CollapsibleSection}
+        <Section title={node.section}>
           {#snippet children()}
             <Self {data} {schema} layout={node.children ?? []} {context} />
           {/snippet}
-        </CollapsibleSection>
+        </Section>
       {:else if node.objectSection}
         {@const target = walk(data_obj, node.objectSection)}
         {@const ts = schema_at(schema, node.objectSection)}
-        <CollapsibleSection title={node.title ?? title_for(node.objectSection)}>
+        {@const Section = node.plain ? PlainSection : CollapsibleSection}
+        <Section title={node.title ?? title_for(node.objectSection)}>
           {#snippet children()}
             {#if target}
               {#if node.children}
@@ -203,7 +206,7 @@
               {/if}
             {/if}
           {/snippet}
-        </CollapsibleSection>
+        </Section>
       {:else if node.toggleSection}
         {@const parent = parent_of(node.toggleSection)}
         {@const tkey = leaf_of(node.toggleSection)}

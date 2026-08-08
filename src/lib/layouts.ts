@@ -29,6 +29,9 @@ export interface LayoutNode {
   children?: LayoutNode[]
   objectSection?: string
   title?: string
+  // Renders the section header without the collapse marker. A page whose every
+  // section is worth reading has nothing to disclose.
+  plain?: boolean
   toggleSection?: string
   mapSection?: string
   keyLabel?: string
@@ -240,6 +243,7 @@ export const wanLayout: LayoutNode[] = [
   {
     objectSection: 'ipv4',
     title: 'IPv4',
+    plain: true,
     children: [
       { field: 'addressing', widget: 'addressing', describe: 'How the IPv4 address is assigned.' },
       { field: 'subnet', required: true, when: isStatic, describe: 'Static IPv4 (CIDR).' },
@@ -250,6 +254,7 @@ export const wanLayout: LayoutNode[] = [
   {
     objectSection: 'ipv6',
     title: 'IPv6',
+    plain: true,
     children: [{ field: 'addressing', widget: 'addressing-ro' }]
   }
 ]
@@ -259,7 +264,8 @@ export const wanLayout: LayoutNode[] = [
 export const lanLayout: LayoutNode[] = [
   {
     objectSection: 'ipv4',
-    title: 'Addresses',
+    title: 'IPv4',
+    plain: true,
     children: [
       { field: 'subnet', required: true, label: 'Router address', describe: 'Static IPv4 (CIDR).' },
       { dhcpRange: true }
@@ -268,6 +274,7 @@ export const lanLayout: LayoutNode[] = [
   {
     objectSection: 'ipv6',
     title: 'IPv6',
+    plain: true,
     children: [{ field: 'dhcpv6.mode', label: 'DHCPv6 Mode', describe: 'DHCPv6 server mode.' }]
   },
   { field: 'isolate-hosts', describe: 'Isolate clients from each other.' }
