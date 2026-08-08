@@ -1,5 +1,6 @@
 <script lang="ts">
   import { title_for } from '../schema.js'
+  import { is_secret_key } from '../secrets.js'
   import { t } from '../i18n.svelte.js'
   import type { JsonSchemaNode } from '../schema'
 
@@ -28,7 +29,7 @@
   const fid = $props.id()
   const value = $derived(obj[key] as FieldValue)
   const missing = $derived(required && (value === undefined || value === null || value === ''))
-  const isSecret = $derived(/password|passphrase|psk|secret/i.test(key) || key === 'key')
+  const isSecret = $derived(is_secret_key(key))
   let show = $state(false)
   const lbl = $derived(t(label ?? title_for(key)))
   const desc = $derived(t(clean(describe), { value: value as string | number | boolean }))

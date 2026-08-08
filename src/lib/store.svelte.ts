@@ -2,6 +2,7 @@ import type { UconfigDocument } from './types/uconfig'
 import examplesJson from './data/examples.json'
 import timezones from './data/timezones.json'
 import { def_get, schema_at, ref_resolve } from './schema.ts'
+import { is_secret_key } from './secrets.ts'
 import { SERVICE_CONFIG_KEYS } from './services.ts'
 import { settings } from './settings.svelte.ts'
 
@@ -127,13 +128,27 @@ export function baseline_reset() {
 // document untouched. Scopes match `changes_list`'s `scope` field.
 export function scope_reset(scope: string) {
   if (!store.baseline) return
-  // Absent in the baseline means the fragment did not exist there, so resetting
-  // removes it rather than restoring an empty one.
+  // Absent in the baseline means it did not exist there, so resetting removes it
+  // rather than restoring an empty one. `include:<name>/<key>` addresses one
+  // overlay, so resetting a shared setting leaves the venue's others alone.
   if (scope.startsWith('include:')) {
-    const name = scope.slice(8)
+    const rest = scope.slice(8)
+    const cut = rest.indexOf('/')
+    const name = cut === -1 ? rest : rest.slice(0, cut)
+    const key = cut === -1 ? null : rest.slice(cut + 1)
     const base = store.includeBaselines?.[name]
-    if (base === undefined) delete store.includes[name]
-    else store.includes[name] = structuredClone($state.snapshot(base)) as IncludeFragment
+    if (key == null) {
+      if (base === undefined) delete store.includes[name]
+      else store.includes[name] = structuredClone($state.snapshot(base)) as IncludeFragment
+      return
+    }
+    const baseValue = base?.[key]
+    if (baseValue === undefined) {
+      if (store.includes[name]) delete store.includes[name][key]
+      return
+    }
+    if (!store.includes[name]) store.includes[name] = {} as IncludeFragment
+    store.includes[name][key] = structuredClone($state.snapshot(baseValue))
     return
   }
   const base = structuredClone($state.snapshot(store.baseline)) as UconfigDocument
@@ -342,7 +357,35 @@ export function payload_export(): ConfigPayload {
     const pruned = prune(fragment)
     includes[name] = (pruned && typeof pruned === 'object' ? pruned : {}) as IncludeFragment
   }
-  return { config: prune(store.doc) as UconfigDocument, includes }
+  const config = prune(store.doc) as UconfigDocument
+  secrets_hold_back(config)
+  return { config, includes }
+}
+
+// The device deletes a disabled interface before it renders anything, so the
+// keys of a switched-off network reach it only to sit there. The document keeps
+// them, so turning the network back on restores what it was; the copy that goes
+// over the wire does not carry its PSKs.
+//
+// `prune` has already copied the document, so this rewrites its own object.
+function secrets_hold_back(config: UconfigDocument) {
+  const ifaces = config.interfaces as Record<string, Record<string, unknown>> | undefined
+  for (const [name, iface] of Object.entries(ifaces ?? {})) {
+    if (iface?.disable === true) ifaces![name] = secrets_strip(iface) as Record<string, unknown>
+  }
+}
+
+function secrets_strip(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(secrets_strip)
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(value)) {
+      if (is_secret_key(k)) continue
+      out[k] = secrets_strip(v)
+    }
+    return out
+  }
+  return value
 }
 
 function prune(value: unknown): unknown {
