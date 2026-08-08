@@ -241,7 +241,7 @@
   "half": "half",
   "hardware": "hardware",
   "HE": "Wi-Fi 6 (802.11ax)",
-  "He Multiple Bssid": "He Multiple Bssid",
+  "HE Multiple BSSID": "HE Multiple BSSID",
   "Hidden SSID": "Hidden SSID",
   "Hide the network.": "Disable beacon-frame broadcasting and, in doing so, hide the SSID.",
   "Host": "Host",

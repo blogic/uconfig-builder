@@ -19,6 +19,7 @@ const LABEL_OVERRIDES: Record<string, string> = {
   bssid: 'BSSID',
   'bss-mode': 'BSS Mode',
   'hidden-ssid': 'Hidden SSID',
+  'he-multiple-bssid': 'HE Multiple BSSID',
   'wifi-radios': 'WiFi Radios',
   'multi-psk': 'Multi-PSK',
   ssh: 'SSH',
