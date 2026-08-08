@@ -97,15 +97,7 @@
       context={{ radios: store.doc.radios }}
     />
 
-    {#if isRouter}
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium text-zinc-700">{t('Guest addresses')}</span>
-        <input class="input bg-zinc-50 text-zinc-500" value={GUEST_SUBNET} readonly />
-        <p class="text-[11px] leading-snug text-zinc-500">
-          {t('This device owns the guest subnet and answers DHCP on it. Access points bridge onto the same VLAN.')}
-        </p>
-      </div>
-    {:else}
+    {#if !isRouter}
       <p class="text-[11px] leading-snug text-zinc-500">
         {t('Guest traffic is bridged onto VLAN {id}. The router that owns the subnet answers DHCP for it.', {
           id: GUEST_VLAN
