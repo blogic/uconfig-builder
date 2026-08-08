@@ -33,11 +33,21 @@
     lan: { label: 'Network › LAN', icon: 'bi-ethernet' }
   }
 
+  // Overlays in the shared include belong to whichever page sets them, not to
+  // the file they happen to travel in.
+  const OVERLAY_GROUPS: Record<string, { label: string; icon: string }> = {
+    'guest-vlan': { label: 'Network › Guest', icon: 'bi-people' }
+  }
+
   // Prefixed scopes carry a name after the colon, so they group by what they own.
   function group_for(c: ChangeEntry): { label: string; icon: string } {
     if (SCOPE_GROUPS[c.scope]) return SCOPE_GROUPS[c.scope]
     if (c.scope.startsWith('service:')) return { label: 'System › Services', icon: 'bi-hdd-network' }
-    if (c.scope.startsWith('include:')) return { label: 'Wireless › Main', icon: 'bi-wifi' }
+    if (c.scope.startsWith('include:')) {
+      const cut = c.scope.indexOf('/')
+      const overlay = cut === -1 ? '' : c.scope.slice(cut + 1)
+      return OVERLAY_GROUPS[overlay] ?? { label: c.section, icon: 'bi-share' }
+    }
     if (c.scope.startsWith('interface:')) {
       const name = c.scope.slice(10)
       return IFACE_GROUPS[name] ?? { label: `Network › ${name}`, icon: 'bi-ethernet' }

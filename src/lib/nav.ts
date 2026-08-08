@@ -1,9 +1,11 @@
 // Nav entries shared by the desktop sidebar and the mobile bottom bar.
 // Bootstrap Icons match the ones the previous builder used per entry.
 
+import { iface_enabled } from './interfaces.ts'
 import { SERVICES, available_services } from './services.ts'
 import type { ServiceEntry } from './services.ts'
 import { title_for } from './labels.ts'
+import type { UconfigDocument } from './types/uconfig'
 
 export interface NavItem {
   key: string
@@ -13,6 +15,9 @@ export interface NavItem {
   // own, and Changes only appears once there is something to show.
   group?: boolean
   whenChanges?: boolean
+  // A page that only some documents have anything to say on. Shaped after
+  // LayoutNode.when, which does the same job for a field.
+  when?: (doc: UconfigDocument) => boolean
 }
 
 export interface NavSection {
@@ -94,13 +99,22 @@ export const WIRELESS_ITEMS: NavItem[] = [
   { key: 'net-radios', label: 'Radios', icon: 'bi-broadcast' }
 ]
 
+// A guest network this device has settings for: switched on, and routed rather
+// than bridged. An access point carries guest traffic but owns none of it, and
+// a network that is off has nothing to address, so the page is absent in both
+// cases rather than explaining itself.
+function guest_routed(doc: UconfigDocument): boolean {
+  const guest = (doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.guest
+  return iface_enabled(guest as { disable?: boolean } | undefined) && guest?.role === 'downstream'
+}
+
 // Pages of the Network section: the wired side, uplink and addressing.
 // `net-guest` rather than `guest` because page keys share one flat namespace and
 // `guest` already names the Wireless page that owns the guest SSID.
 export const NETWORK_ITEMS: NavItem[] = [
   { key: 'wan', label: 'WAN', icon: 'bi-globe' },
   { key: 'lan', label: 'LAN', icon: 'bi-ethernet' },
-  { key: 'net-guest', label: 'Guest', icon: 'bi-people' }
+  { key: 'net-guest', label: 'Guest', icon: 'bi-people', when: guest_routed }
 ]
 
 // Edits arrive from several sections, so the pending list is a section of its
@@ -140,6 +154,17 @@ export const SECTIONS: NavSection[] = [
     whenChanges: true
   }
 ]
+
+// The pages of a section that apply right now. One place, because the sidebar
+// and the effect that keeps the open page valid have to agree: a page the
+// sidebar hides but the effect still counts is one the user cannot leave.
+export function items_for(items: NavItem[], hasChanges: boolean, doc: UconfigDocument): NavItem[] {
+  return items.filter((i) => {
+    if (i.whenChanges && !hasChanges) return false
+    if (i.when && !i.when(doc)) return false
+    return true
+  })
+}
 
 // Sections available for this build and breakpoint.
 export function sections_for(

@@ -3,6 +3,8 @@
   import type { NavItem } from '../nav.js'
 
   interface Props {
+    // Already filtered by the caller, which owns the document the predicates
+    // read; filtering again here would be a second rule to keep in step.
     items?: NavItem[]
     // Passed in rather than imported: a connected device narrows the list to
     // the packages it actually has installed.
@@ -23,11 +25,10 @@
   $effect(() => {
     if (inServices) servicesOpen = true
   })
-  const visible = $derived(items.filter((i) => !i.whenChanges || changes > 0))
 </script>
 
 <nav class="flex h-full w-[172px] flex-shrink-0 flex-col overflow-y-auto border-r border-zinc-200 bg-surface">
-  {#each visible as i (i.key)}
+  {#each items as i (i.key)}
     {#if i.group}
       <button
         type="button"
