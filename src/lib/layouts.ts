@@ -244,8 +244,7 @@ export const wanLayout: LayoutNode[] = [
       { field: 'addressing', widget: 'addressing', describe: 'How the IPv4 address is assigned.' },
       { field: 'subnet', required: true, when: isStatic, describe: 'Static IPv4 (CIDR).' },
       { field: 'gateway', required: true, when: isStatic, describe: 'Static IPv4 gateway.' },
-      { field: 'use-dns', widget: 'list', describe: 'DNS servers to use.' },
-      { field: 'send-hostname', when: isDynamic, describe: 'Send hostname in DHCP requests.' }
+      { field: 'use-dns', widget: 'list', describe: 'DNS servers to use.' }
     ]
   },
   {
