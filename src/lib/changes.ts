@@ -396,7 +396,8 @@ function canon_at(value: unknown, mount: IncludeMount): JsonObject | undefined {
   return s && typeof s === 'object' && !Array.isArray(s) ? s : undefined
 }
 
-function at_path(fragment: IncludeFragment | undefined, path: string | null): unknown {
+// Exported so the include resolver reads a reference exactly as the diff does.
+export function at_path(fragment: IncludeFragment | undefined, path: string | null): unknown {
   if (!fragment) return undefined
   if (!path) return fragment
   let node: unknown = fragment
@@ -418,21 +419,30 @@ function mounted_keys(mounts: IncludeMount[]): Set<string> {
   return keys
 }
 
+// One fragment carries every overlay the venue shares, so a top-level key of it
+// is the unit a page owns and can reset. Scoping to the fragment instead would
+// make resetting a guest VLAN take the rest of the venue's settings with it.
+function overlay_meta(name: string, key: string | null): DiffMeta {
+  return {
+    doc: `include:${name}`,
+    section: 'Includes',
+    scope: key ? `include:${name}/${key}` : `include:${name}`,
+    // Named as it is referenced, so the entry reads as the thing the user set
+    // rather than as the file it happens to travel in.
+    container: { noun: t('include'), key: key ? `${name}.${key}` : name }
+  }
+}
+
 function fragment_diff(
   cur: IncludeFragment | undefined,
   base: IncludeFragment | undefined,
   name: string,
   mounts: IncludeMount[]
 ): ChangeEntry[] {
-  const meta: DiffMeta = {
-    doc: `include:${name}`,
-    section: 'Includes',
-    scope: `include:${name}`,
-    container: { noun: t('include'), key: name }
-  }
   const out: ChangeEntry[] = []
 
   for (const mount of mounts) {
+    const meta = overlay_meta(name, mount.path ? mount.path.split('.')[0] : null)
     out.push(...diff_fields(canon_at(at_path(cur, mount.path), mount), canon_at(at_path(base, mount.path), mount), meta))
   }
 
@@ -442,20 +452,20 @@ function fragment_diff(
   // report every fragment as changed every time.
   const covered = mounted_keys(mounts)
   if (!mounts.length || covered.size) {
-    const rest = (o: IncludeFragment | undefined): JsonObject => {
-      const acc: JsonObject = {}
-      for (const [k, v] of Object.entries(o ?? {})) {
-        if (k === 'uuid' || covered.has(k)) continue
-        acc[k] = v as JsonValue
-      }
-      return acc
+    const at = (o: IncludeFragment | undefined, k: string): JsonObject => ({ [k]: (o ?? {})[k] as JsonValue })
+    for (const key of keys_union(cur, base)) {
+      if (key === 'uuid' || covered.has(key)) continue
+      out.push(...diff_fields(at(cur, key), at(base, key), overlay_meta(name, key)))
     }
-    out.push(...diff_fields(rest(cur), rest(base), meta))
   }
 
-  // One fragment referenced twice is still one edit.
+  // One overlay referenced twice is still one edit. Keyed by scope as well as
+  // field, so two overlays that happen to share a field name both survive.
   const seen = new Set<string>()
-  return out.filter((c) => !seen.has(c.key) && seen.add(c.key))
+  return out.filter((c) => {
+    const id = `${c.scope} ${c.key}`
+    return !seen.has(id) && seen.add(id)
+  })
 }
 
 export function include_changes(
