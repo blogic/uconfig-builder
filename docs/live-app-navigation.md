@@ -28,6 +28,11 @@ A top-level **Network** section with five sidebar pages.
 | WAN | the uplink | `interfaces.wan` |
 | LAN | the local network and its DHCP pool | `interfaces.lan` |
 
+Since split into two sections: Wireless holds Main, Guest and Radios; Network
+holds WAN, LAN and a second Guest page for the guest network's addresses and
+its VLAN. The wireless side of a guest network and the wired side of it turned
+out to be different questions asked by different people.
+
 Each page asks what the user wants and derives the schema fields itself. Two
 examples of what that means in practice, both from the mockups:
 
@@ -43,6 +48,34 @@ examples of what that means in practice, both from the mockups:
 subnet, and `disallow-upstream-subnet`. Presenting it as one switch with
 consequences is the clearest case of the vocabulary shift: the user decides
 "visitors get their own network", and the page writes four objects.
+
+### A page that is absent rather than apologetic
+
+Network › Guest applies only to a router with the guest network switched on: an
+access point carries guest traffic but owns none of its settings, and a network
+that is off has nothing to address. Both cases used to render a paragraph
+explaining why the page was empty. The page and its sidebar entry are now
+absent instead — a menu entry that leads to an excuse is worse than no entry.
+
+`NavItem.when` carries the predicate, shaped after `LayoutNode.when`.
+`items_for()` in `src/lib/nav.ts` is the single place it is evaluated, because
+the sidebar and the effect that keeps the open page valid must agree: a page
+the sidebar hides but the effect still counts is one the user cannot leave.
+
+### Switched off, not deleted
+
+Turning the guest network off sets `interfaces.guest.disable` rather than
+removing the interface. uconfig deletes a disabled interface whole before it
+renders anything, so nothing reaches the wire; keeping the object means the
+SSID, key and subnet are still there when the network comes back.
+
+Two consequences. Anything derived from the document has to skip a disabled
+interface, or a switched-off network goes on blocking the ports and VLAN ids it
+no longer uses (`iface_enabled()` in `src/lib/interfaces.ts`). And the PSK of a
+disabled network is stripped on the way to the device: it would sit in the
+config doing nothing but waiting to leak. The document keeps it, so re-enabling
+before an apply loses nothing; applying while disabled means it has to be
+typed again.
 
 ### No live status readouts
 

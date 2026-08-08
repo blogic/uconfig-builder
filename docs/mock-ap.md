@@ -42,6 +42,15 @@ The configuration is live. `config-apply` writes `state/config.json` and
 reload. `state/` is gitignored; `factory-reset` deletes it and the next
 `config-get` serves `factory.json` again.
 
+Include fragments travel with it. `npm run mock` passes `--includes`, which
+wraps the reply as `{config, includes}` and stores one file per fragment under
+`state/includes/`, named after its key. Dropping the flag serves the bare
+document instead, which is what a client predating the envelope sees. The
+fragment set is authoritative on apply: a name the client omits is deleted, so
+a client that does not model includes must leave the field out altogether
+rather than send `{}`. See [includes.md](includes.md) for what the app puts
+there.
+
 `factory.json` is deliberately minimal: `wan` upstream on `wan*`, `lan`
 downstream on `lan*` offering ssh and webui, and an `ssh` service block. There
 is **no top-level `webui` key**: its absence is the signal that the device has
