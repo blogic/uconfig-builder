@@ -84,13 +84,18 @@ export const CONFIG_ITEMS: NavItem[] = [
   { key: 'json', label: 'JSON', icon: 'bi-code-square' }
 ]
 
-// Pages of the Network section: what the network does, rather than how the
-// document is shaped. `net-radios` rather than `radios` because page keys share
-// one flat namespace and `radios` already names the Configure page.
-export const NETWORK_ITEMS: NavItem[] = [
-  { key: 'wireless', label: 'Wireless', icon: 'bi-wifi' },
+// Pages of the Wireless section: the Wi-Fi networks and the radios they run
+// on. `net-radios` rather than `radios` because page keys share one flat
+// namespace and `radios` already names the Configure page; `wireless` predates
+// the Main label the entry now carries.
+export const WIRELESS_ITEMS: NavItem[] = [
+  { key: 'wireless', label: 'Main', icon: 'bi-wifi' },
   { key: 'guest', label: 'Guest', icon: 'bi-people' },
-  { key: 'net-radios', label: 'Radios', icon: 'bi-broadcast' },
+  { key: 'net-radios', label: 'Radios', icon: 'bi-broadcast' }
+]
+
+// Pages of the Network section: the wired side, uplink and addressing.
+export const NETWORK_ITEMS: NavItem[] = [
   { key: 'wan', label: 'WAN', icon: 'bi-globe' },
   { key: 'lan', label: 'LAN', icon: 'bi-ethernet' }
 ]
@@ -117,6 +122,7 @@ export const SECTIONS: NavSection[] = [
   // Reachable on mobile: it is a read-only view of the venue, not a config
   // errand, and the bottom bar carries it beside the Status pages.
   { key: 'ucoord', label: 'uCoord', icon: 'bi-diagram-3', device: true, items: UCOORD_ITEMS },
+  { key: 'wifi', label: 'Wireless', icon: 'bi-wifi', device: true, items: WIRELESS_ITEMS, desktopOnly: true },
   { key: 'network', label: 'Network', icon: 'bi-diagram-2', device: true, items: NETWORK_ITEMS, desktopOnly: true },
   { key: 'config', label: 'Configure', icon: 'bi-sliders', items: CONFIG_ITEMS, desktopOnly: true },
   { key: 'system', label: 'System', icon: 'bi-wrench', device: true, items: SYSTEM_ITEMS, desktopOnly: true },

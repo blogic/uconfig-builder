@@ -483,7 +483,7 @@
       <p class="text-sm text-zinc-500">{t('This device has no Wi-Fi network configured yet.')}</p>
     {/if}
   {/snippet}
-  {@render networkPage(t('Wireless'), PAGE_DESCRIPTIONS.wireless, `ssid:${primary?.[0] ?? 'lan'}/main`, inner)}
+  {@render networkPage(t('Main'), PAGE_DESCRIPTIONS.wireless, `ssid:${primary?.[0] ?? 'lan'}/main`, inner)}
 {/snippet}
 
 {#snippet netRadiosBody()}

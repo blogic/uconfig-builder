@@ -46,8 +46,8 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   changes: 'Everything edited since this configuration was loaded, grouped by where you changed it.',
   json: 'The resulting uConfig document. Download it, save it locally, or apply it to a connected device.',
 
-  // Network section: what the network does, rather than how the document is
-  // shaped. Deliberately shorter than the Configure pages above.
+  // Wireless and Network sections: what the network does, rather than how the
+  // document is shaped. Deliberately shorter than the Configure pages above.
   wireless: 'The Wi-Fi network your own devices join. Changes apply to every radio the device has.',
   guest: 'A separate network for visitors. Guests reach the internet, and nothing else on your network.',
   'net-radios': 'The radios your Wi-Fi networks run on. Channel and power settings per band.',
