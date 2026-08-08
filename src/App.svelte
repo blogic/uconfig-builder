@@ -30,6 +30,7 @@
     radioIntentLayout,
     wanLayout,
     lanLayout,
+    guestLayout,
     primary_iface
   } from './lib/layouts.js'
   import { view } from './lib/view.svelte.js'
@@ -547,6 +548,26 @@
   {@render networkPage(t('LAN'), PAGE_DESCRIPTIONS.lan, `interface:${primary?.[0] ?? 'lan'}`, inner)}
 {/snippet}
 
+{#snippet netGuestBody()}
+  {@const guest = (store.doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.guest}
+  {#snippet inner()}
+    {#if !guest}
+      <p class="text-sm text-zinc-500">
+        {t('The guest network is off. Turn it on under Wireless to give it addresses of its own.')}
+      </p>
+    {:else if guest.role !== 'downstream'}
+      <!-- An access point bridges guest traffic onto the VLAN rather than
+           routing it, so the router that owns the subnet sets these. -->
+      <p class="text-sm text-zinc-500">
+        {t('This device bridges its guest network, so the router upstream of it owns these settings.')}
+      </p>
+    {:else}
+      <LayoutRenderer data={guest} schema={interfaceDef ?? {}} layout={guestLayout} context={{ role: 'downstream' }} />
+    {/if}
+  {/snippet}
+  {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS['net-guest'], 'interface:guest', inner)}
+{/snippet}
+
 {#snippet changesBody()}
   <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
   <ConfigurationPanel {changes} />
@@ -561,6 +582,7 @@
   {:else if key === 'net-radios'}{@render netRadiosBody()}
   {:else if key === 'wan'}{@render wanBody()}
   {:else if key === 'lan'}{@render lanBody()}
+  {:else if key === 'net-guest'}{@render netGuestBody()}
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />

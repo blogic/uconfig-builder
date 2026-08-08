@@ -280,6 +280,25 @@ export const lanLayout: LayoutNode[] = [
   { field: 'isolate-hosts', describe: 'Isolate clients from each other.' }
 ]
 
+// Guest addressing, which only a router has: an access point bridges guest
+// traffic onto the VLAN and the router upstream of it owns the subnet. No pool
+// here, unlike LAN; the range the guest network hands out is not a decision
+// this page asks about.
+export const guestLayout: LayoutNode[] = [
+  {
+    objectSection: 'ipv4',
+    title: 'IPv4',
+    plain: true,
+    children: [{ field: 'subnet', required: true, label: 'Router address', describe: 'Static IPv4 (CIDR).' }]
+  },
+  {
+    objectSection: 'ipv6',
+    title: 'IPv6',
+    plain: true,
+    children: [{ field: 'dhcpv6.mode', label: 'DHCPv6 Mode', describe: 'DHCPv6 server mode.' }]
+  }
+]
+
 const serviceLayouts: Record<string, LayoutNode[]> = {
   ssh: [
     { field: 'port', describe: 'SSH server port.' },

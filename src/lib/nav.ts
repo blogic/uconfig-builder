@@ -95,9 +95,12 @@ export const WIRELESS_ITEMS: NavItem[] = [
 ]
 
 // Pages of the Network section: the wired side, uplink and addressing.
+// `net-guest` rather than `guest` because page keys share one flat namespace and
+// `guest` already names the Wireless page that owns the guest SSID.
 export const NETWORK_ITEMS: NavItem[] = [
   { key: 'wan', label: 'WAN', icon: 'bi-globe' },
-  { key: 'lan', label: 'LAN', icon: 'bi-ethernet' }
+  { key: 'lan', label: 'LAN', icon: 'bi-ethernet' },
+  { key: 'net-guest', label: 'Guest', icon: 'bi-people' }
 ]
 
 // Edits arrive from several sections, so the pending list is a section of its

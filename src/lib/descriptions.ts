@@ -52,7 +52,8 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   guest: 'A separate network for visitors. Guests reach the internet, and nothing else on your network.',
   'net-radios': 'The radios your Wi-Fi networks run on. Channel and power settings per band.',
   wan: 'How this device reaches the internet.',
-  lan: 'Your own network: the addresses this device hands out to everything that joins.'
+  lan: 'Your own network: the addresses this device hands out to everything that joins.',
+  'net-guest': 'The addresses on the visitor network. Only the router that owns the guest subnet sets these.'
 }
 
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,
