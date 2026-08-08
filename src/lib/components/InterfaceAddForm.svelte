@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { iface_enabled, vlan_id, VLAN_MAX, VLAN_MIN } from '../interfaces.js'
   import { t } from '../i18n.svelte.js'
   import type { Interface } from '../types/uconfig'
 
@@ -20,10 +21,11 @@
     !trimmed ? t('Name is required') : interfaces[trimmed] !== undefined ? t('Name already in use') : ''
   )
 
+  // A disabled interface is dropped by the device before anything is rendered,
+  // so it neither provides a VLAN nor stands in the way of one.
+  const live = $derived(Object.values(interfaces).filter((i) => iface_enabled(i)))
   const upstreamVlans = $derived(
-    Object.values(interfaces)
-      .filter((i) => i?.role === 'upstream' && i?.vlan?.id != null)
-      .map((i) => i.vlan!.id as number)
+    live.filter((i) => i?.role === 'upstream' && vlan_id(i) != null).map((i) => vlan_id(i) as number)
   )
 
   const vid = $derived(Number(vlanId))
@@ -31,9 +33,9 @@
 
   function vlan_error(): string {
     if (!vlanOn) return ''
-    if (!(Number.isInteger(vid) && vid >= 1 && vid <= 4094)) return t('VLAN ID must be between 1 and 4094')
+    if (!(Number.isInteger(vid) && vid >= VLAN_MIN && vid <= VLAN_MAX)) return t('VLAN ID must be between 1 and 4094')
     if (role === 'upstream') {
-      const dup = Object.values(interfaces).some((i) => i?.role === 'upstream' && i?.vlan?.id === vid)
+      const dup = live.some((i) => i?.role === 'upstream' && vlan_id(i) === vid)
       if (dup) return t('VLAN {id} is already used by an upstream interface', { id: vid })
     } else if (!upstreamVlans.includes(vid)) {
       return t('No upstream interface provides VLAN {id}', { id: vid })
@@ -99,8 +101,8 @@
         <input
           class="input"
           type="number"
-          min="1"
-          max="4094"
+          min={VLAN_MIN}
+          max={VLAN_MAX}
           bind:value={vlanId}
           placeholder={t('1 to 4094')}
           onkeydown={(e) => e.key === 'Enter' && submit()}

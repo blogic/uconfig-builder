@@ -5,6 +5,7 @@
   import { port_cover, effective_tag, port_options, port_absorbed, is_wildcard } from '../ports.js'
   import { device_ports } from '../capabilities.svelte.js'
   import { confirm } from '../confirm.svelte.js'
+  import { iface_enabled, vlan_id } from '../interfaces.js'
   import { t } from '../i18n.svelte.js'
   import type { Interface, InterfacePorts } from '../types/uconfig'
 
@@ -19,7 +20,7 @@
 
   const ports = $derived(iface.ports ?? {})
   const assigned = $derived(Object.keys(ports))
-  const hasVlan = $derived(iface.vlan?.id != null)
+  const hasVlan = $derived(vlan_id(iface) != null)
   const portList = $derived(device_ports())
 
   let showModal = $state(false)
@@ -31,8 +32,9 @@
   function others_cover(p: string): string[] {
     const tags: string[] = []
     for (const [n, iv] of Object.entries(interfaces)) {
-      if (n === selfName) continue
-      const ivVlan = iv?.vlan?.id != null
+      // A disabled interface is dropped by the device, so it holds no ports.
+      if (n === selfName || !iface_enabled(iv)) continue
+      const ivVlan = vlan_id(iv) != null
       for (const k of Object.keys(iv?.ports ?? {})) {
         if (port_cover(k, portList).includes(p)) tags.push(effective_tag(iv.ports![k], iv.role, ivVlan))
       }

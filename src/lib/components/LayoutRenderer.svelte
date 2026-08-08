@@ -14,6 +14,7 @@
   import VlanSection from './VlanSection.svelte'
   import DhcpPoolSection from './DhcpPoolSection.svelte'
   import DhcpRangeSection from './DhcpRangeSection.svelte'
+  import GuestVlanField from './GuestVlanField.svelte'
   import MapEditor from './MapEditor.svelte'
   import CollapsibleSection from './CollapsibleSection.svelte'
   import PlainSection from './PlainSection.svelte'
@@ -285,6 +286,8 @@
         <!-- Nested inside an ipv4 objectSection, so the data object is already
              the ipv4 block rather than the interface. -->
         <DhcpRangeSection ipv4={data_obj} />
+      {:else if node.guestVlan}
+        <GuestVlanField />
       {:else if node.mapList}
         {@const vs = pattern_value_schema(schema_at(schema, node.mapList))}
         <MapListField container={data_obj} mapKey={node.mapList} valueSchema={vs} keyLabel={node.keyLabel ?? 'entry'} />

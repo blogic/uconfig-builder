@@ -4,13 +4,15 @@
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
   import { request as ws_request, login as ws_login } from '../connection.svelte.js'
-  import { wizard_defaults, wizard_steps, step_error, wizard_document, MAX_SSID, MAX_KEY } from '../wizard.svelte.js'
+  import { wizard_defaults, wizard_steps, step_error, wizard_document, wizard_includes, MAX_SSID, MAX_KEY } from '../wizard.svelte.js'
   import type { WizardStep, WizardSecurity } from '../wizard.svelte.js'
-  import type { UconfigDocument } from '../types/uconfig'
+  import type { ConfigPayload } from '../store.svelte.js'
 
   interface Props {
     capabilities?: unknown
-    onDone: (doc: UconfigDocument) => void
+    // The fragments go too: they are as much a part of what the device now runs
+    // as the document is, and adopting the document alone would drop them.
+    onDone: (payload: ConfigPayload) => void
   }
 
   let { capabilities = null, onDone }: Props = $props()
@@ -19,8 +21,8 @@
   let index = $state(0)
   let phase = $state<'form' | 'applying' | 'done'>('form')
   let touched = $state(false)
-  // The document the wizard produced, handed to the caller on Continue.
-  let pending = $state<UconfigDocument | null>(null)
+  // What the wizard applied, handed to the caller on Continue.
+  let pending = $state<ConfigPayload | null>(null)
   let applyError = $state<string | null>(null)
   let continuing = $state(false)
 
@@ -52,13 +54,16 @@
     applyError = null
     // Both inputs are snapshotted: the document goes to doc_adopt, which
     // structuredClones it, and a reactive proxy cannot be cloned.
-    const doc = wizard_document($state.snapshot(data), $state.snapshot(capabilities))
+    const payload = {
+      config: wizard_document($state.snapshot(data), $state.snapshot(capabilities)),
+      includes: wizard_includes()
+    }
     try {
       // Password first. A device in setup mode is already authenticated, so
       // setting it cannot invalidate the session part-way through.
       await ws_request('change-password', { password: data.password })
-      await ws_request('config-apply', { config: doc, includes: {} })
-      pending = doc
+      await ws_request('config-apply', payload)
+      pending = payload
       phase = 'done'
     } catch (e) {
       applyError = e instanceof Error ? e.message : String(e)

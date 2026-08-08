@@ -18,8 +18,9 @@
   import Button from './lib/components/Button.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get } from './lib/schema.js'
-  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, sections_for, service_entries } from './lib/nav.js'
+  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, items_for, sections_for, service_entries } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
+  import { iface_enabled } from './lib/interfaces.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
   import { default_width } from './lib/channels.js'
   import {
@@ -54,24 +55,9 @@
   import type { ConfigPayload } from './lib/store.svelte.js'
   import { device_load, deviceApi } from './lib/device.svelte.js'
   import type { DeviceMod } from './lib/device.svelte.js'
-  import type { UconfigDocument, Radio, Interface } from './lib/types/uconfig'
+  import type { Radio, Interface } from './lib/types/uconfig'
   import type { Route } from './lib/router.svelte.js'
   import type { CapabilitiesData } from './lib/capabilities.svelte.js'
-
-  interface NavItem {
-    key: string
-    label: string
-    icon: string
-    group?: boolean
-    whenChanges?: boolean
-  }
-
-  interface NavSection {
-    key: string
-    label: string
-    icon: string
-    items: NavItem[]
-  }
 
   // Device modules load on demand; in the editor build the branch is dropped
   // and nothing below ever runs.
@@ -253,8 +239,8 @@
 
   // The wizard has already applied the document and logged in, so this adopts
   // what the device is now running and opens the app on it.
-  async function wizard_done(doc: UconfigDocument) {
-    doc_adopt(doc, settings.host ?? '')
+  async function wizard_done(payload: ConfigPayload) {
+    doc_adopt(payload, settings.host ?? '')
     section = 'status'
     view.section = STATUS_ITEMS[0]?.key ?? 'traffic'
     if (IS_DEVICE && dev) await dev.poll.preload()
@@ -344,15 +330,13 @@
   // Sections available for this build and breakpoint. System and Configure are
   // desktop-only: reboot, firmware and schema editing are not phone errands.
   const availableSections = $derived(
-    sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession, changes.length > 0) as NavSection[]
+    sections_for(IS_DEVICE, IS_EDITOR, wide, deviceSession, changes.length > 0)
   )
   const activeSection = $derived(
     availableSections.some((s) => s.key === section) ? section : (availableSections[0]?.key ?? 'config')
   )
   const sectionItems = $derived(
-    (availableSections.find((s) => s.key === activeSection)?.items ?? []).filter(
-      (i) => !i.whenChanges || changes.length > 0
-    )
+    items_for(availableSections.find((s) => s.key === activeSection)?.items ?? [], changes.length > 0, store.doc)
   )
 
   // Mobile has no section tabs, so the bottom bar spans them: the Status pages
@@ -550,22 +534,14 @@
 
 {#snippet netGuestBody()}
   {@const guest = (store.doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.guest}
-  {#snippet inner()}
-    {#if !guest}
-      <p class="text-sm text-zinc-500">
-        {t('The guest network is off. Turn it on under Wireless to give it addresses of its own.')}
-      </p>
-    {:else if guest.role !== 'downstream'}
-      <!-- An access point bridges guest traffic onto the VLAN rather than
-           routing it, so the router that owns the subnet sets these. -->
-      <p class="text-sm text-zinc-500">
-        {t('This device bridges its guest network, so the router upstream of it owns these settings.')}
-      </p>
-    {:else}
+  <!-- The nav entry is gone in these cases, so this only covers the tick before
+       the effect moves off a page that has just stopped applying. -->
+  {#if iface_enabled(guest as { disable?: boolean } | undefined) && guest?.role === 'downstream'}
+    {#snippet inner()}
       <LayoutRenderer data={guest} schema={interfaceDef ?? {}} layout={guestLayout} context={{ role: 'downstream' }} />
-    {/if}
-  {/snippet}
-  {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS['net-guest'], 'interface:guest', inner)}
+    {/snippet}
+    {@render networkPage(t('Guest'), PAGE_DESCRIPTIONS['net-guest'], 'interface:guest', inner)}
+  {/if}
 {/snippet}
 
 {#snippet changesBody()}

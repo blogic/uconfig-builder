@@ -12,18 +12,36 @@
   import { def_get } from '../schema.js'
   import { GUEST_VLAN, GUEST_SUBNET, radio_bands } from '../wizard.svelte.js'
   import { capabilities } from '../capabilities.svelte.js'
+  import { GUEST_VLAN_KEY, include_ensure, overlay_get, overlay_set, ref_attach } from '../includes.js'
+  import { iface_enabled } from '../interfaces.js'
   import { wirelessLayout } from '../layouts.js'
 
   const ssidDef = def_get('interface.ssid')
 
   const interfaces = $derived((store.doc.interfaces ?? {}) as Record<string, Record<string, unknown>>)
   const guest = $derived(interfaces.guest)
-  const on = $derived(guest != null)
+  const on = $derived(iface_enabled(guest))
 
   // An access point bridges guest traffic onto the VLAN; only a router owns the
   // subnet and answers DHCP on it. Which one this device is follows from
   // whether it has a downstream interface at all.
-  const isRouter = $derived(Object.values(interfaces).some((i) => i?.role === 'downstream' && i !== guest))
+  const isRouter = $derived(
+    Object.values(interfaces).some((i) => i?.role === 'downstream' && i !== guest && iface_enabled(i))
+  )
+
+  const vlan = $derived((overlay_get(GUEST_VLAN_KEY)?.id as number | undefined) ?? GUEST_VLAN)
+
+  // The VLAN is the one part of a guest network that has to match across the
+  // venue, so it lives in the shared include and the interface only points at
+  // it. Seeded rather than overwritten: a venue that already agreed on an id
+  // keeps it.
+  function vlan_ref(): Record<string, unknown> {
+    include_ensure()
+    if (!overlay_get(GUEST_VLAN_KEY)) overlay_set(GUEST_VLAN_KEY, { id: GUEST_VLAN })
+    const ref: Record<string, unknown> = {}
+    ref_attach(ref, GUEST_VLAN_KEY)
+    return ref
+  }
 
   function guest_create() {
     const bands = radio_bands($state.snapshot(capabilities.data))
@@ -39,7 +57,7 @@
       ? {
           role: 'downstream',
           ports: { 'lan*': 'auto' },
-          vlan: { id: GUEST_VLAN },
+          vlan: vlan_ref(),
           ipv4: {
             addressing: 'static',
             subnet: GUEST_SUBNET,
@@ -51,15 +69,20 @@
       : {
           role: 'upstream',
           ports: { 'wan*': 'auto', 'lan*': 'auto' },
-          vlan: { id: GUEST_VLAN },
+          vlan: vlan_ref(),
           ipv4: { addressing: 'none' },
           ssids
         }
   }
 
+  // Switched off rather than removed. Deleting the interface would leave a
+  // router still carrying the guest VLAN on the wire once the SSID went away;
+  // uconfig drops a disabled interface whole, and the settings survive for
+  // whenever it comes back.
   function toggle() {
-    if (on) delete interfaces.guest
-    else guest_create()
+    if (!guest) return guest_create()
+    if (on) guest.disable = true
+    else delete guest.disable
   }
 </script>
 
@@ -82,11 +105,6 @@
       ></span>
     </button>
     <span class="text-sm font-semibold text-zinc-900">{t('Guest network')}</span>
-    {#if on}
-      <span class="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
-        {t('VLAN {id}', { id: GUEST_VLAN })}
-      </span>
-    {/if}
   </div>
 
   {#if on && guest?.ssids}
@@ -100,7 +118,7 @@
     {#if !isRouter}
       <p class="text-[11px] leading-snug text-zinc-500">
         {t('Guest traffic is bridged onto VLAN {id}. The router that owns the subnet answers DHCP for it.', {
-          id: GUEST_VLAN
+          id: vlan
         })}
       </p>
     {/if}

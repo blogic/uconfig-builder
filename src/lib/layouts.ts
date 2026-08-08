@@ -1,4 +1,5 @@
 import { default_width } from './channels'
+import { iface_enabled } from './interfaces'
 import { SERVICES, available_services } from './services'
 
 export interface LayoutContext {
@@ -44,6 +45,9 @@ export interface LayoutNode {
   // The pool as a first/last address pair rather than the stored offset and
   // count. Derived, so it needs a component rather than a field node.
   dhcpRange?: boolean
+  // The guest VLAN, which lives in the shared include. The field pipeline only
+  // walks `data`, so a value held elsewhere needs a component of its own.
+  guestVlan?: boolean
   disallow?: string
   multiPsk?: boolean
   aclField?: boolean
@@ -177,7 +181,9 @@ export const interfaceLayout: LayoutNode[] = [
 export function primary_iface(
   interfaces: Record<string, unknown> | undefined
 ): [string, Record<string, unknown>] | null {
-  const entries = Object.entries(interfaces ?? {}) as [string, Record<string, unknown>][]
+  const entries = (Object.entries(interfaces ?? {}) as [string, Record<string, unknown>][]).filter(([, v]) =>
+    iface_enabled(v as { disable?: boolean })
+  )
   const named = (n: string) => entries.find(([k]) => k === n)
   const byRole = (r: string) => entries.find(([, v]) => v?.role === r)
   // A guest network is downstream too, so prefer the conventional name before
@@ -285,6 +291,7 @@ export const lanLayout: LayoutNode[] = [
 // here, unlike LAN; the range the guest network hands out is not a decision
 // this page asks about.
 export const guestLayout: LayoutNode[] = [
+  { section: 'VLAN', plain: true, children: [{ guestVlan: true }] },
   {
     objectSection: 'ipv4',
     title: 'IPv4',
