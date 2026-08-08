@@ -439,6 +439,7 @@
   "Remove lease \"{name}\"?": "Remove lease \"{name}\"?",
   "Remove port \"{port}\"?": "Remove port \"{port}\"?",
   "Remove PSK \"{name}\"?": "Remove PSK \"{name}\"?",
+  "Remove radio \"{name}\"?": "Remove radio \"{name}\"?",
   "Remove trunk {id}?": "Remove trunk {id}?",
   "Repeat password": "Repeat password",
   "Request Attribute": "Request Attribute",

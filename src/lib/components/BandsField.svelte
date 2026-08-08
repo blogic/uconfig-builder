@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { confirm } from '../confirm.svelte.js'
   import ListBox from './ListBox.svelte'
   import RemoveButton from './RemoveButton.svelte'
   import { title_for } from '../schema.js'
@@ -33,7 +34,8 @@
     ;(obj[KEY] as string[]).push(sel)
     showModal = false
   }
-  function remove(b: string) {
+  async function remove(b: string) {
+    if (!(await confirm(t('Remove radio "{name}"?', { name: title_for(b) })))) return
     const arr = obj[KEY] as string[]
     arr.splice(arr.indexOf(b), 1)
     if (!arr.length) onset(KEY, undefined)
