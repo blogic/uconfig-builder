@@ -31,7 +31,7 @@
   }
 </script>
 
-<div class="flex flex-col gap-1">
+<div class="flex max-w-sm flex-col gap-1">
   <label for={fid} class="text-xs font-medium text-zinc-700">{t('TX Power')}</label>
   <input
     id={fid}

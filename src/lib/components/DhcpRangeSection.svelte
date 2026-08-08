@@ -91,7 +91,7 @@
   {#if base}
     <div class="flex flex-col gap-1">
       <span class="text-xs font-medium text-zinc-700">{t('DHCP Address range')}</span>
-      <div class="flex items-center gap-2">
+      <div class="flex max-w-sm items-center gap-2">
         <input
           class="input"
           value={firstAddr}

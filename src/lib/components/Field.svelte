@@ -160,7 +160,7 @@
   {:else if kind === 'scalar-union'}
     <input id={fid} class="input" type="text" value={value ?? ''} oninput={onUnion} placeholder="number or keyword (e.g. auto)" />
   {:else if isSecret}
-    <div class="relative">
+    <div class="relative max-w-sm">
       <input
         id={fid}
         class="input pr-9"

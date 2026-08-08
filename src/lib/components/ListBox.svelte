@@ -22,7 +22,7 @@
   }: Props = $props()
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex max-w-sm flex-col gap-2">
   {#if label}
     <span class="text-xs font-medium text-zinc-700">{t(label)}</span>
   {/if}

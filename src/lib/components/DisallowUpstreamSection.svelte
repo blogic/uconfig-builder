@@ -86,7 +86,7 @@
 {/snippet}
 
 {#if view.mode === 'menu'}
-  <section class="rounded-base border border-zinc-200 bg-surface">
+  <section class="max-w-sm rounded-base border border-zinc-200 bg-surface">
     <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left" onclick={toggle_open}>
       {@render chevron(true)}
       <span class="flex-1 text-xs font-semibold uppercase tracking-wide text-zinc-600">{t(title_for(KEY))}</span>
