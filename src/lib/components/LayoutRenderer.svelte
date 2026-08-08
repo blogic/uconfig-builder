@@ -58,10 +58,14 @@
 
   accordion_provide(true)
 
-  // Object sections (e.g. ipv4/ipv6) are always present.
-  const ensurePaths = $derived(
-    layout.filter((n): n is LayoutNode & { objectSection: string } => n.objectSection != null).map((n) => n.objectSection)
-  )
+  // Object sections (e.g. ipv4/ipv6) are always present, as is the container of
+  // a dotted field path (e.g. the dhcpv6 of dhcpv6.mode). Creating either one
+  // while rendering is what Svelte reports as state_unsafe_mutation, so both are
+  // materialised here instead.
+  const ensurePaths = $derived([
+    ...layout.filter((n) => n.objectSection != null).map((n) => n.objectSection as string),
+    ...layout.filter((n) => n.field?.includes('.')).map((n) => (n.field as string).replace(/\.[^.]+$/, ''))
+  ])
   $effect(() => {
     for (const p of ensurePaths) walk(data_obj, p, true)
   })
@@ -115,9 +119,11 @@
     return cur
   }
 
-  function parent_of(path: string): Record<string, unknown> {
+  // Read-only: the ensure effect above owns creation. Undefined until it has
+  // run, which the callers guard for.
+  function parent_of(path: string): Record<string, unknown> | undefined {
     const dot = path.lastIndexOf('.')
-    return dot < 0 ? data_obj : (walk(data_obj, path.slice(0, dot), true) as Record<string, unknown>)
+    return dot < 0 ? data_obj : walk(data_obj, path.slice(0, dot))
   }
   function leaf_of(path: string): string {
     const dot = path.lastIndexOf('.')
@@ -141,40 +147,42 @@
     {#if show(node)}
       {#if node.field}
         {@const parent = parent_of(node.field)}
-        {@const fkey = leaf_of(node.field)}
-        {@const fs0 = schema_at(schema, node.field)}
-        {@const cur = parent[fkey]}
-        {@const enumOpts = node.options
-          ? cur != null && !node.options.includes(cur)
-            ? [...node.options, cur]
-            : node.options
-          : null}
-        {@const fs = enumOpts ? { ...fs0, enum: enumOpts } : fs0}
-        {@const w = node.widget ?? (fs.type === 'array' ? 'list' : 'field')}
-        {#if w === 'field'}
-          <Field obj={parent} key={fkey} onset={(k, v) => field_set(parent, k, v)} schema={fs} required={req_of(node)} label={node.label ?? null} fallback={node.default as LeafValue} describe={node.describe ?? null} />
-        {:else if w === 'list'}
-          <ArrayListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} schema={fs} label={node.label ?? null} describe={node.describe ?? null} />
-        {:else if w === 'channel'}
-          <ChannelField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
-        {:else if w === 'channel-width'}
-          <ChannelWidthField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
-        {:else if w === 'channel-mode'}
-          <ChannelModeField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
-        {:else if w === 'tx-power'}
-          <TxPowerField obj={parent} onset={(k, v) => field_set(parent, k, v)} describe={node.describe ?? null} />
-        {:else if w === 'addressing'}
-          <AddressingField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} role={context.role} describe={node.describe ?? null} />
-        {:else if w === 'addressing-ro'}
-          <AddressingReadonly obj={parent} />
-        {:else if w === 'timezone'}
-          <TimezoneField obj={parent} onset={(k, v) => field_set(parent, k, v)} />
-        {:else if w === 'bands'}
-          <BandsField obj={parent} onset={(k, v) => field_set(parent, k, v)} {context} />
-        {:else if w === 'choice'}
-          <ChoiceListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} options={(node.options ?? []) as string[]} label={node.label ?? null} />
-        {:else if w === 'services'}
-          <ServicesField obj={parent} {context} />
+        {#if parent}
+          {@const fkey = leaf_of(node.field)}
+          {@const fs0 = schema_at(schema, node.field)}
+          {@const cur = parent[fkey]}
+          {@const enumOpts = node.options
+            ? cur != null && !node.options.includes(cur)
+              ? [...node.options, cur]
+              : node.options
+            : null}
+          {@const fs = enumOpts ? { ...fs0, enum: enumOpts } : fs0}
+          {@const w = node.widget ?? (fs.type === 'array' ? 'list' : 'field')}
+          {#if w === 'field'}
+            <Field obj={parent} key={fkey} onset={(k, v) => field_set(parent, k, v)} schema={fs} required={req_of(node)} label={node.label ?? null} fallback={node.default as LeafValue} describe={node.describe ?? null} />
+          {:else if w === 'list'}
+            <ArrayListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} schema={fs} label={node.label ?? null} describe={node.describe ?? null} />
+          {:else if w === 'channel'}
+            <ChannelField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          {:else if w === 'channel-width'}
+            <ChannelWidthField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          {:else if w === 'channel-mode'}
+            <ChannelModeField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} band={context.band ?? ''} describe={node.describe ?? null} />
+          {:else if w === 'tx-power'}
+            <TxPowerField obj={parent} onset={(k, v) => field_set(parent, k, v)} describe={node.describe ?? null} />
+          {:else if w === 'addressing'}
+            <AddressingField obj={parent} onset={(k, v) => field_set(parent, k, v)} schema={fs} role={context.role} describe={node.describe ?? null} />
+          {:else if w === 'addressing-ro'}
+            <AddressingReadonly obj={parent} />
+          {:else if w === 'timezone'}
+            <TimezoneField obj={parent} onset={(k, v) => field_set(parent, k, v)} />
+          {:else if w === 'bands'}
+            <BandsField obj={parent} onset={(k, v) => field_set(parent, k, v)} {context} />
+          {:else if w === 'choice'}
+            <ChoiceListField obj={parent} onset={(k, v) => field_set(parent, k, v)} key={fkey} options={(node.options ?? []) as string[]} label={node.label ?? null} />
+          {:else if w === 'services'}
+            <ServicesField obj={parent} {context} />
+          {/if}
         {/if}
       {:else if node.section}
         <CollapsibleSection title={node.section}>
