@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applications and services mockups</title>
+
+<!-- Mockups for splitting the live app's Services group into a top-level
+     Applications menu and a Services page under System.
+     Addresses open question 1 in ../live-app-navigation.md (Configure's fate).
+     Self-contained: open directly in a browser, no build step. -->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --accent: #3498db;
+    --accent-dark: #2980b9;
+    --accent-ink: #ffffff;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --ok: #28a745;
+    --warn: #f0ad4e;
+    --warn-ink: #856404;
+    --warn-bg: #fff3cd;
+    --danger: #e74c3c;
+    --radius: 4px;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface: #22303c;
+      --page: #1a252f;
+      --nav-active: #2c3e50;
+      --ink: #ecf0f1;
+      --ink-soft: #dfe6e9;
+      --muted: #95a5a6;
+      --faint: #7f8c8d;
+      --line: #34495e;
+      --line-strong: #3d566e;
+      --note-bg: #1f2b36;
+      --note-ink: #b6c2cd;
+      --warn-bg: #4a3f1a;
+      --warn-ink: #ffd97a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #22303c;
+    --page: #1a252f;
+    --nav-active: #2c3e50;
+    --ink: #ecf0f1;
+    --ink-soft: #dfe6e9;
+    --muted: #95a5a6;
+    --faint: #7f8c8d;
+    --line: #34495e;
+    --line-strong: #3d566e;
+    --note-bg: #1f2b36;
+    --note-ink: #b6c2cd;
+    --warn-bg: #4a3f1a;
+    --warn-ink: #ffd97a;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+    --warn-bg: #fff3cd;
+    --warn-ink: #856404;
+  }
+
+  body {
+    margin: 0;
+    padding: 2rem 1.25rem 4rem;
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.doc { margin-bottom: 2.5rem; }
+  header.doc h1 { font-size: 1.55rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  header.doc p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+  h2.sec {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); margin: 3rem 0 .35rem; font-weight: 600;
+  }
+  h2.sec:first-of-type { margin-top: 2rem; }
+  .sec-lead { margin: 0 0 1rem; color: var(--muted); max-width: 68ch; font-size: .9rem; }
+
+  /* ---- app frame ---- */
+  .frame {
+    border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .frame-scroll { overflow-x: auto; }
+  .app { display: flex; flex-direction: column; min-width: 860px; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 1.5rem;
+    border-bottom: 1px solid var(--line); padding: 0 1rem; height: 44px;
+    background: var(--surface);
+  }
+  .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: .95rem; }
+  .brand-mark {
+    width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-size: .7rem;
+  }
+  .tabs { display: flex; gap: 1.25rem; font-size: .85rem; height: 100%; align-items: stretch; }
+  .tab {
+    display: flex; align-items: center; gap: .35rem; color: var(--muted);
+    border-bottom: 2px solid transparent; padding: 0 .1rem;
+  }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .host { margin-left: auto; font-size: .72rem; color: var(--muted); }
+  .host b { color: var(--ink); }
+
+  .body { display: flex; min-height: 340px; }
+
+  .side {
+    width: 172px; flex-shrink: 0; border-right: 1px solid var(--line);
+    background: var(--surface); padding: 0;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .55rem; padding: .62rem .75rem;
+    font-size: .82rem; color: var(--ink-soft); border-left: 3px solid transparent;
+  }
+  .nav-item .ico { width: 1rem; text-align: center; color: var(--muted); font-size: .8rem; }
+  .nav-item.on {
+    background: var(--nav-active); color: var(--accent);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  .nav-item.on .ico { color: var(--accent); }
+  .badge {
+    margin-left: auto; background: var(--accent); color: var(--accent-ink);
+    border-radius: 999px; font-size: .62rem; font-weight: 700;
+    min-width: 1.05rem; height: 1.05rem; display: grid; place-items: center; padding: 0 .3rem;
+  }
+
+  .content { flex: 1; padding: 1.1rem 1.35rem; min-width: 0; }
+  .lead { color: var(--muted); font-size: .84rem; margin: 0 0 1.1rem; max-width: 70ch; }
+
+  /* ---- form vocabulary ---- */
+  .field { margin-bottom: 1rem; }
+  .label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .3rem; }
+  .input {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: .42rem .55rem; font-size: .84rem;
+    background: var(--surface); color: var(--ink);
+  }
+  .input.ro { background: var(--page); color: var(--muted); }
+  .hint { font-size: .71rem; color: var(--muted); margin-top: .25rem; }
+  .row { display: flex; gap: .85rem; }
+  .row > * { flex: 1; min-width: 0; }
+
+  .seg { display: flex; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+  .seg span { padding: .34rem .85rem; font-size: .78rem; color: var(--ink-soft); }
+  .seg span.on { background: var(--accent); color: #fff; font-weight: 600; }
+
+  .toggle { width: 34px; height: 19px; border-radius: 999px; background: var(--faint); position: relative; flex-shrink: 0; }
+  .toggle.on { background: var(--accent); }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+  .toggle.on::after { left: auto; right: 2px; }
+  .toggle-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem; }
+  .toggle-row .t { font-size: .82rem; font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius);
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    padding: .36rem .8rem; font-size: .8rem; font-weight: 500;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem; margin-bottom: .8rem; }
+  .card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .1rem; }
+  .card-title { font-weight: 600; font-size: .87rem; }
+  .pill {
+    font-size: .64rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px;
+    background: var(--page); color: var(--muted); border: 1px solid var(--line);
+  }
+  .pill.live { background: #e8f6ec; color: #1e7e34; border-color: #c9e7d2; }
+  .pill.vlan { background: var(--nav-active); color: var(--accent-dark); border-color: #cfe6f7; }
+  @media (prefers-color-scheme: dark) {
+    .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+    .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+  }
+  :root[data-theme="dark"] .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+  :root[data-theme="dark"] .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+
+  .kv { display: flex; justify-content: space-between; font-size: .78rem; padding: .18rem 0; }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-variant-numeric: tabular-nums; }
+
+  /* Pending-changes tab: present only when something is pending, so it carries
+     the amber cue on its own rather than needing a count. */
+  .tab.pending { color: var(--warn-ink); }
+  .tab.pending.on { color: var(--warn-ink); border-bottom-color: var(--warn); font-weight: 600; }
+
+  .chg-group { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .7rem; }
+  .chg-head {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .55rem .85rem; border-bottom: 1px solid var(--line);
+  }
+  .chg-head .ico { font-size: .82rem; }
+  .chg-title { font-weight: 600; font-size: .84rem; }
+  .chg-count { font-size: .71rem; color: var(--muted); }
+  .chg-reset {
+    margin-left: auto; font-size: .74rem; color: var(--accent); font-weight: 500;
+  }
+  .chg-item {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .32rem .85rem; font-size: .79rem; color: var(--muted);
+  }
+  .chg-item:first-of-type { padding-top: .5rem; }
+  .chg-item:last-child { padding-bottom: .55rem; }
+  .chg-item .dot {
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+  }
+
+  .disclosure {
+    display: flex; align-items: center; gap: .45rem; padding: .5rem 0;
+    border-top: 1px solid var(--line); margin-top: .4rem;
+    font-size: .82rem; font-weight: 600; color: var(--ink-soft);
+  }
+  .disclosure .ico { color: var(--muted); font-size: .7rem; }
+  .disclosure-note { font-weight: 400; font-size: .71rem; color: var(--muted); margin-left: .1rem; }
+
+  .tabs-inline { display: flex; gap: .3rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  .tabs-inline span { padding: .4rem .75rem; font-size: .8rem; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs-inline span.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .note {
+    background: var(--note-bg); border-left: 3px solid var(--accent);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; color: var(--note-ink); margin: .9rem 0 0;
+  }
+  .note b { color: var(--ink); }
+  .note ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .note li { margin: .2rem 0; }
+
+  .warn {
+    background: var(--warn-bg); color: var(--warn-ink); border-left: 3px solid var(--warn);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; margin: .9rem 0 0;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8em;
+    background: var(--page); padding: .08em .35em; border-radius: 3px; border: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: dark) { code { background: #1a252f; } }
+  :root[data-theme="dark"] code { background: #1a252f; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="doc">
+  <h1>Applications and services — mockups</h1>
+  <p>Services today are one collapsible group under <b>Configure</b>, ten pages deep, each shaped like the
+     schema block behind it. This splits them in two: <b>Applications</b> becomes a top-level menu for the
+     things someone adds because of what they do, and the plumbing moves to a <b>Services</b> page under
+     System. Palette, spacing and controls are taken from <code>src/app.css</code>, so these read as the real app.</p>
+</header>
+
+
+<!-- ========================= APPLICATIONS, OFF ========================= -->
+<h2 class="sec">1 — Applications › AdGuard Home, off</h2>
+<p class="sec-lead">An application that is not switched on has nothing to configure, so the page is what it does
+   and one switch. The sidebar is the catalogue: only applications this device reports as installed appear,
+   because the app cannot install a package it lacks.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab on">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item on"><span class="ico">🛡</span> AdGuard Home</div>
+        <div class="nav-item"><span class="ico">🔗</span> Tailscale</div>
+        <div class="nav-item"><span class="ico">🚦</span> Quality of Service</div>
+      </div>
+      <div class="content">
+        <p class="lead">Blocks advertising and tracking domains for every device that uses this network,
+           with nothing to install on the devices themselves.</p>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle"></span><span class="t">AdGuard Home</span></div>
+          <div class="hint">Off. Devices use whichever DNS servers the uplink hands out.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Turning this on will</span></div>
+          <div class="kv"><span class="k">Answer DNS for</span><span class="v">LAN and Guest</span></div>
+          <div class="kv"><span class="k">Move the existing resolver to</span><span class="v">port 54</span></div>
+          <div class="kv"><span class="k">Serve its own page at</span><span class="v">192.168.1.1:3000</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Only what the device has.</b> The sidebar is <code>service_entries()</code> narrowed by the
+  <code>modules</code> list the device returns at login — <code>adguardhome</code>, <code>tailscale</code> and
+  <code>qosify</code> here. An application whose package is missing is not drawn at all, since the app has no way
+  to install one. Against the mock AP that hides nothing; against a device without <code>qosify</code>, Quality of
+  Service simply is not in the list.
+</div>
+
+<div class="warn">
+  <b>Is the sidebar catalogue enough?</b> Drawn as one page per application, matching how every other section
+  works. With three entries the sidebar answers "what do I have?" on its own. The alternative is an
+  <b>Overview</b> entry above them holding a card per application with its switch, which reads more like an app
+  list but adds a page that says nothing the sidebar does not.
+</div>
+
+
+<!-- ========================= APPLICATIONS, ON ========================= -->
+<h2 class="sec">2 — Applications › AdGuard Home, on</h2>
+<p class="sec-lead">Switched on, the page asks the three things this device actually decides. <b>Filter for</b> is
+   the important one: it is the interface service list, drawn as a question about networks rather than as an array
+   of strings, because that list is what genuinely starts the daemon.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab on">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item on"><span class="ico">🛡</span> AdGuard Home</div>
+        <div class="nav-item"><span class="ico">🔗</span> Tailscale</div>
+        <div class="nav-item"><span class="ico">🚦</span> Quality of Service</div>
+      </div>
+      <div class="content">
+        <p class="lead">Blocks advertising and tracking domains for every device that uses this network,
+           with nothing to install on the devices themselves.</p>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">AdGuard Home</span></div>
+          <div class="hint">On. Its own page is at <code>192.168.1.1:3000</code>.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Filter for</label>
+          <div class="row">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">LAN</span></div></div>
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">Guest</span></div></div>
+          </div>
+          <div class="hint">Which networks it answers DNS for. A network left off keeps the uplink's servers.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Upstream servers</label>
+          <input class="input" value="1.1.1.1, 9.9.9.9" readonly>
+          <div class="hint">Where it forwards anything it does not block. Empty uses the uplink's servers.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle"></span><span class="t">Catch devices with their own DNS</span></div>
+          <div class="hint">Redirects all port 53 traffic here, so a device configured to use its own resolver
+             is filtered too. Off by default: it also breaks a device that legitimately runs its own.</div>
+        </div>
+
+        <div class="disclosure">
+          <span class="ico">▸</span> Advanced
+          <span class="disclosure-note">web interface port</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> One switch, two places written:
+  <ul>
+    <li>The switch → the <code>services.adguardhome</code> block, <b>and</b> <code>adguardhome</code> in
+        <code>interfaces.lan.services</code>. Both are needed: the template calls
+        <code>lookup_interfaces("adguardhome")</code> and returns early when nothing lists it.</li>
+    <li>Filter for → which interfaces carry it in their <code>services</code> array. Downstream only, matching
+        <code>ServiceEntry.iface: 'downstream'</code> in <code>src/lib/services.ts</code>.</li>
+    <li>Upstream servers → <code>servers</code>, catch devices → <code>dns-intercept</code>,
+        behind Advanced → <code>webui-port</code>.</li>
+  </ul>
+</div>
+
+
+<!-- ========================= QUALITY OF SERVICE ========================= -->
+<h2 class="sec">3 — Applications › Quality of Service</h2>
+<p class="sec-lead">The odd one. It is switched on by neither a block nor a service list but by the uplink's
+   speeds being known, so the page asks for those first and says why. The named traffic classes come from
+   qosify's own <code>qos.json</code>, grouped into things people recognise rather than listed as service names.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab on">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🛡</span> AdGuard Home</div>
+        <div class="nav-item"><span class="ico">🔗</span> Tailscale</div>
+        <div class="nav-item on"><span class="ico">🚦</span> Quality of Service</div>
+      </div>
+      <div class="content">
+        <p class="lead">Keeps calls and video smooth when the line is busy, by letting small urgent packets past
+           large downloads instead of queueing behind them.</p>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">Quality of Service</span></div>
+          <div class="hint">On. Applied to the WAN uplink.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Your line speed</label>
+          <div class="row">
+            <div>
+              <input class="input" value="500" readonly>
+              <div class="hint">Download, Mbit/s</div>
+            </div>
+            <div>
+              <input class="input" value="50" readonly>
+              <div class="hint">Upload, Mbit/s</div>
+            </div>
+          </div>
+          <div class="hint">Required. Shaping works by holding the queue on this device rather than at the
+             provider, which only works if it knows what the line can carry. Measure it, then set it slightly low.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Give priority to</label>
+          <div class="row">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">Video calls</span></div></div>
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">Voice calls</span></div></div>
+          </div>
+          <div class="row" style="margin-top:.4rem">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">Streaming</span></div></div>
+            <div><div class="toggle-row"><span class="toggle"></span><span class="t">Web browsing</span></div></div>
+          </div>
+          <div class="hint">Video calls covers Zoom, Teams, Meet, FaceTime, Webex and Jitsi; streaming covers
+             YouTube, Netflix, Prime, Disney+ and HBO. Recognised by qosify from its own database.</div>
+        </div>
+
+        <div class="disclosure">
+          <span class="ico">▸</span> Advanced
+          <span class="disclosure-note">bulk flow detection, custom classifiers by port or domain</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b>
+  <ul>
+    <li>Line speed → <code>interfaces.wan.quality-of-service.bandwidth-up</code> and <code>bandwidth-down</code>,
+        in Mbit. <b>These are the switch</b>: <code>has_qos_interfaces()</code> requires an upstream interface
+        with both set, and disables qosify otherwise.</li>
+    <li>Give priority to → <code>services.quality-of-service.services</code>, an array of names from
+        <code>qos.json</code>. Each toggle stands for a group of them.</li>
+    <li>Behind Advanced → <code>bulk-detection.dscp</code>, <code>bulk-detection.packets-per-second</code>,
+        and the <code>classifier</code> array of port and DNS rules.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <b>This one could belong on WAN instead.</b> Two of its three controls are properties of the uplink, and the
+  Network mockup already lists <code>quality-of-service</code> under "per interface, still to place". Drawn here
+  because a user looking for "make video calls work" will not look under WAN, and because the classes and
+  classifiers have nowhere sensible to sit there. The alternative is line speed on WAN and the rest behind an
+  Advanced disclosure on that page, with no application at all.
+</div>
+
+
+<!-- ========================= SYSTEM SERVICES ========================= -->
+<h2 class="sec">4 — System › Services</h2>
+<p class="sec-lead">What is left once the applications have gone: plumbing that makes the device manageable or
+   discoverable rather than anything a network is for. One page, not one page each — most of these are read once
+   and never changed, and a sidebar of ten was the problem being solved.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🔧</span> Device</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item on"><span class="ico">🧩</span> Services</div>
+        <div class="nav-item"><span class="ico">📊</span> State</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">💾</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory Reset</div>
+      </div>
+      <div class="content">
+        <p class="lead">What this device offers to the networks it runs. Each one is off until a network is
+           given it.</p>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">🖥</span><span class="card-title">SSH</span>
+            <span class="pill live">LAN</span>
+            <span class="toggle on" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">Shell and command-line access to the device itself.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">📡</span><span class="card-title">Local discovery</span>
+            <span class="pill live">LAN</span>
+            <span class="pill live">Guest</span>
+            <span class="toggle on" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">Answers to <code>openwrt.local</code>, and lets printers and speakers be found by name. mDNS.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">📄</span><span class="card-title">Logging</span>
+            <span class="toggle" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">Keeps a local log buffer, and can copy it to a syslog server elsewhere.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">🔌</span><span class="card-title">Neighbour discovery</span>
+            <span class="toggle" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">Announces this device to the switches it is plugged into, so network maps find it. LLDP.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">🔐</span><span class="card-title">RADIUS server</span>
+            <span class="toggle" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">A built-in account list, for Wi-Fi or wired networks that authenticate each user
+             rather than sharing one password.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="ico">🔑</span><span class="card-title">Wired authentication</span>
+            <span class="toggle" style="margin-left:auto"></span>
+          </div>
+          <div class="hint">Requires a device to authenticate before the socket it is plugged into carries
+             traffic. 802.1X.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Renamed, not reinvented.</b> mDNS, LLDP and 802.1X are drawn under what they do, with the protocol name
+  kept in the hint so anyone searching for it still lands here. The keys are unchanged:
+  <code>services.mdns</code>, <code>services.lldp</code>, <code>services.ieee8021x</code>. SSH and RADIUS keep
+  their own names because those <em>are</em> the plain words for them.
+</div>
+
+<div class="warn">
+  <b>RADIUS and wired authentication are one thought.</b> 802.1X's only setting is which RADIUS server to ask,
+  and the usual answer is the built-in one directly above it. They are drawn as two rows here; one row called
+  <b>Network access</b> holding both would be fewer decisions, at the cost of hiding that either can be used
+  without the other.
+</div>
+
+
+<!-- ========================= A SERVICE PAGE ========================= -->
+<h2 class="sec">5 — System › Services › SSH</h2>
+<p class="sec-lead">A row opens into its settings. Same shape as an application page: the switch, then which
+   networks it is offered on, then the few things worth changing.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🔧</span> Device</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item on"><span class="ico">🧩</span> Services</div>
+        <div class="nav-item"><span class="ico">📊</span> State</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">💾</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory Reset</div>
+      </div>
+      <div class="content">
+        <p class="lead"><span style="color:var(--accent)">‹ Services</span> &nbsp; Shell and command-line
+           access to the device itself.</p>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">SSH</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label">Reachable from</label>
+          <div class="row">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">LAN</span></div></div>
+            <div><div class="toggle-row"><span class="toggle"></span><span class="t">Guest</span></div></div>
+            <div><div class="toggle-row"><span class="toggle"></span><span class="t">WAN</span></div></div>
+          </div>
+          <div class="hint">Opens the port on those networks only. Leaving WAN off is what keeps the device
+             off the public internet.</div>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">Allow password login</span></div>
+          <div class="hint">Turn off once a key is added below, so only a key can get in.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Authorised keys</label>
+          <input class="input ro" value="No keys added" readonly>
+          <div class="hint">Public keys that may log in without a password.</div>
+        </div>
+
+        <div class="disclosure">
+          <span class="ico">▸</span> Advanced
+          <span class="disclosure-note">SSH port 22, command-line port 2222</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> Reachable from → <code>ssh</code> in each interface's <code>services</code> array;
+  allow password login → <code>services.ssh.password-authentication</code>; authorised keys →
+  <code>authorized-keys</code>; behind Advanced → <code>port</code> and <code>cli-port</code>. The ports are
+  hidden rather than dropped: changing them is rare, and a service on a surprising port is hard to diagnose
+  from anywhere else.
+</div>
+
+
+<!-- ========================= WHERE THEY SIT ========================= -->
+<h2 class="sec">6 — Where the two sit</h2>
+<p class="sec-lead">Today everything hangs off one collapsible group inside Configure, sorted alphabetically, so
+   AdGuard Home and 802.1X are neighbours. The split gives the three anyone actually goes looking for a menu of
+   their own, and leaves the rest where the device's other settings already are.</p>
+
+<div class="split">
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">Wireless</span>
+            <span class="tab">Network</span>
+            <span class="tab on">Configure</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:230px">
+          <div class="side" style="width:158px">
+            <div class="nav-item"><span class="ico">🔧</span> Unit</div>
+            <div class="nav-item"><span class="ico">🖧</span> Interfaces</div>
+            <div class="nav-item"><span class="ico">📡</span> Radios</div>
+            <div class="nav-item on"><span class="ico">🧩</span> Services</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">802.1X</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">AdGuard Home</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">LLDP</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">Log</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">mDNS</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">NTP</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">Quality of Service</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">RADIUS Server</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">SSH</div>
+            <div class="nav-item" style="padding-left:1.6rem;font-size:.76rem">Tailscale</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Today.</b> Ten entries in alphabetical order, so an ad blocker
+               and a wired authentication protocol sit next to each other. Nothing says which of them this
+               device is actually running.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab">Status</span>
+            <span class="tab">Wireless</span>
+            <span class="tab">Network</span>
+            <span class="tab on">Applications</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:230px">
+          <div class="side" style="width:158px">
+            <div class="nav-item on"><span class="ico">🛡</span> AdGuard Home</div>
+            <div class="nav-item"><span class="ico">🔗</span> Tailscale</div>
+            <div class="nav-item"><span class="ico">🚦</span> Quality of Service</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Proposed.</b> Three entries, each one something a person wanted.
+               The plumbing moves to System › Services, and Configure keeps the raw editor for anyone who needs
+               it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Where this lands in the bar.</b> Applications sits after Network and before Configure:
+  <b>Status · uCoord · Wireless · Network · Applications · Configure · System</b>, with Changes appended only
+  while something is pending. Services becomes a page in <code>SYSTEM_ITEMS</code> beside Device and Time —
+  which is what <code>ChangesPanel.svelte</code> has been labelling these all along
+  (<code>unit</code> → "System › Device", <code>ntp</code> → "System › Time", <code>service:*</code> →
+  "System › Services"), so the changes list needs no relabelling.
+</div>
+
+
+<!-- ========================= WHAT ON MEANS ========================= -->
+<h2 class="sec">7 — What "on" actually means</h2>
+<p class="sec-lead">The load-bearing part. A single switch per application looks obvious in a drawing, but the
+   device starts these five different ways, and today's toggle writes only one of them.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">Started by a network listing it</span></div>
+    <div class="kv"><span class="k">ssh</span><span class="v">interfaces.*.services</span></div>
+    <div class="kv"><span class="k">mdns</span><span class="v">interfaces.*.services</span></div>
+    <div class="kv"><span class="k">lldp</span><span class="v">interfaces.*.services</span></div>
+    <div class="kv"><span class="k">adguardhome</span><span class="v">interfaces.*.services</span></div>
+    <div class="kv"><span class="k">tailscale</span><span class="v">interfaces.*.services</span></div>
+    <div class="hint" style="margin-top:.5rem">The template calls <code>lookup_interfaces()</code> and returns
+       early when nothing lists it, so the settings block alone starts nothing.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Started some other way</span></div>
+    <div class="kv"><span class="k">log</span><span class="v">the block existing</span></div>
+    <div class="kv"><span class="k">radius-server</span><span class="v">being installed at all</span></div>
+    <div class="kv"><span class="k">ieee8021x</span><span class="v">ieee8021x-ports set</span></div>
+    <div class="kv"><span class="k">quality-of-service</span><span class="v">bandwidth-up and -down set</span></div>
+    <div class="kv"><span class="k">ntp</span><span class="v">definitions.ntp-servers non-empty</span></div>
+    <div class="hint" style="margin-top:.5rem">Four mechanisms across five services. None of them is the
+       enable toggle the UI currently draws.</div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Today's toggle is half a switch.</b> <code>service_enable()</code> and <code>service_disable()</code> in
+  <code>src/lib/store.svelte.ts</code> add and remove the <code>services.&lt;key&gt;</code> block and nothing
+  else — the comment on <code>service_disable</code> says interface service lists are deliberately left alone.
+  For the five in the left column that means switching one on in the UI starts nothing on the device, and
+  switching it off leaves it running. Any single-switch page has to write both places, which is why "Filter for"
+  and "Reachable from" are drawn as first-class controls rather than buried.
+</div>
+
+<div class="note">
+  <b>And what "off" should mean.</b> Removing the network from the list stops the service but keeps its settings;
+  removing the block loses them. Both are defensible and they are not the same, so this needs deciding before
+  any of it is built. The guest network settled the equivalent question by keeping the whole object and setting
+  <code>disable</code> — services have no such flag.
+</div>
+
+
+<!-- ========================= STILL TO PLACE ========================= -->
+<h2 class="sec">8 — Still to place</h2>
+<p class="sec-lead">Six entries in <code>SERVICES</code> have no settings block and appear in no drawing above,
+   and Configure still owns things that are not network settings. Neither list is decided here.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">Named on a network, nothing to configure</span></div>
+    <div class="kv"><span class="k">fingerprint</span><span class="v">names devices in the client list</span></div>
+    <div class="kv"><span class="k">samba4</span><span class="v">file sharing</span></div>
+    <div class="kv"><span class="k">nlbwmon</span><span class="v">per-device traffic accounting</span></div>
+    <div class="kv"><span class="k">ucoord</span><span class="v">coordinates the venue</span></div>
+    <div class="kv"><span class="k">webui</span><span class="v">serves this interface</span></div>
+    <div class="kv"><span class="k">state</span><span class="v">reports device state</span></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">What Configure would keep</span></div>
+    <div class="kv"><span class="k">unit</span><span class="v">→ System › Device</span></div>
+    <div class="kv"><span class="k">definitions.ntp-servers</span><span class="v">→ System › Time</span></div>
+    <div class="kv"><span class="k">interfaces</span><span class="v">stays, raw</span></div>
+    <div class="kv"><span class="k">radios</span><span class="v">stays, raw</span></div>
+    <div class="kv"><span class="k">JSON</span><span class="v">stays</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Two of the six are user-facing.</b> <code>samba4</code> is file sharing and <code>fingerprint</code> is why
+  the client list shows "Living room TV" rather than a MAC address — both are things someone would look for.
+  Neither has a settings block, so each would be a switch and nothing else, and per the uconfig repo
+  <code>samba4</code> is not wired into the template set at all yet. The remaining four are internal and should
+  probably never appear: <code>webui</code> is what is serving this page.
+</div>
+
+<div class="warn">
+  <b>Configure's fate is only half answered here.</b> Moving services out leaves interfaces, radios and JSON,
+  which are the raw editor and not intent pages at all. Whether the live app keeps a raw editor beside the
+  intent pages, or drops it and sends anyone who needs it to the offline build, is the decision underneath
+  open question 1 in <a href="../live-app-navigation.md">live-app-navigation.md</a> — and this artefact does
+  not settle it.
+</div>
+
+</div>
+
+</body>
+</html>
