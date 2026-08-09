@@ -61,6 +61,33 @@ export function ts_relative(ts: number | null | undefined): string {
   return `${Math.floor(hours / 24)}d ago`
 }
 
+// Wall clock for a log line. The event log needs the actual time rather than
+// ts_relative's coarse age: two entries a second apart are the whole story when
+// something is retrying, and "just now" hides it.
+export function clock_format(ts: number): string {
+  return new Date(ts * 1000).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  })
+}
+
+// Heading for a run of entries from the same day. `now` is passed in rather
+// than read from the browser because these timestamps are the device's clock,
+// and a device with no working NTP is skewed against the browser but consistent
+// with itself.
+export function day_label(ts: number, now: number): string {
+  const day = (t: number) => {
+    const d = new Date(t * 1000)
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  }
+  const diff = Math.round((day(now) - day(ts)) / 86400000)
+  if (diff <= 0) return 'Today'
+  if (diff === 1) return 'Yesterday'
+  return new Date(ts * 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+}
+
 // Signal bands follow the usual WiFi rule of thumb: -60 and better is strong,
 // -75 and better is usable, below that is weak.
 export function signal_class(dbm: number | null | undefined): string {

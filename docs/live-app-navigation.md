@@ -94,7 +94,14 @@ Status is **Internet**, **Network**, **Wireless**, **Clients**. Traffic is gone
 as a page of its own and now opens Internet, because a throughput graph
 explains nothing without the address and lease beside it.
 
-Two things the pages have to get right, both learned from drawing them:
+Two more sit under System, after Overview: **Events**, the device's own log of
+what it did, and **Memory**, which process is growing. They are there rather
+than under Status because Status is at four entries, which the mobile bottom bar
+shares with uCoord and which is its whole budget; System is `desktopOnly`. The
+key is `events` rather than `log`, because `svc:log` already puts a "Log" entry
+in the same sidebar for configuring the log buffer.
+
+Three things the pages have to get right, all learned from drawing them:
 
 The uplink is found by `uplink()` in `src/lib/netstate.svelte.ts`, and a
 gateway alone is not enough to go on. An uplink that has lost its lease has no
@@ -107,6 +114,20 @@ onto Network as a nameless local interface.
 No carrier, carrier but no address, and no upstream interface at all send
 someone to three different places; collapsing them into one message sends them
 to swap a cable that was never the problem.
+
+A page must not repeat a word the device chose. `memory info` sorts processes
+into `leaking` and `stable`, but its whole rule is "grew by any amount at all",
+which flags 18 of 44 processes on a healthy device. `MemoryPage.svelte` says
+**grown since first seen** and **steady** and shows the figure. The device's
+vocabulary is a fact about its implementation, not a claim the UI may pass on.
+
+One more that only shows up in translation. An event line bolds a value in the
+middle of a sentence, and the obvious way to build it is to concatenate
+fragments around a `<b>`, which leaves the catalogue holding "Handed" and
+"to {name}" as separate keys that no translator can reorder. `EventsPage.svelte`
+instead translates the whole sentence and marks the emphasised value with a
+sentinel character that travels with it, so the bold follows the placeholder
+wherever a translation puts it.
 
 Two joins are still by case-folding rather than agreement. `radios` keys on
 `2g`/`5g` where the schema says `2G`/`5G`, and `ports` names sockets `WAN` and

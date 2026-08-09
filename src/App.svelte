@@ -592,6 +592,8 @@
     {:else if key === 'wired'}<DP.WiredPage />
     {:else if key === 'airtime'}<DP.AirtimePage />
     {:else if key === 'state'}<DP.StatePage />
+    {:else if key === 'events'}<DP.EventsPage />
+    {:else if key === 'memory'}<DP.MemoryPage />
     {:else if key === 'overview'}<DP.UcoordPage />
     {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}
       <DP.SystemBusy>

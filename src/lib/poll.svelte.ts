@@ -7,6 +7,12 @@
 
 import { devices_refresh, devices_clear } from './devices.svelte.ts'
 import {
+  events_refresh,
+  events_clear,
+  memory_refresh,
+  memory_clear
+} from './diagnostics.svelte.ts'
+import {
   network_refresh,
   network_clear,
   ports_refresh,
@@ -31,6 +37,11 @@ const FEEDS = [
   { key: 'network', refresh: network_refresh, clear: network_clear, every: 10000 },
   { key: 'ports', refresh: ports_refresh, clear: ports_clear, every: 10000 },
   { key: 'radios', refresh: radios_refresh, clear: radios_clear, every: 10000 },
+  { key: 'events', refresh: events_refresh, clear: events_clear, every: 10000 },
+  // Only the free-memory half of this is live. The per-process figures come
+  // from a table the device resamples once an hour, so polling any faster would
+  // redraw a frozen list beside a moving gauge.
+  { key: 'memory', refresh: memory_refresh, clear: memory_clear, every: 60000 },
   // Peer entries only change on a state transition, so this is near-static; the
   // cost is one status call plus an info call per connected peer.
   { key: 'ucoord', refresh: ucoord_refresh, clear: ucoord_clear, every: 10000 }

@@ -227,17 +227,23 @@ should read one or the other, never both, or it will show two different totals.
 
 ## Who reads them
 
-`src/lib/netstate.svelte.ts` holds one store per call, refreshed on a ten second
-poll through the `poll_feed()` registry, plus the three derivations the pages
-share: `uplink()`, `local()` and `sorted_ports()`.
+`src/lib/netstate.svelte.ts` holds a store per network call, plus the three
+derivations its pages share: `uplink()`, `local()` and `sorted_ports()`.
+`src/lib/diagnostics.svelte.ts` holds the other two, kept apart because they are
+about the device rather than the network, with `events_recent()` for the sort
+and `event_group()` for the filter. All of them refresh through the
+`poll_feed()` registry.
 
 | Page | Component | Feeds |
 |---|---|---|
 | Status › Internet | `InternetPage.svelte` | `network`, `ports`, `traffic` |
 | Status › Network | `WiredPage.svelte` | `network`, `ports`, `clients` |
 | Status › Wireless | `AirtimePage.svelte` | `radios`, `clients` |
-| System › Events | drawn, not built | `event-log`, `clients` |
-| System › Memory | drawn, not built | `memory` |
+| System › Events | `EventsPage.svelte` | `event-log`, `clients` |
+| System › Memory | `MemoryPage.svelte` | `memory` |
+
+Everything polls at ten seconds except `memory`, at sixty: only its
+free-memory half is live.
 
 The Events page reads `clients` as well because the log records MACs and people
 read names. `devices` is the only thing that maps one to the other, so a log

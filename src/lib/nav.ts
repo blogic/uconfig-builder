@@ -139,6 +139,13 @@ export const SYSTEM_ITEMS: NavItem[] = [
   // asking one: arriving at System usually means wanting to know how the device
   // is doing.
   { key: 'state', label: 'Overview', icon: 'bi-speedometer2' },
+  // Overview says how the device is; these two say what it did and what is
+  // growing. They sit here rather than under Status because Status is at four
+  // entries, which the mobile bottom bar shares with uCoord and which is its
+  // whole budget. `events` rather than `log`: svc:log already puts a "Log"
+  // entry in this sidebar for configuring the log buffer.
+  { key: 'events', label: 'Events', icon: 'bi-list-columns-reverse' },
+  { key: 'memory', label: 'Memory', icon: 'bi-memory' },
   // `time` rather than `ntp`: the page holds the timezone as well, and the
   // editor's raw NTP page keeps that key.
   { key: 'time', label: 'Time', icon: 'bi-clock' },
