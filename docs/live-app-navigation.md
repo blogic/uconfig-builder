@@ -172,6 +172,18 @@ service restores its networks as well as its settings, since one page wrote
 both, and `canon_iface` drops `services` so it is not reported twice. Resetting
 an interface leaves the list alone, the way it already leaves the SSIDs alone.
 
+Each service groups under its own name, "System › Services › Logging": with a
+page per service, the section alone could not say which of them a bare "Changed
+Host" belonged to. The field names stay the schema's, as they are everywhere
+else in the changes list.
+
+### The page does not collapse when the last network goes
+
+Turning the last network off is how a service is switched off, so the page
+cannot hide its own controls at that moment: there would be nowhere to turn one
+back on. The networks and settings show whenever the service has a block at
+all, and the switch above them reports whether anything is offering it.
+
 ## Changes: one menu, conditionally rendered
 
 Edits now originate in several sections, so a pending-changes item inside one

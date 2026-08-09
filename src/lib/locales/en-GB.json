@@ -510,7 +510,6 @@
   "Syslog transport.": "Transport protocol used for the remote syslog connection.",
   "System": "System",
   "System › Device": "System › Device",
-  "System › Services": "System › Services",
   "System › Time": "System › Time",
   "system-defaults": "system-defaults",
   "tagged": "Tagged",

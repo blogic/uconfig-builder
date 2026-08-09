@@ -1,5 +1,7 @@
 <script lang="ts">
   import { store, doc_export, config_save, saved_names, changes_reset, scope_reset } from '../store.svelte.js'
+  import { title_for } from '../labels.js'
+  import { system_service } from '../services.js'
   import { t } from '../i18n.svelte.js'
   import Button from './Button.svelte'
   import ChangesResetModal from './ChangesResetModal.svelte'
@@ -43,7 +45,16 @@
   // Prefixed scopes carry a name after the colon, so they group by what they own.
   function group_for(c: ChangeEntry): { label: string; icon: string } {
     if (SCOPE_GROUPS[c.scope]) return SCOPE_GROUPS[c.scope]
-    if (c.scope.startsWith('service:')) return { label: 'System › Services', icon: 'bi-hdd-network' }
+    // Each service is its own page now, so the group names it: "System ›
+    // Services" alone could not say which of them "Changed Host" belonged to.
+    if (c.scope.startsWith('service:')) {
+      const key = c.scope.slice(8)
+      const svc = system_service(key)
+      return {
+        label: `System › Services › ${svc?.label ?? title_for(key)}`,
+        icon: svc?.icon ?? 'bi-hdd-network'
+      }
+    }
     if (c.scope.startsWith('include:')) {
       const cut = c.scope.indexOf('/')
       const overlay = cut === -1 ? '' : c.scope.slice(cut + 1)

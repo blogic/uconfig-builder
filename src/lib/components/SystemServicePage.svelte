@@ -111,7 +111,11 @@
     </div>
   {/if}
 
-  {#if enabled && meta?.networks}
+  <!-- Shown whenever the service has settings at all, not only while it is
+       running: turning the last network off is how you switch it off, and the
+       page collapsing under you at that moment leaves nowhere to turn one back
+       on. -->
+  {#if data && meta?.networks}
     <div class="flex flex-col gap-1">
       <span class="text-xs font-medium text-zinc-700">{t('Offered on')}</span>
       {#each networks as name (name)}
@@ -143,7 +147,7 @@
   {/if}
 </div>
 
-{#if enabled && data}
+{#if data}
   <div class={meta?.always ? '' : 'mt-4'}>
     <LayoutRenderer {data} {schema} {layout} />
   </div>
