@@ -531,6 +531,7 @@
   "The resulting uConfig document. Download it, save it locally, or apply it to a connected device.": "The resulting uConfig document. Download it, save it locally, or apply it to a connected device.",
   "The tag guest traffic carries on the wire. Shared with every device in the venue, so changing it here changes it for all of them.": "The tag guest traffic carries on the wire. Shared with every device in the venue, so changing it here changes it for all of them.",
   "The Wi-Fi network your own devices join. Changes apply to every radio the device has.": "The Wi-Fi network your own devices join. Changes apply to every radio the device has.",
+  "The zone this device reads the clock in, and the servers it asks for the time.": "The zone this device reads the clock in, and the servers it asks for the time.",
   "This device bridges its local network, so the router upstream of it owns these settings.": "This device bridges its local network, so the router upstream of it owns these settings.",
   "This device has no uplink interface configured.": "This device has no uplink interface configured.",
   "This device has no Wi-Fi network configured yet.": "This device has no Wi-Fi network configured yet.",

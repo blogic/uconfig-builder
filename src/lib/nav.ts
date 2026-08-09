@@ -128,7 +128,9 @@ export const CHANGES_ITEMS: NavItem[] = [
 // irreversible action each. Services expands rather than linking to a page,
 // because a page holding only links to pages earns nothing.
 export const SYSTEM_ITEMS: NavItem[] = [
-  { key: 'ntp', label: 'Time', icon: 'bi-clock' },
+  // `time` rather than `ntp`: the page holds the timezone as well, and the
+  // editor's raw NTP page keeps that key.
+  { key: 'time', label: 'Time', icon: 'bi-clock' },
   { key: 'system-services', label: 'Services', icon: 'bi-hdd-network', group: true },
   { key: 'state', label: 'State', icon: 'bi-speedometer2' },
   { key: 'reboot', label: 'Reboot', icon: 'bi-arrow-clockwise' },

@@ -157,6 +157,15 @@ export function scope_reset(scope: string) {
     unit_defaults(store.doc)
     return
   }
+  // One field of unit, because the page that sets it owns only that field.
+  // Restored exactly: seeding a default here would leave an edit behind.
+  if (scope === 'time') {
+    if (!store.doc.unit || typeof store.doc.unit !== 'object') store.doc.unit = {}
+    const tz = base.unit?.timezone
+    if (tz) store.doc.unit.timezone = tz
+    else delete store.doc.unit.timezone
+    return
+  }
   if (scope === 'radios' || scope === 'interfaces') {
     store.doc[scope] = base[scope] ?? {}
     return

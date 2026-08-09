@@ -63,7 +63,8 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
     'Lets this device be found by name instead of by address, and lets printers and speakers announce themselves to it. mDNS.',
   'svc:lldp':
     'Announces this device to the switches it is plugged into, so network maps and neighbouring equipment find it. LLDP.',
-  'svc:log': 'Keeps a local log buffer, and can copy it to a syslog server elsewhere.'
+  'svc:log': 'Keeps a local log buffer, and can copy it to a syslog server elsewhere.',
+  time: 'The zone this device reads the clock in, and the servers it asks for the time.'
 }
 
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,

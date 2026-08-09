@@ -10,6 +10,7 @@
   import SystemServicePage from './lib/components/SystemServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
   import NtpPage from './lib/components/NtpPage.svelte'
+  import TimePage from './lib/components/TimePage.svelte'
   import InterfaceAddForm from './lib/components/InterfaceAddForm.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
   import TopBar from './lib/components/TopBar.svelte'
@@ -582,6 +583,7 @@
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />
+  {:else if key === 'time'}<TimePage {changes} />
   {:else if key?.startsWith('svc:')}<SystemServicePage serviceKey={key.slice(4)} {changes} />
   {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} toggleable={!deviceSession} />
   {:else if IS_DEVICE && DP}

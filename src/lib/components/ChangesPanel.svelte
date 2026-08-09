@@ -21,7 +21,8 @@
     unit: { label: 'System › Device', icon: 'bi-shield-check' },
     radios: { label: 'Wireless › Radios', icon: 'bi-broadcast' },
     interfaces: { label: 'Network › Interfaces', icon: 'bi-ethernet' },
-    ntp: { label: 'System › Time', icon: 'bi-clock' }
+    ntp: { label: 'System › Time', icon: 'bi-clock' },
+    time: { label: 'System › Time', icon: 'bi-clock' }
   }
 
   // Interfaces the Wireless and Network sections give a page of their own, so

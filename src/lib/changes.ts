@@ -194,12 +194,16 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
   if (!cur || !base) return []
   const out: ChangeEntry[] = []
 
-  out.push(
-    ...diff_fields(canon_unit(cur.unit) as JsonObject | undefined, canon_unit(base.unit) as JsonObject | undefined, {
-      section: 'Unit',
-      scope: 'unit'
-    })
+  const unit = diff_fields(
+    canon_unit(cur.unit) as JsonObject | undefined,
+    canon_unit(base.unit) as JsonObject | undefined,
+    { section: 'Unit', scope: 'unit' }
   )
+  // The timezone is set beside the NTP servers on System > Time rather than
+  // beside the hostname, so it carries that page's scope: grouping and reset
+  // follow the page that owns a field, not the block it happens to live in.
+  for (const c of unit) if (c.key === 'timezone') c.scope = 'time'
+  out.push(...unit)
 
   const radioMeta = { section: 'Radios', scope: 'radios' }
   for (const band of keys_union(cur.radios, base.radios)) {
