@@ -153,6 +153,14 @@
     border-left-color: var(--accent); font-weight: 600;
   }
   .nav-item.on .ico { color: var(--accent); }
+  /* Sub-entries of an expandable group, mirroring .nav-subitem in src/app.css:
+     the active one takes the wash but keeps its own text colour. */
+  .nav-sub {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .48rem .75rem .48rem 2.05rem; font-size: .78rem; color: var(--muted);
+    border-left: 3px solid transparent;
+  }
+  .nav-sub.on { background: var(--nav-active); color: var(--ink); font-weight: 600; }
   .badge {
     margin-left: auto; background: var(--accent); color: var(--accent-ink);
     border-radius: 999px; font-size: .62rem; font-weight: 700;
@@ -285,8 +293,9 @@
   <h1>Applications and services — mockups</h1>
   <p>Services today are one collapsible group under <b>Configure</b>, ten pages deep, each shaped like the
      schema block behind it. This splits them in two: <b>Applications</b> becomes a top-level menu for the
-     things someone adds because of what they do, and the plumbing moves to a <b>Services</b> page under
-     System. Palette, spacing and controls are taken from <code>src/app.css</code>, so these read as the real app.</p>
+     things someone adds because of what they do, and the plumbing stays a sidebar group, moved under
+     <b>System</b> and down to six. Palette, spacing and controls are taken from <code>src/app.css</code>, so
+     these read as the real app.</p>
 </header>
 
 
@@ -533,8 +542,9 @@
 <!-- ========================= SYSTEM SERVICES ========================= -->
 <h2 class="sec">4 — System › Services</h2>
 <p class="sec-lead">What is left once the applications have gone: plumbing that makes the device manageable or
-   discoverable rather than anything a network is for. One page, not one page each — most of these are read once
-   and never changed, and a sidebar of ten was the problem being solved.</p>
+   discoverable rather than anything a network is for. Services expands in the sidebar rather than sitting behind
+   a list page, which is the group pattern Configure already uses — reaching one is a click, not two, and the
+   menu stays a menu rather than becoming a page that only holds links.</p>
 
 <div class="frame frame-scroll">
   <div class="app">
@@ -555,121 +565,20 @@
       <div class="side">
         <div class="nav-item"><span class="ico">🔧</span> Device</div>
         <div class="nav-item"><span class="ico">🕐</span> Time</div>
-        <div class="nav-item on"><span class="ico">🧩</span> Services</div>
+        <div class="nav-item"><span class="ico">🧩</span> Services <span style="margin-left:auto;font-size:.7rem">▾</span></div>
+        <div class="nav-sub on">SSH</div>
+        <div class="nav-sub">Local discovery</div>
+        <div class="nav-sub">Logging</div>
+        <div class="nav-sub">Neighbour discovery</div>
+        <div class="nav-sub">RADIUS server</div>
+        <div class="nav-sub">Wired authentication</div>
         <div class="nav-item"><span class="ico">📊</span> State</div>
         <div class="nav-item"><span class="ico">↻</span> Reboot</div>
         <div class="nav-item"><span class="ico">💾</span> Firmware</div>
         <div class="nav-item"><span class="ico">⚠</span> Factory Reset</div>
       </div>
       <div class="content">
-        <p class="lead">What this device offers to the networks it runs. Each one is off until a network is
-           given it.</p>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">🖥</span><span class="card-title">SSH</span>
-            <span class="pill live">LAN</span>
-            <span class="toggle on" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">Shell and command-line access to the device itself.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">📡</span><span class="card-title">Local discovery</span>
-            <span class="pill live">LAN</span>
-            <span class="pill live">Guest</span>
-            <span class="toggle on" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">Answers to <code>openwrt.local</code>, and lets printers and speakers be found by name. mDNS.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">📄</span><span class="card-title">Logging</span>
-            <span class="toggle" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">Keeps a local log buffer, and can copy it to a syslog server elsewhere.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">🔌</span><span class="card-title">Neighbour discovery</span>
-            <span class="toggle" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">Announces this device to the switches it is plugged into, so network maps find it. LLDP.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">🔐</span><span class="card-title">RADIUS server</span>
-            <span class="toggle" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">A built-in account list, for Wi-Fi or wired networks that authenticate each user
-             rather than sharing one password.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="ico">🔑</span><span class="card-title">Wired authentication</span>
-            <span class="toggle" style="margin-left:auto"></span>
-          </div>
-          <div class="hint">Requires a device to authenticate before the socket it is plugged into carries
-             traffic. 802.1X.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="note">
-  <b>Renamed, not reinvented.</b> mDNS, LLDP and 802.1X are drawn under what they do, with the protocol name
-  kept in the hint so anyone searching for it still lands here. The keys are unchanged:
-  <code>services.mdns</code>, <code>services.lldp</code>, <code>services.ieee8021x</code>. SSH and RADIUS keep
-  their own names because those <em>are</em> the plain words for them.
-</div>
-
-<div class="warn">
-  <b>RADIUS and wired authentication are one thought.</b> 802.1X's only setting is which RADIUS server to ask,
-  and the usual answer is the built-in one directly above it. They are drawn as two rows here; one row called
-  <b>Network access</b> holding both would be fewer decisions, at the cost of hiding that either can be used
-  without the other.
-</div>
-
-
-<!-- ========================= A SERVICE PAGE ========================= -->
-<h2 class="sec">5 — System › Services › SSH</h2>
-<p class="sec-lead">A row opens into its settings. Same shape as an application page: the switch, then which
-   networks it is offered on, then the few things worth changing.</p>
-
-<div class="frame frame-scroll">
-  <div class="app">
-    <div class="topbar">
-      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
-      <div class="tabs">
-        <span class="tab">Status</span>
-        <span class="tab">uCoord</span>
-        <span class="tab">Wireless</span>
-        <span class="tab">Network</span>
-        <span class="tab">Applications</span>
-        <span class="tab">Configure</span>
-        <span class="tab on">System</span>
-      </div>
-      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
-    </div>
-    <div class="body">
-      <div class="side">
-        <div class="nav-item"><span class="ico">🔧</span> Device</div>
-        <div class="nav-item"><span class="ico">🕐</span> Time</div>
-        <div class="nav-item on"><span class="ico">🧩</span> Services</div>
-        <div class="nav-item"><span class="ico">📊</span> State</div>
-        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
-        <div class="nav-item"><span class="ico">💾</span> Firmware</div>
-        <div class="nav-item"><span class="ico">⚠</span> Factory Reset</div>
-      </div>
-      <div class="content">
-        <p class="lead"><span style="color:var(--accent)">‹ Services</span> &nbsp; Shell and command-line
-           access to the device itself.</p>
+        <p class="lead">Shell and command-line access to the device itself.</p>
 
         <div class="field">
           <div class="toggle-row"><span class="toggle on"></span><span class="t">SSH</span></div>
@@ -707,11 +616,108 @@
 </div>
 
 <div class="note">
-  <b>Field mapping.</b> Reachable from → <code>ssh</code> in each interface's <code>services</code> array;
-  allow password login → <code>services.ssh.password-authentication</code>; authorised keys →
-  <code>authorized-keys</code>; behind Advanced → <code>port</code> and <code>cli-port</code>. The ports are
-  hidden rather than dropped: changing them is rare, and a service on a surprising port is hard to diagnose
-  from anywhere else.
+  <b>A service is given to a network from the service's own page.</b> "Reachable from" writes <code>ssh</code>
+  into each interface's <code>services</code> array — the same array Configure › Interfaces offers as a checkbox
+  list. Asking here is the right way round: someone turning on SSH is thinking about SSH, not walking the
+  interfaces to remember which of them should carry it. It also puts the switch and its scope in one place,
+  which is what makes a single switch honest. Configure › Interfaces keeps its checkbox list: the raw editor
+  edits the document as the schema shapes it, and two views of one array is the ordinary case there.
+</div>
+
+<div class="note">
+  <b>Renamed, not reinvented.</b> mDNS, LLDP and 802.1X are drawn under what they do, with the protocol name
+  kept in the hint so anyone searching for it still lands here. The keys are unchanged:
+  <code>services.mdns</code>, <code>services.lldp</code>, <code>services.ieee8021x</code>. SSH and RADIUS keep
+  their own names because those <em>are</em> the plain words for them.
+</div>
+
+<div class="warn">
+  <b>RADIUS and wired authentication are one thought.</b> 802.1X's only setting is which RADIUS server to ask,
+  and the usual answer is the built-in one directly above it. They are drawn as two rows here; one row called
+  <b>Network access</b> holding both would be fewer decisions, at the cost of hiding that either can be used
+  without the other.
+</div>
+
+
+<!-- ========================= A SERVICE PAGE ========================= -->
+<h2 class="sec">5 — System › Services › Local discovery</h2>
+<p class="sec-lead">Most of these have almost nothing to set, and this is the extreme: a switch, the networks it
+   answers on, and any extra names to announce. Which is the argument for the submenu rather than a list page —
+   a list page would mostly be a way of reaching pages that are themselves nearly empty.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Applications</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🔧</span> Device</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item"><span class="ico">🧩</span> Services <span style="margin-left:auto;font-size:.7rem">▾</span></div>
+        <div class="nav-sub">SSH</div>
+        <div class="nav-sub on">Local discovery</div>
+        <div class="nav-sub">Logging</div>
+        <div class="nav-sub">Neighbour discovery</div>
+        <div class="nav-sub">RADIUS server</div>
+        <div class="nav-sub">Wired authentication</div>
+        <div class="nav-item"><span class="ico">📊</span> State</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">💾</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory Reset</div>
+      </div>
+      <div class="content">
+        <p class="lead">Lets this device be found by name instead of by address, and lets printers, speakers and
+           the like announce themselves to it. mDNS.</p>
+
+        <div class="field">
+          <div class="toggle-row"><span class="toggle on"></span><span class="t">Local discovery</span></div>
+          <div class="hint">On. This device answers to <code>openwrt.local</code>.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Answers on</label>
+          <div class="row">
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">LAN</span></div></div>
+            <div><div class="toggle-row"><span class="toggle on"></span><span class="t">Guest</span></div></div>
+            <div><div class="toggle-row"><span class="toggle"></span><span class="t">WAN</span></div></div>
+          </div>
+          <div class="hint">Announcements do not cross between networks, so a guest cannot discover a printer
+             on the LAN by turning this on for both.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Extra names</label>
+          <input class="input ro" value="None" readonly>
+          <div class="hint">Further <code>.local</code> names this device should answer to, on top of its
+             hostname.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> The switch and "Answers on" → <code>mdns</code> in each interface's <code>services</code>
+  array, which is the whole of what starts it; extra names → <code>services.mdns.additional-hostnames</code>,
+  the only field the block has. Nothing here is behind Advanced because there is nothing left to put there.
+</div>
+
+<div class="note">
+  <b>The same page for SSH.</b> Section 4 is that page: switch, "Reachable from", then password login and
+  authorised keys, with <code>port</code> and <code>cli-port</code> behind Advanced. Every service in the
+  submenu is this shape — a switch, the networks, and between zero and four settings — which is why they read
+  better as siblings in a menu than as a list of cards standing in front of them.
 </div>
 
 
@@ -771,20 +777,27 @@
             <span class="tab">Status</span>
             <span class="tab">Wireless</span>
             <span class="tab">Network</span>
-            <span class="tab on">Applications</span>
-            <span class="tab">System</span>
+            <span class="tab">Applications</span>
+            <span class="tab on">System</span>
           </div>
         </div>
         <div class="body" style="min-height:230px">
           <div class="side" style="width:158px">
-            <div class="nav-item on"><span class="ico">🛡</span> AdGuard Home</div>
-            <div class="nav-item"><span class="ico">🔗</span> Tailscale</div>
-            <div class="nav-item"><span class="ico">🚦</span> Quality of Service</div>
+            <div class="nav-item"><span class="ico">🔧</span> Device</div>
+            <div class="nav-item"><span class="ico">🕐</span> Time</div>
+            <div class="nav-item"><span class="ico">🧩</span> Services <span style="margin-left:auto;font-size:.7rem">▾</span></div>
+            <div class="nav-sub on">SSH</div>
+            <div class="nav-sub">Local discovery</div>
+            <div class="nav-sub">Logging</div>
+            <div class="nav-sub">Neighbour discovery</div>
+            <div class="nav-sub">RADIUS server</div>
+            <div class="nav-sub">Wired authentication</div>
+            <div class="nav-item"><span class="ico">📊</span> State</div>
           </div>
           <div class="content" style="padding:.9rem">
-            <p class="lead" style="margin:0"><b>Proposed.</b> Three entries, each one something a person wanted.
-               The plumbing moves to System › Services, and Configure keeps the raw editor for anyone who needs
-               it.</p>
+            <p class="lead" style="margin:0"><b>Proposed.</b> Still a group in a sidebar, but six entries instead
+               of ten and all of one kind. The three applications have gone to a menu of their own, and NTP to
+               System › Time.</p>
           </div>
         </div>
       </div>
@@ -795,10 +808,19 @@
 <div class="note">
   <b>Where this lands in the bar.</b> Applications sits after Network and before Configure:
   <b>Status · uCoord · Wireless · Network · Applications · Configure · System</b>, with Changes appended only
-  while something is pending. Services becomes a page in <code>SYSTEM_ITEMS</code> beside Device and Time —
-  which is what <code>ChangesPanel.svelte</code> has been labelling these all along
+  while something is pending. Services becomes a <code>group: true</code> entry in <code>SYSTEM_ITEMS</code>
+  beside Device and Time — which is what <code>ChangesPanel.svelte</code> has been labelling these all along
   (<code>unit</code> → "System › Device", <code>ntp</code> → "System › Time", <code>service:*</code> →
   "System › Services"), so the changes list needs no relabelling.
+</div>
+
+<div class="note">
+  <b>Two groups where the nav supports one.</b> <code>group: true</code> exists once today, and
+  <code>SectionNav.svelte</code> holds a single <code>servicesOpen</code> state for it, opened by an
+  <code>inServices</code> predicate hardcoded as <code>page.startsWith('service:') || page === 'ntp'</code> in
+  both <code>SectionNav.svelte</code> and <code>App.svelte</code>. A second group needs that generalised to
+  per-group state, and the duplicated predicate reduced to one. Applications is a section rather than a group,
+  so it does not add a third.
 </div>
 
 
