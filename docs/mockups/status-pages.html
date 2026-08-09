@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Status pages mockups</title>
+
+<!-- Mockups for the live app's Status section, once the device can report what
+     it is doing: Internet, Network and Wireless.
+     See ../device-state.md for the RPCs these read.
+     Self-contained: open directly in a browser, no build step. -->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --accent: #3498db;
+    --accent-dark: #2980b9;
+    --accent-ink: #ffffff;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --ok: #28a745;
+    --warn: #f0ad4e;
+    --warn-ink: #856404;
+    --warn-bg: #fff3cd;
+    --danger: #e74c3c;
+    --radius: 4px;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface: #22303c;
+      --page: #1a252f;
+      --nav-active: #2c3e50;
+      --ink: #ecf0f1;
+      --ink-soft: #dfe6e9;
+      --muted: #95a5a6;
+      --faint: #7f8c8d;
+      --line: #34495e;
+      --line-strong: #3d566e;
+      --note-bg: #1f2b36;
+      --note-ink: #b6c2cd;
+      --warn-bg: #4a3f1a;
+      --warn-ink: #ffd97a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #22303c;
+    --page: #1a252f;
+    --nav-active: #2c3e50;
+    --ink: #ecf0f1;
+    --ink-soft: #dfe6e9;
+    --muted: #95a5a6;
+    --faint: #7f8c8d;
+    --line: #34495e;
+    --line-strong: #3d566e;
+    --note-bg: #1f2b36;
+    --note-ink: #b6c2cd;
+    --warn-bg: #4a3f1a;
+    --warn-ink: #ffd97a;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+    --warn-bg: #fff3cd;
+    --warn-ink: #856404;
+  }
+
+  body {
+    margin: 0;
+    padding: 2rem 1.25rem 4rem;
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.doc { margin-bottom: 2.5rem; }
+  header.doc h1 { font-size: 1.55rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  header.doc p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+  h2.sec {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); margin: 3rem 0 .35rem; font-weight: 600;
+  }
+  h2.sec:first-of-type { margin-top: 2rem; }
+  .sec-lead { margin: 0 0 1rem; color: var(--muted); max-width: 68ch; font-size: .9rem; }
+
+  /* ---- app frame ---- */
+  .frame {
+    border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .frame-scroll { overflow-x: auto; }
+  .app { display: flex; flex-direction: column; min-width: 860px; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 1.5rem;
+    border-bottom: 1px solid var(--line); padding: 0 1rem; height: 44px;
+    background: var(--surface);
+  }
+  .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: .95rem; }
+  .brand-mark {
+    width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-size: .7rem;
+  }
+  .tabs { display: flex; gap: 1.25rem; font-size: .85rem; height: 100%; align-items: stretch; }
+  .tab {
+    display: flex; align-items: center; gap: .35rem; color: var(--muted);
+    border-bottom: 2px solid transparent; padding: 0 .1rem;
+  }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .host { margin-left: auto; font-size: .72rem; color: var(--muted); }
+  .host b { color: var(--ink); }
+
+  .body { display: flex; min-height: 340px; }
+
+  .side {
+    width: 172px; flex-shrink: 0; border-right: 1px solid var(--line);
+    background: var(--surface); padding: 0;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .55rem; padding: .62rem .75rem;
+    font-size: .82rem; color: var(--ink-soft); border-left: 3px solid transparent;
+  }
+  .nav-item .ico { width: 1rem; text-align: center; color: var(--muted); font-size: .8rem; }
+  .nav-item.on {
+    background: var(--nav-active); color: var(--accent);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  .nav-item.on .ico { color: var(--accent); }
+  /* Sub-entries of an expandable group, mirroring .nav-subitem in src/app.css:
+     the active one takes the wash but keeps its own text colour. */
+  .nav-sub {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .48rem .75rem .48rem 2.05rem; font-size: .78rem; color: var(--muted);
+    border-left: 3px solid transparent;
+  }
+  .nav-sub.on { background: var(--nav-active); color: var(--ink); font-weight: 600; }
+  .badge {
+    margin-left: auto; background: var(--accent); color: var(--accent-ink);
+    border-radius: 999px; font-size: .62rem; font-weight: 700;
+    min-width: 1.05rem; height: 1.05rem; display: grid; place-items: center; padding: 0 .3rem;
+  }
+
+  .content { flex: 1; padding: 1.1rem 1.35rem; min-width: 0; }
+  .lead { color: var(--muted); font-size: .84rem; margin: 0 0 1.1rem; max-width: 70ch; }
+
+  /* ---- form vocabulary ---- */
+  .field { margin-bottom: 1rem; }
+  .label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .3rem; }
+  .input {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: .42rem .55rem; font-size: .84rem;
+    background: var(--surface); color: var(--ink);
+  }
+  .input.ro { background: var(--page); color: var(--muted); }
+  .hint { font-size: .71rem; color: var(--muted); margin-top: .25rem; }
+  .row { display: flex; gap: .85rem; }
+  .row > * { flex: 1; min-width: 0; }
+
+  .seg { display: flex; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+  .seg span { padding: .34rem .85rem; font-size: .78rem; color: var(--ink-soft); }
+  .seg span.on { background: var(--accent); color: #fff; font-weight: 600; }
+
+  .toggle { width: 34px; height: 19px; border-radius: 999px; background: var(--faint); position: relative; flex-shrink: 0; }
+  .toggle.on { background: var(--accent); }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+  .toggle.on::after { left: auto; right: 2px; }
+  .toggle-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem; }
+  .toggle-row .t { font-size: .82rem; font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius);
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    padding: .36rem .8rem; font-size: .8rem; font-weight: 500;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem; margin-bottom: .8rem; }
+  .card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .1rem; }
+  .card-title { font-weight: 600; font-size: .87rem; }
+  .pill {
+    font-size: .64rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px;
+    background: var(--page); color: var(--muted); border: 1px solid var(--line);
+  }
+  .pill.live { background: #e8f6ec; color: #1e7e34; border-color: #c9e7d2; }
+  .pill.vlan { background: var(--nav-active); color: var(--accent-dark); border-color: #cfe6f7; }
+  @media (prefers-color-scheme: dark) {
+    .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+    .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+  }
+  :root[data-theme="dark"] .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+  :root[data-theme="dark"] .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+
+  .kv { display: flex; justify-content: space-between; font-size: .78rem; padding: .18rem 0; }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-variant-numeric: tabular-nums; }
+
+  /* Pending-changes tab: present only when something is pending, so it carries
+     the amber cue on its own rather than needing a count. */
+  .tab.pending { color: var(--warn-ink); }
+  .tab.pending.on { color: var(--warn-ink); border-bottom-color: var(--warn); font-weight: 600; }
+
+  .chg-group { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .7rem; }
+  .chg-head {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .55rem .85rem; border-bottom: 1px solid var(--line);
+  }
+  .chg-head .ico { font-size: .82rem; }
+  .chg-title { font-weight: 600; font-size: .84rem; }
+  .chg-count { font-size: .71rem; color: var(--muted); }
+  .chg-reset {
+    margin-left: auto; font-size: .74rem; color: var(--accent); font-weight: 500;
+  }
+  .chg-item {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .32rem .85rem; font-size: .79rem; color: var(--muted);
+  }
+  .chg-item:first-of-type { padding-top: .5rem; }
+  .chg-item:last-child { padding-bottom: .55rem; }
+  .chg-item .dot {
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+  }
+
+  .disclosure {
+    display: flex; align-items: center; gap: .45rem; padding: .5rem 0;
+    border-top: 1px solid var(--line); margin-top: .4rem;
+    font-size: .82rem; font-weight: 600; color: var(--ink-soft);
+  }
+  .disclosure .ico { color: var(--muted); font-size: .7rem; }
+  .disclosure-note { font-weight: 400; font-size: .71rem; color: var(--muted); margin-left: .1rem; }
+
+  .tabs-inline { display: flex; gap: .3rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  .tabs-inline span { padding: .4rem .75rem; font-size: .8rem; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs-inline span.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .note {
+    background: var(--note-bg); border-left: 3px solid var(--accent);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; color: var(--note-ink); margin: .9rem 0 0;
+  }
+  .note b { color: var(--ink); }
+  .note ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .note li { margin: .2rem 0; }
+
+  .warn {
+    background: var(--warn-bg); color: var(--warn-ink); border-left: 3px solid var(--warn);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; margin: .9rem 0 0;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8em;
+    background: var(--page); padding: .08em .35em; border-radius: 3px; border: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: dark) { code { background: #1a252f; } }
+  :root[data-theme="dark"] code { background: #1a252f; }
+</style>
+
+<!-- Only what these pages need beyond the shared vocabulary. -->
+<style>
+  /* Airtime and link utilisation: a bar rather than the app's arc gauge, which
+     is wired to bit/s. Amber and red mirror UsageGauge's severity ramp. */
+  .meter { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--accent); }
+  /* Not .warn: that class is already the amber callout box, and an <i> would
+     inherit its padding and border. */
+  .meter i.busy { background: var(--warn); }
+  .meter i.hot { background: var(--danger); }
+  .meter-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .3rem; }
+  .meter-row .n { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* One socket per row: name, link state, counters. */
+  .port { display: flex; align-items: center; gap: .7rem; padding: .45rem 0; border-top: 1px solid var(--line); font-size: .8rem; }
+  .port:first-of-type { border-top: 0; }
+  .port .name { font-weight: 600; width: 3.4rem; flex-shrink: 0; }
+  .port .cnt { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .port.down { color: var(--faint); }
+  .port.down .name { color: var(--muted); }
+
+  .big { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; }
+  .big-unit { font-size: .8rem; font-weight: 500; color: var(--muted); margin-left: .2rem; }
+  .stat { display: flex; gap: 2.2rem; margin: .2rem 0 1rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="doc">
+  <h1>Status — mockups</h1>
+  <p>Status can only show traffic and a client list, because until now nothing told the app what the device
+     was doing. Three RPCs change that, and three pages read them: <b>Internet</b> for the uplink,
+     <b>Network</b> for the wired side, <b>Wireless</b> for the radios. Every number below is real, read off a
+     GL-MT6000 and then scrubbed of its addresses. Palette, spacing and controls are taken from
+     <code>src/app.css</code>, so these read as the real app.</p>
+</header>
+
+
+<!-- ========================= INTERNET, UP ========================= -->
+<h2 class="sec">1 — Status › Internet</h2>
+<p class="sec-lead">The page for "is the internet alright". Traffic moves here from its own entry: throughput is
+   a property of the uplink, and someone watching the graph wants the address and the lease in the same glance.
+   Reads <code>network</code>, <code>ports</code> and the existing <code>traffic</code>.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab on">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item on"><span class="ico">🌍</span> Internet</div>
+        <div class="nav-item"><span class="ico">🖧</span> Network</div>
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Clients</div>
+      </div>
+      <div class="content">
+        <div class="card-head" style="margin-bottom:.6rem">
+          <span class="card-title" style="font-size:1rem">Connected</span>
+          <span class="pill live">1 Gbit/s</span>
+          <span class="pill">up 1 day 4 hours</span>
+        </div>
+
+        <div class="stat">
+          <div>
+            <div class="big">38.2<span class="big-unit">Mbit/s</span></div>
+            <div class="hint">Download</div>
+          </div>
+          <div>
+            <div class="big">4.1<span class="big-unit">Mbit/s</span></div>
+            <div class="hint">Upload</div>
+          </div>
+        </div>
+
+        <div class="tabs-inline"><span class="on">Hour</span><span>Day</span><span>Week</span></div>
+        <svg viewBox="0 0 600 120" style="width:100%;height:90px;display:block;margin-bottom:1rem">
+          <path d="M0,60 L40,52 L80,56 L120,38 L160,50 L200,20 L240,44 L280,34 L320,48 L360,26 L400,46 L440,40 L480,54 L520,30 L560,44 L600,50 L600,60 Z" fill="#3498db" fill-opacity=".55"/>
+          <path d="M0,60 L40,66 L80,64 L120,72 L160,65 L200,78 L240,68 L280,71 L320,66 L360,76 L400,67 L440,69 L480,64 L520,74 L560,68 L600,66 L600,60 Z" fill="#95a5a6" fill-opacity=".45"/>
+          <line x1="0" y1="60" x2="600" y2="60" stroke="currentColor" stroke-opacity=".15"/>
+        </svg>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Uplink</span><span class="pill">DHCP</span></div>
+            <div class="kv"><span class="k">Address</span><span class="v">192.0.2.50/24</span></div>
+            <div class="kv"><span class="k">Gateway</span><span class="v">192.0.2.1</span></div>
+            <div class="kv"><span class="k">DNS</span><span class="v">192.0.2.1</span></div>
+            <div class="kv"><span class="k">Lease from</span><span class="v">192.0.2.1</span></div>
+            <div class="kv"><span class="k">Renews in</span><span class="v">4 days</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">IPv6</span><span class="pill">DHCPv6</span></div>
+            <div class="kv"><span class="k">Address</span><span class="v">2001:db8:1403:600::1dd7/64</span></div>
+            <div class="kv"><span class="k">Delegated to us</span><span class="v">2001:db8:1403:6fc::/62</span></div>
+            <div class="kv"><span class="k">Handed on</span><span class="v">2001:db8:1403:6fc::/64</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Socket</span><span class="pill live">Link up</span></div>
+          <div class="port">
+            <span class="name">WAN</span>
+            <span>1 Gbit/s · eth1</span>
+            <span class="cnt">↓ 30.2 GB &nbsp; ↑ 4.0 GB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> Three calls, one page:
+  <ul>
+    <li>Connected, uptime → <code>network.wan.up</code> and <code>uptime</code>. The heading is the answer to
+        the question the page was opened with, so it is the first thing rendered.</li>
+    <li>Uplink card → <code>network.wan.ipv4</code>: <code>address</code>, <code>gateway</code>,
+        <code>dns</code>, <code>lease.server</code>. <b>Renews in</b> is <code>lease.time</code> counted
+        against <code>uptime</code>, because "864000 seconds" is not an answer.</li>
+    <li>IPv6 card → <code>network.wan.ipv6</code>. <b>Delegated to us</b> is <code>prefix</code>, the /62 the
+        ISP handed down; <b>handed on</b> is the /64 this device assigned to the LAN, from
+        <code>network.main.ipv6.assigned</code>.</li>
+    <li>Socket → <code>ports.WAN</code>: <code>carrier</code>, <code>speed</code>, <code>netdev</code> and the
+        byte counters. Throughput stays on the existing <code>traffic</code> feed.</li>
+  </ul>
+</div>
+
+
+<!-- ========================= INTERNET, DOWN ========================= -->
+<h2 class="sec">2 — Status › Internet, with no uplink</h2>
+<p class="sec-lead">The state the page exists for. Every field it would have shown is a dash, and the one line
+   that matters says which of the two things went wrong: no cable, or a cable and no address.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab on">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body" style="min-height:230px">
+      <div class="side">
+        <div class="nav-item on"><span class="ico">🌍</span> Internet</div>
+        <div class="nav-item"><span class="ico">🖧</span> Network</div>
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Clients</div>
+      </div>
+      <div class="content">
+        <div class="card-head" style="margin-bottom:.6rem">
+          <span class="card-title" style="font-size:1rem">Not connected</span>
+          <span class="pill">No cable in the WAN socket</span>
+        </div>
+        <p class="lead">Nothing is plugged into the socket marked WAN. Until something is, this device has no
+           route to the internet and its clients will not either.</p>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Uplink</span><span class="pill">DHCP</span></div>
+            <div class="kv"><span class="k">Address</span><span class="v">—</span></div>
+            <div class="kv"><span class="k">Gateway</span><span class="v">—</span></div>
+            <div class="kv"><span class="k">DNS</span><span class="v">—</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Socket</span><span class="pill">Link down</span></div>
+            <div class="port down">
+              <span class="name">WAN</span>
+              <span>No cable · eth1</span>
+              <span class="cnt">↓ 0 B &nbsp; ↑ 0 B</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Two failures, told apart.</b> <code>ports.WAN.carrier</code> false means no cable, which is the message
+  drawn. Carrier true with an empty <code>network.wan.ipv4.address</code> means the cable is fine and the
+  provider gave nothing, which wants different words: <em>"Connected to the socket, but no address from your
+  provider."</em> A page that said only "not connected" would send someone to replace a working cable.
+</div>
+
+
+<!-- ========================= NETWORK ========================= -->
+<h2 class="sec">3 — Status › Network</h2>
+<p class="sec-lead">The wired side of the house: what this device calls itself on the LAN, what it hands out,
+   and which sockets have anything in them. Reads <code>network</code> and <code>ports</code>.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab on">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🌍</span> Internet</div>
+        <div class="nav-item on"><span class="ico">🖧</span> Network</div>
+        <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Clients</div>
+      </div>
+      <div class="content">
+        <p class="lead">Your own network, and the sockets on the back of the device.</p>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><span class="card-title">This device</span><span class="pill">main</span></div>
+            <div class="kv"><span class="k">Address</span><span class="v">192.168.42.1/24</span></div>
+            <div class="kv"><span class="k">IPv6</span><span class="v">2001:db8:1403:6fc::1/64</span></div>
+            <div class="kv"><span class="k">Also reachable at</span><span class="v">fd00:db8:1::1/64</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Clients</span></div>
+            <div class="kv"><span class="k">Online now</span><span class="v">14</span></div>
+            <div class="kv"><span class="k">On a cable</span><span class="v">2</span></div>
+            <div class="kv"><span class="k">On Wi-Fi</span><span class="v">12</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Sockets</span><span class="pill">2 of 5 in use</span></div>
+          <div class="port down"><span class="name">LAN1</span><span>No cable</span><span class="cnt">—</span></div>
+          <div class="port"><span class="name">LAN2</span><span>1 Gbit/s</span><span class="cnt">↓ 4.1 GB &nbsp; ↑ 30.0 GB</span></div>
+          <div class="port"><span class="name">LAN3</span><span>1 Gbit/s</span><span class="cnt">↓ 68.1 MB &nbsp; ↑ 437.6 MB</span></div>
+          <div class="port down"><span class="name">LAN4</span><span>No cable</span><span class="cnt">—</span></div>
+          <div class="port down"><span class="name">LAN5</span><span>No cable</span><span class="cnt">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping.</b> This device → <code>network.main</code>: <code>ipv4.address</code> and
+  <code>ipv6.assigned</code>, which carries both the global /64 delegated from the uplink and the ULA the
+  device always has. Sockets → <code>ports</code> minus the WAN entry, in <code>index</code> order;
+  <b>no cable</b> is <code>carrier: false</code>, where <code>speed</code> is null. Client counts are the
+  existing <code>devices</code> reply, split on whether an entry has a <code>wifi</code> block.
+</div>
+
+<div class="warn">
+  <b>The names do not match.</b> <code>ports</code> calls them <code>WAN</code> and <code>LAN1</code>…, while
+  <code>capabilities</code> and the Ports config page call the same sockets <code>eth1</code> and
+  <code>lan1</code>…. Drawn with the friendly names, since these are the labels printed on the case, but a
+  device configured by port name shows the other set two menus away. Either the state reply carries both, or
+  the config pages adopt these.
+</div>
+
+
+<!-- ========================= WIRELESS ========================= -->
+<h2 class="sec">4 — Status › Wireless</h2>
+<p class="sec-lead">One card per radio. The number worth having is airtime: a band at two thirds busy explains
+   a slow network that every other page reports as healthy. Reads <code>radios</code>.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab on">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">🌍</span> Internet</div>
+        <div class="nav-item"><span class="ico">🖧</span> Network</div>
+        <div class="nav-item on"><span class="ico">📶</span> Wireless</div>
+        <div class="nav-item"><span class="ico">👥</span> Clients</div>
+      </div>
+      <div class="content">
+        <p class="lead">What each radio settled on, and how busy the air around it is.</p>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">2.4 GHz</span>
+              <span class="pill">Wi-Fi 6</span>
+              <span class="pill vlan">6 clients</span>
+            </div>
+            <div class="kv"><span class="k">Channel</span><span class="v">11 · chosen automatically</span></div>
+            <div class="kv"><span class="k">Width</span><span class="v">20 MHz</span></div>
+            <div class="kv"><span class="k">Frequency</span><span class="v">2462 MHz</span></div>
+            <div style="margin-top:.7rem">
+              <div class="meter-row"><span class="k" style="font-size:.78rem;color:var(--muted)">Airtime in use</span><span class="n">66%</span></div>
+              <div class="meter"><i class="busy" style="width:66%"></i></div>
+              <div class="hint">Busy. Other networks nearby are on this channel too; 2.4 GHz has three that do
+                 not overlap and everyone is sharing them.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">5 GHz</span>
+              <span class="pill">Wi-Fi 6</span>
+              <span class="pill vlan">8 clients</span>
+            </div>
+            <div class="kv"><span class="k">Channel</span><span class="v">36 · set in the config</span></div>
+            <div class="kv"><span class="k">Width</span><span class="v">80 MHz</span></div>
+            <div class="kv"><span class="k">Frequency</span><span class="v">5180 MHz</span></div>
+            <div style="margin-top:.7rem">
+              <div class="meter-row"><span class="k" style="font-size:.78rem;color:var(--muted)">Airtime in use</span><span class="n">11%</span></div>
+              <div class="meter"><i style="width:11%"></i></div>
+              <div class="hint">Quiet. Room for more clients or a wider channel.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Field mapping, and why two channel numbers.</b> <code>radios.2g</code> carries both
+  <code>channel</code>, what the config asked for, and <code>active_channel</code>, what the radio picked.
+  <code>"0"</code> means automatic, so the page reads <b>11 · chosen automatically</b>; 5 GHz has
+  <code>channel: "36"</code> and lands on 36, so it reads <b>set in the config</b>. Showing only one of the two
+  loses the answer to "I set automatic, what did it do".
+  <ul>
+    <li>Width → <code>bandwidth</code>, mode → <code>mode</code> rendered as its marketing name.</li>
+    <li>Airtime → <code>utilization</code>, a percentage from hostapd. The ramp matches
+        <code>UsageGauge.svelte</code>: accent under 75, amber to 90, red above.</li>
+    <li><code>bandwidths</code> and <code>channels</code> are also in the reply — what this radio could still
+        be moved to. Not drawn: that is a change, and this section only reports.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <b>Client counts are not in the reply.</b> <code>radios</code> says nothing about who is associated. The
+  numbers above are countable client-side by grouping <code>devices</code> on <code>wifi.band</code>, which is
+  what the drawing assumes — but that payload spells the band <code>5G</code> while <code>radios</code> keys
+  on <code>5g</code>, so the join has to fold case. The alternative is a station count in the RPC, which the
+  device already knows.
+</div>
+
+
+<!-- ========================= WHERE THEY SIT ========================= -->
+<h2 class="sec">5 — Where they sit</h2>
+<p class="sec-lead">Status holds two pages today, one of which is a graph with no context. Three named pages
+   replace it, and Traffic stops being a page of its own.</p>
+
+<div class="split">
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab on">Status</span>
+            <span class="tab">Wireless</span>
+            <span class="tab">Network</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:170px">
+          <div class="side" style="width:150px">
+            <div class="nav-item on"><span class="ico">📈</span> Traffic</div>
+            <div class="nav-item"><span class="ico">👥</span> Clients</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Today.</b> A throughput graph and a list of clients. Nothing
+               says whether the uplink has an address, which channel a radio chose, or whether a cable is in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="frame">
+      <div class="app" style="min-width:0">
+        <div class="topbar" style="padding:0 .7rem">
+          <div class="brand" style="font-size:.85rem"><span class="brand-mark" style="width:18px;height:18px">⚙</span> uConfig</div>
+          <div class="tabs" style="gap:.8rem;font-size:.78rem">
+            <span class="tab on">Status</span>
+            <span class="tab">Wireless</span>
+            <span class="tab">Network</span>
+            <span class="tab">System</span>
+          </div>
+        </div>
+        <div class="body" style="min-height:170px">
+          <div class="side" style="width:150px">
+            <div class="nav-item on"><span class="ico">🌍</span> Internet</div>
+            <div class="nav-item"><span class="ico">🖧</span> Network</div>
+            <div class="nav-item"><span class="ico">📶</span> Wireless</div>
+            <div class="nav-item"><span class="ico">👥</span> Clients</div>
+          </div>
+          <div class="content" style="padding:.9rem">
+            <p class="lead" style="margin:0"><b>Proposed.</b> Four pages, each answering a question someone
+               arrived with. Traffic folds into Internet, where the throughput has an address beside it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Two knock-on effects.</b> <code>STATUS_ITEMS[0]</code> is where a session lands after login, so Internet
+  becomes the landing page — which is the right one. And the mobile bottom bar spreads every Status item, so it
+  goes from two icons to four; that is its whole budget, and a fifth Status page would need a different answer
+  on phones.
+</div>
+
+
+<!-- ========================= THE RPCS ========================= -->
+<h2 class="sec">6 — What the calls return</h2>
+<p class="sec-lead">Three methods, all authenticated, none addressed. <code>radios</code> and <code>ports</code>
+   already exist on the device as <code>ubus call state …</code>; <code>network</code> is new and specified in
+   <a href="../device-state.md">device-state.md</a>. All three are mocked, so the pages can be built before the
+   device side lands.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">radios</span><span class="pill">exists</span></div>
+    <div class="kv"><span class="k">channel</span><span class="v">asked for, "0" = auto</span></div>
+    <div class="kv"><span class="k">active_channel</span><span class="v">landed on</span></div>
+    <div class="kv"><span class="k">bandwidth, mode</span><span class="v">20 / 80, HE</span></div>
+    <div class="kv"><span class="k">utilization</span><span class="v">airtime %</span></div>
+    <div class="kv"><span class="k">channels, bandwidths</span><span class="v">what it could move to</span></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">ports</span><span class="pill">exists</span></div>
+    <div class="kv"><span class="k">carrier</span><span class="v">is a cable in</span></div>
+    <div class="kv"><span class="k">speed</span><span class="v">negotiated, null when down</span></div>
+    <div class="kv"><span class="k">rx_bytes, tx_bytes</span><span class="v">since boot</span></div>
+    <div class="kv"><span class="k">netdev, index</span><span class="v">lan2, socket order</span></div>
+    <div class="kv"><span class="k">{network}</span><span class="v">narrows to one interface</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-title">network</span><span class="pill vlan">new</span></div>
+  <div class="kv"><span class="k">up, uptime, device</span><span class="v">per document interface</span></div>
+  <div class="kv"><span class="k">ipv4</span><span class="v">address, gateway, dns, search, lease</span></div>
+  <div class="kv"><span class="k">ipv6</span><span class="v">addresses, prefix delegated, assigned</span></div>
+</div>
+
+<div class="note">
+  <b>Why <code>network</code> needs writing rather than proxying.</b> netifd splits one uplink into three
+  interfaces — <code>wan</code> carrying the link, <code>wan_4</code> the DHCP lease, <code>wan_6</code> the
+  prefix — and none is named after the document. uconfig already stamps each generated section with
+  <code>option uconfig_name 'wan'</code>, so the new method groups <code>network.interface dump</code> by that
+  tag and folds the families into one entry. Without it every page would have to know that <code>wan_6</code>
+  belongs to <code>wan</code>, which is netifd's business and changes with the proto.
+</div>
+
+<div class="warn">
+  <b>The bridge is broken today.</b> <code>handle_radios</code> and <code>handle_traffic</code> in the AP's
+  <code>uwsd-handler.uc</code> call <code>ubus.call('uconfig-ui', …)</code>, and no such object exists — the
+  publisher is <code>state</code>. On the device, <code>ubus call uconfig-ui radios</code> answers
+  <em>Command failed: Not found</em>, so both RPCs fail on real hardware while working against the mock.
+  <code>ports</code> has no bridge at all. Three lines in the AP repo, but nothing here works on hardware until
+  they land.
+</div>
+
+
+<!-- ========================= STILL TO PLACE ========================= -->
+<h2 class="sec">7 — Still to place</h2>
+<p class="sec-lead">What these three pages do not answer, and what the payloads do not carry.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">Not in the replies</span></div>
+    <div class="kv"><span class="k">clients per radio</span><span class="v">counted from devices instead</span></div>
+    <div class="kv"><span class="k">DFS and radar</span><span class="v">why a 5 GHz radio moved</span></div>
+    <div class="kv"><span class="k">tx power in use</span><span class="v">config says 30, radio may differ</span></div>
+    <div class="kv"><span class="k">noise floor</span><span class="v">airtime without it is half a story</span></div>
+    <div class="kv"><span class="k">port duplex, errors</span><span class="v">a flapping cable looks fine</span></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Uplinks not drawn</span></div>
+    <div class="kv"><span class="k">PPPoE</span><span class="v">session state, not a lease</span></div>
+    <div class="kv"><span class="k">WWAN</span><span class="v">signal, operator, data cap</span></div>
+    <div class="kv"><span class="k">static</span><span class="v">no lease card at all</span></div>
+    <div class="kv"><span class="k">bridged AP</span><span class="v">no uplink of its own</span></div>
+    <div class="kv"><span class="k">two uplinks</span><span class="v">which one is in use</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>An access point has no Internet page.</b> In AP mode there is no <code>wan</code> in the document and the
+  device holds no uplink, so the page has nothing to report — the same shape as Network › Guest, which is
+  absent rather than apologetic when the device does not route. Network and Wireless still apply and are the
+  pages that matter there.
+</div>
+
+</div>
+
+</body>
+</html>
