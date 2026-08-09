@@ -254,6 +254,30 @@ export function service_disable(key: string) {
   if (services) delete services[key]
 }
 
+// Which networks offer a service.
+//
+// This array, not the settings block, is what starts most services: the device
+// template looks up the interfaces naming it and returns early when none does,
+// so a block nothing lists renders nothing at all.
+export function service_ifaces(name: string): string[] {
+  const ifaces = store.doc.interfaces as Record<string, Record<string, unknown>> | undefined
+  return Object.entries(ifaces ?? {})
+    .filter(([, v]) => Array.isArray(v?.services) && (v.services as string[]).includes(name))
+    .map(([k]) => k)
+}
+
+export function service_iface_set(name: string, iface: string, on: boolean) {
+  const target = (store.doc.interfaces as Record<string, Record<string, unknown>> | undefined)?.[iface]
+  if (!target) return
+  const list = Array.isArray(target.services) ? (target.services as string[]) : []
+  if (on === list.includes(name)) return
+  const next = on ? [...list, name] : list.filter((s) => s !== name)
+  // An empty array would survive export, where it reads as a deliberate "no
+  // services" rather than as the absence it is.
+  if (next.length) target.services = next
+  else delete target.services
+}
+
 // Discard every edit, restoring the document as it was loaded. Distinct from
 // doc_reset, which blanks the document and starts over.
 export function changes_reset() {
