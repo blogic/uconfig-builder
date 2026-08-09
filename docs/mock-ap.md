@@ -77,10 +77,10 @@ rather than send `{}`. See [includes.md](includes.md) for what the app puts
 there.
 
 `factory.json` is deliberately minimal: `wan` upstream on `wan*`, `lan`
-downstream on `lan*` offering ssh and webui, and an `ssh` service block. There
-is **no top-level `webui` key**: its absence is the signal that the device has
-not been through setup. The `webui` in `lan.services` is the daemon that serves
-the UI, which is a different thing.
+downstream on `lan*` offering ssh and uconfig-ui, and an `ssh` service block.
+There is **no top-level `webui` key**: its absence is the signal that the device
+has not been through setup. The `uconfig-ui` in `lan.services` is the daemon that
+serves the UI, which is a different thing.
 
 ## Fidelity
 

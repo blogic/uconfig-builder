@@ -33,7 +33,7 @@ export const SERVICES: ServiceEntry[] = [
   { name: 'samba4', pkg: 'samba4', config: null, iface: true },
   { name: 'state', pkg: null, config: null, iface: false },
   { name: 'ucoord', pkg: 'ucoord', config: null, iface: false },
-  { name: 'webui', pkg: null, config: null, iface: false }
+  { name: 'uconfig-ui', pkg: null, config: null, iface: true }
 ]
 
 // A device reports the optional packages it has installed. Anything without a

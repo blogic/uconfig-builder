@@ -19,7 +19,7 @@
 			"role": "downstream",
 			"services": [
 				"ssh",
-				"webui"
+				"uconfig-ui"
 			],
 			"ports": {
 				"lan*": "auto"

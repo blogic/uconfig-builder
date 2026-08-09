@@ -158,7 +158,7 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
     const interfaces: Record<string, unknown> = {
       wan: {
         role: 'upstream',
-        services: ['ssh', 'webui'],
+        services: ['ssh', 'uconfig-ui'],
         ports: { 'wan*': 'auto', 'lan*': 'auto' },
         ipv4: { addressing: 'dynamic' },
         ipv6: { addressing: 'dynamic' },
@@ -193,7 +193,7 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
     },
     lan: {
       role: 'downstream',
-      services: ['ssh', 'webui'],
+      services: ['ssh', 'uconfig-ui'],
       ports: { 'lan*': 'auto' },
       ipv4: {
         addressing: 'static',
