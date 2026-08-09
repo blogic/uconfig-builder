@@ -257,6 +257,18 @@ class Session:
     async def m_network(self, rid, _params):
         await self.reply(rid, fixtures['network'])
 
+    async def m_event_log(self, rid, _params):
+        # The device returns the ring buffer in slot order, so once it has
+        # wrapped the array starts mid-way through. The fixture is stored
+        # rotated for that reason: a client that forgets to sort by `time`
+        # should look wrong here rather than on the device.
+        await self.reply(rid, fixtures['event-log'])
+
+    async def m_memory(self, rid, _params):
+        # `system` is read from /proc/meminfo when the call arrives; the process
+        # lists are resampled hourly, so the two halves are not the same age.
+        await self.reply(rid, fixtures['memory'])
+
     async def m_state(self, rid, _params):
         # The real daemon has no `state` object registered, and the UI is
         # written to tolerate that; failing here keeps the mock honest.
@@ -355,6 +367,8 @@ class Session:
             'radios': (self.m_radios, True),
             'ports': (self.m_ports, True),
             'network': (self.m_network, True),
+            'event-log': (self.m_event_log, True),
+            'memory': (self.m_memory, True),
             'config-get': (self.m_config_get, True),
             'config-test': (self.m_config_test, True),
             'config-apply': (self.m_config_apply, True),

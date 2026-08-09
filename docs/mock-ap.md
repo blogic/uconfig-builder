@@ -37,12 +37,30 @@ The client list is synthetic. MAC addresses are from the documentation range
 reserved by RFC 7042, and hostnames, SSIDs and addresses are generic, so the
 fixture carries nothing from the network it was captured on.
 
-`radios`, `ports` and `network` are the live-state calls, described in
-[device-state.md](device-state.md). Their fixtures were read off a real
-GL-MT6000 and then scrubbed the same way: the ISP's delegated prefix became
+`radios`, `ports`, `network`, `event-log` and `memory` are the live-state calls,
+described in [device-state.md](device-state.md). Their fixtures were read off a
+real GL-MT6000 and then scrubbed the same way: the ISP's delegated prefix became
 `2001:db8::/32`, the upstream became `192.0.2.0/24`, and the port MACs came from
 the RFC 7042 range. The 2.4 GHz radio keeps the 66% airtime it was measured at,
 because a congested band is the state worth being able to draw.
+
+Three of those fixtures are shaped by hand rather than merely scrubbed, and each
+for a reason:
+
+- **`event-log` is rebuilt, not captured.** Every MAC in it is one of the
+  clients in `devices`, so a log line resolves to a name and the page can say
+  what happened rather than printing a MAC. It also carries one of every
+  `object`/`verb` the device can emit, including the three that were not in the
+  live buffer — a wrong passphrase, a channel switch, and a cable coming loose.
+  It is stored **rotated rather than in time order**, because that is what the
+  device's ring buffer returns once it has wrapped; a client that forgets to
+  sort should look wrong here.
+- **`memory` keeps its real spread**: one process grown by 30 MB, several by a
+  few hundred kB, and one by 8 kB. That spread is the whole reason the page does
+  not repeat the device's word "leaking".
+- **Clients sit on `192.168.42.x`**, matching `network.main`. They used to be on
+  `192.168.1.x`, which put two contradictory addresses on screen at once — the
+  Clients page against the Network status page.
 
 The configuration is live. `config-apply` writes `state/config.json` and
 `config-get` returns it thereafter, so an edit made in the UI survives a

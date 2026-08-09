@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System diagnostics mockups</title>
+
+<!-- Mockups for two System pages the device can already feed: Events, from the
+     event ring buffer, and Memory, from umemd's per-process watch.
+     See ../device-state.md for the RPCs these read.
+     Self-contained: open directly in a browser, no build step. -->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --accent: #3498db;
+    --accent-dark: #2980b9;
+    --accent-ink: #ffffff;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --ok: #28a745;
+    --warn: #f0ad4e;
+    --warn-ink: #856404;
+    --warn-bg: #fff3cd;
+    --danger: #e74c3c;
+    --radius: 4px;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface: #22303c;
+      --page: #1a252f;
+      --nav-active: #2c3e50;
+      --ink: #ecf0f1;
+      --ink-soft: #dfe6e9;
+      --muted: #95a5a6;
+      --faint: #7f8c8d;
+      --line: #34495e;
+      --line-strong: #3d566e;
+      --note-bg: #1f2b36;
+      --note-ink: #b6c2cd;
+      --warn-bg: #4a3f1a;
+      --warn-ink: #ffd97a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #22303c;
+    --page: #1a252f;
+    --nav-active: #2c3e50;
+    --ink: #ecf0f1;
+    --ink-soft: #dfe6e9;
+    --muted: #95a5a6;
+    --faint: #7f8c8d;
+    --line: #34495e;
+    --line-strong: #3d566e;
+    --note-bg: #1f2b36;
+    --note-ink: #b6c2cd;
+    --warn-bg: #4a3f1a;
+    --warn-ink: #ffd97a;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #ffffff;
+    --page: #f8f9fa;
+    --nav-active: #e3f2fd;
+    --ink: #2c3e50;
+    --ink-soft: #495057;
+    --muted: #6c757d;
+    --faint: #bdc3c7;
+    --line: #e9ecef;
+    --line-strong: #ddd;
+    --note-bg: #f1f5f9;
+    --note-ink: #475569;
+    --warn-bg: #fff3cd;
+    --warn-ink: #856404;
+  }
+
+  body {
+    margin: 0;
+    padding: 2rem 1.25rem 4rem;
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.doc { margin-bottom: 2.5rem; }
+  header.doc h1 { font-size: 1.55rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  header.doc p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+  h2.sec {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); margin: 3rem 0 .35rem; font-weight: 600;
+  }
+  h2.sec:first-of-type { margin-top: 2rem; }
+  .sec-lead { margin: 0 0 1rem; color: var(--muted); max-width: 68ch; font-size: .9rem; }
+
+  /* ---- app frame ---- */
+  .frame {
+    border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .frame-scroll { overflow-x: auto; }
+  .app { display: flex; flex-direction: column; min-width: 860px; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 1.5rem;
+    border-bottom: 1px solid var(--line); padding: 0 1rem; height: 44px;
+    background: var(--surface);
+  }
+  .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: .95rem; }
+  .brand-mark {
+    width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-size: .7rem;
+  }
+  .tabs { display: flex; gap: 1.25rem; font-size: .85rem; height: 100%; align-items: stretch; }
+  .tab {
+    display: flex; align-items: center; gap: .35rem; color: var(--muted);
+    border-bottom: 2px solid transparent; padding: 0 .1rem;
+  }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .host { margin-left: auto; font-size: .72rem; color: var(--muted); }
+  .host b { color: var(--ink); }
+
+  .body { display: flex; min-height: 340px; }
+
+  .side {
+    width: 172px; flex-shrink: 0; border-right: 1px solid var(--line);
+    background: var(--surface); padding: 0;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .55rem; padding: .62rem .75rem;
+    font-size: .82rem; color: var(--ink-soft); border-left: 3px solid transparent;
+  }
+  .nav-item .ico { width: 1rem; text-align: center; color: var(--muted); font-size: .8rem; }
+  .nav-item.on {
+    background: var(--nav-active); color: var(--accent);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  .nav-item.on .ico { color: var(--accent); }
+  /* Sub-entries of an expandable group, mirroring .nav-subitem in src/app.css:
+     the active one takes the wash but keeps its own text colour. */
+  .nav-sub {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .48rem .75rem .48rem 2.05rem; font-size: .78rem; color: var(--muted);
+    border-left: 3px solid transparent;
+  }
+  .nav-sub.on { background: var(--nav-active); color: var(--ink); font-weight: 600; }
+  .badge {
+    margin-left: auto; background: var(--accent); color: var(--accent-ink);
+    border-radius: 999px; font-size: .62rem; font-weight: 700;
+    min-width: 1.05rem; height: 1.05rem; display: grid; place-items: center; padding: 0 .3rem;
+  }
+
+  .content { flex: 1; padding: 1.1rem 1.35rem; min-width: 0; }
+  .lead { color: var(--muted); font-size: .84rem; margin: 0 0 1.1rem; max-width: 70ch; }
+
+  /* ---- form vocabulary ---- */
+  .field { margin-bottom: 1rem; }
+  .label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .3rem; }
+  .input {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: .42rem .55rem; font-size: .84rem;
+    background: var(--surface); color: var(--ink);
+  }
+  .input.ro { background: var(--page); color: var(--muted); }
+  .hint { font-size: .71rem; color: var(--muted); margin-top: .25rem; }
+  .row { display: flex; gap: .85rem; }
+  .row > * { flex: 1; min-width: 0; }
+
+  .seg { display: flex; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+  .seg span { padding: .34rem .85rem; font-size: .78rem; color: var(--ink-soft); }
+  .seg span.on { background: var(--accent); color: #fff; font-weight: 600; }
+
+  .toggle { width: 34px; height: 19px; border-radius: 999px; background: var(--faint); position: relative; flex-shrink: 0; }
+  .toggle.on { background: var(--accent); }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+  .toggle.on::after { left: auto; right: 2px; }
+  .toggle-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem; }
+  .toggle-row .t { font-size: .82rem; font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius);
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    padding: .36rem .8rem; font-size: .8rem; font-weight: 500;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem; margin-bottom: .8rem; }
+  .card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .1rem; }
+  .card-title { font-weight: 600; font-size: .87rem; }
+  .pill {
+    font-size: .64rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px;
+    background: var(--page); color: var(--muted); border: 1px solid var(--line);
+  }
+  .pill.live { background: #e8f6ec; color: #1e7e34; border-color: #c9e7d2; }
+  .pill.vlan { background: var(--nav-active); color: var(--accent-dark); border-color: #cfe6f7; }
+  @media (prefers-color-scheme: dark) {
+    .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+    .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+  }
+  :root[data-theme="dark"] .pill.live { background: #1e3a28; color: #7fd39b; border-color: #2f5a3f; }
+  :root[data-theme="dark"] .pill.vlan { background: #22384a; color: #7fc0e8; border-color: #315a75; }
+
+  .kv { display: flex; justify-content: space-between; font-size: .78rem; padding: .18rem 0; }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-variant-numeric: tabular-nums; }
+
+  /* Pending-changes tab: present only when something is pending, so it carries
+     the amber cue on its own rather than needing a count. */
+  .tab.pending { color: var(--warn-ink); }
+  .tab.pending.on { color: var(--warn-ink); border-bottom-color: var(--warn); font-weight: 600; }
+
+  .chg-group { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: .7rem; }
+  .chg-head {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .55rem .85rem; border-bottom: 1px solid var(--line);
+  }
+  .chg-head .ico { font-size: .82rem; }
+  .chg-title { font-weight: 600; font-size: .84rem; }
+  .chg-count { font-size: .71rem; color: var(--muted); }
+  .chg-reset {
+    margin-left: auto; font-size: .74rem; color: var(--accent); font-weight: 500;
+  }
+  .chg-item {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .32rem .85rem; font-size: .79rem; color: var(--muted);
+  }
+  .chg-item:first-of-type { padding-top: .5rem; }
+  .chg-item:last-child { padding-bottom: .55rem; }
+  .chg-item .dot {
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+  }
+
+  .disclosure {
+    display: flex; align-items: center; gap: .45rem; padding: .5rem 0;
+    border-top: 1px solid var(--line); margin-top: .4rem;
+    font-size: .82rem; font-weight: 600; color: var(--ink-soft);
+  }
+  .disclosure .ico { color: var(--muted); font-size: .7rem; }
+  .disclosure-note { font-weight: 400; font-size: .71rem; color: var(--muted); margin-left: .1rem; }
+
+  .tabs-inline { display: flex; gap: .3rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  .tabs-inline span { padding: .4rem .75rem; font-size: .8rem; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs-inline span.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  .note {
+    background: var(--note-bg); border-left: 3px solid var(--accent);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; color: var(--note-ink); margin: .9rem 0 0;
+  }
+  .note b { color: var(--ink); }
+  .note ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+  .note li { margin: .2rem 0; }
+
+  .warn {
+    background: var(--warn-bg); color: var(--warn-ink); border-left: 3px solid var(--warn);
+    padding: .7rem .9rem; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: .82rem; margin: .9rem 0 0;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8em;
+    background: var(--page); padding: .08em .35em; border-radius: 3px; border: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: dark) { code { background: #1a252f; } }
+  :root[data-theme="dark"] code { background: #1a252f; }
+</style>
+<!-- Only what these pages need beyond the shared vocabulary. -->
+<style>
+  /* One event per row: clock, what emitted it, what happened. The clock is a
+     fixed column so the sentences line up and the page reads as a column of
+     prose rather than a table. */
+  .ev { display: flex; align-items: baseline; gap: .7rem; padding: .38rem 0; border-top: 1px solid var(--line); font-size: .8rem; }
+  .ev:first-of-type { border-top: 0; }
+  .ev .t { color: var(--muted); font-variant-numeric: tabular-nums; width: 4.3rem; flex-shrink: 0; }
+  .ev .tag {
+    width: 3.4rem; flex-shrink: 0; font-size: .66rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted);
+  }
+  .ev .msg { color: var(--ink-soft); }
+  .ev .msg b { color: var(--ink); font-weight: 600; }
+  .ev-day { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin: .9rem 0 .2rem; }
+  .ev-day:first-child { margin-top: 0; }
+
+  /* One process per row. Growth is the column the page is about, so it is the
+     only one that carries colour. */
+  .proc { display: flex; align-items: baseline; gap: .6rem; padding: .32rem 0; border-top: 1px solid var(--line); font-size: .78rem; font-variant-numeric: tabular-nums; }
+  .proc:first-of-type { border-top: 0; }
+  .proc .cmd { flex: 1; min-width: 0; font-weight: 600; color: var(--ink); font-variant-numeric: normal; }
+  .proc .pid { width: 3.2rem; text-align: right; color: var(--faint); }
+  .proc .rss { width: 4.6rem; text-align: right; color: var(--ink-soft); }
+  .proc .delta { width: 5rem; text-align: right; color: var(--muted); }
+  .proc .fd { width: 2.2rem; text-align: right; color: var(--faint); }
+  .proc .delta.busy { color: var(--warn-ink); font-weight: 600; }
+  .proc .delta.hot { color: var(--danger); font-weight: 600; }
+  .proc-head { color: var(--faint); font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; border-top: 0; }
+  .proc-head .cmd { color: var(--faint); font-weight: 600; }
+
+  .sub { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.1rem 0 .35rem; }
+  .sub:first-child { margin-top: 0; }
+
+  /* Memory: a bar rather than the app's arc gauge, for the same reason the
+     status mockups gave -- the arc is wired to bit/s. Amber and red mirror
+     UsageGauge's severity ramp. */
+  .meter { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--accent); }
+  .meter i.busy { background: var(--warn); }
+  .meter i.hot { background: var(--danger); }
+
+  .big { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; }
+  .big-unit { font-size: .8rem; font-weight: 500; color: var(--muted); margin-left: .2rem; }
+  .stat { display: flex; gap: 2.2rem; margin: .2rem 0 1rem; }
+
+  .empty { text-align: center; color: var(--muted); font-size: .82rem; padding: 2.6rem 1rem; }
+  .empty b { display: block; color: var(--ink-soft); font-size: .9rem; margin-bottom: .3rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="doc">
+  <h1>System diagnostics — mockups</h1>
+  <p>Two questions the app still cannot answer: <b>what just happened</b>, and <b>why is the memory
+     climbing</b>. The device already knows both — <code>ubus call event log</code> keeps the last hundred
+     things it did, and <code>ubus call memory info</code> watches every process — and neither is bridged to
+     the web UI. Two pages read them, both under System. Every number below is real, read off a GL-MT6000 and
+     then scrubbed of its addresses. Palette, spacing and controls are taken from <code>src/app.css</code>, so
+     these read as the real app.</p>
+</header>
+
+
+<!-- ========================= EVENTS ========================= -->
+<h2 class="sec">1 — System › Events</h2>
+<p class="sec-lead">The device's own account of the last few hours. Everything here is invisible today: a client
+   that keeps dropping, a cable that is not seated, someone at the door with last year's passphrase. Reads
+   <code>event-log</code>, plus <code>devices</code> to turn a MAC into a name.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📊</span> Overview</div>
+        <div class="nav-item on"><span class="ico">📜</span> Events</div>
+        <div class="nav-item"><span class="ico">🧠</span> Memory</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item"><span class="ico">🔌</span> Services</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+      </div>
+      <div class="content">
+        <p class="lead">What the device has done recently. The log lives in memory and holds the last 100
+           entries, so it starts empty after a restart.</p>
+
+        <div class="tabs-inline"><span class="on">All</span><span>Clients</span><span>Wi-Fi</span><span>Device</span></div>
+
+        <div class="ev-day">Today</div>
+          <div class="ev device"><span class="t">12:40:42</span><span class="tag">ssh</span><span class="msg">Child connection from 192.168.42.10:52719</span></div>
+          <div class="ev clients"><span class="t">12:40:12</span><span class="tag">dhcp</span><span class="msg">Handed <b>192.168.42.17</b> to workshop-pc</span></div>
+          <div class="ev device"><span class="t">12:39:48</span><span class="tag">link</span><span class="msg">Cable plugged into <b>LAN2</b></span></div>
+          <div class="ev device"><span class="t">12:39:42</span><span class="tag">link</span><span class="msg">Cable pulled from <b>LAN2</b></span></div>
+          <div class="ev clients"><span class="t">12:37:16</span><span class="tag">dhcp</span><span class="msg">Handed <b>192.168.42.21</b> to console</span></div>
+          <div class="ev clients"><span class="t">12:37:12</span><span class="tag">client</span><span class="msg"><b>console</b> joined uconfig-demo on 2.4 GHz, channel 11</span></div>
+          <div class="ev clients"><span class="t">12:34:12</span><span class="tag">client</span><span class="msg"><b>console</b> left after 1h 49m, 167.8 MB down</span></div>
+          <div class="ev device"><span class="t">12:31:12</span><span class="tag">ssh</span><span class="msg">Exit (root) from &lt;192.168.42.10:52104&gt;: Disconnect received</span></div>
+          <div class="ev clients"><span class="t">12:26:16</span><span class="tag">dhcp</span><span class="msg">Handed <b>192.168.42.14</b> to kitchen-speaker</span></div>
+          <div class="ev clients"><span class="t">12:26:12</span><span class="tag">client</span><span class="msg"><b>kitchen-speaker</b> joined uconfig-demo on 5 GHz, channel 36</span></div>
+          <div class="ev clients"><span class="t">12:21:12</span><span class="tag">client</span><span class="msg"><b>kitchen-speaker</b> left after 2h 27m, 20.7 MB down</span></div>
+          <div class="ev clients"><span class="t">12:16:16</span><span class="tag">dhcp</span><span class="msg">Handed <b>192.168.42.11</b> to handset</span></div>
+          <div class="ev clients"><span class="t">12:16:12</span><span class="tag">client</span><span class="msg"><b>handset</b> joined uconfig-demo on 2.4 GHz, channel 11</span></div>
+          <div class="ev clients"><span class="t">12:11:12</span><span class="tag">client</span><span class="msg"><b>handset</b> left after 1h 28m, 83.9 MB down</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>One sentence per event, not a field dump.</b> Every entry is
+  <code>{object, verb, time, ...payload}</code> flattened together, and the page owes each combination a
+  sentence:
+  <ul>
+    <li><code>client/join</code> → <em>handset joined uconfig-demo on 2.4 GHz, channel 11</em></li>
+    <li><code>client/leave</code> → <em>console left after 1h 49m, 167.8 MB down</em>, from <code>connected_time</code> and <code>rx_bytes</code></li>
+    <li><code>dhcp/ack</code> → <em>Handed 192.168.42.17 to workshop-pc</em></li>
+    <li><code>carrier/up</code>, <code>carrier/down</code> → <em>Cable plugged into LAN2</em>. <code>name</code> is a socket label, matching <code>ports</code> rather than <code>capabilities</code></li>
+    <li><code>ssh/event</code> → the message verbatim; it is already a sentence</li>
+  </ul>
+  The name comes from <code>devices</code>, keyed on the MAC. A device that has never appeared there keeps its
+  MAC, which is the honest answer rather than a gap.
+</div>
+
+<div class="note">
+  <b>Sort by <code>time</code>, always.</b> The daemon writes <code>events[event_count % 100]</code> and the
+  <code>log</code> method returns slot order, so a buffer that has wrapped begins in the middle with the
+  <em>oldest</em> entry. The fixture is stored rotated for exactly this reason: a client that forgets to sort
+  should look wrong against the mock rather than only against a device that has been up for a day.
+</div>
+
+
+<!-- ========================= EVENTS, FILTERED ========================= -->
+<h2 class="sec">2 — System › Events, filtered to clients</h2>
+<p class="sec-lead">The one entry worth building the page for. <code>client/key-mismatch</code> fires when a
+   device offers the wrong passphrase — the answer to "why can't my phone get on", which nothing else on the
+   device or in the app will tell you.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body" style="min-height:250px">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📊</span> Overview</div>
+        <div class="nav-item on"><span class="ico">📜</span> Events</div>
+        <div class="nav-item"><span class="ico">🧠</span> Memory</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item"><span class="ico">🔌</span> Services</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+      </div>
+      <div class="content">
+        <div class="tabs-inline"><span>All</span><span class="on">Clients</span><span>Wi-Fi</span><span>Device</span></div>
+
+          <div class="ev clients"><span class="t">10:06:52</span><span class="tag">client</span><span class="msg"><b>00:00:5E:00:53:C8</b> could not join uconfig-demo — wrong passphrase</span></div>
+          <div class="ev clients"><span class="t">10:05:35</span><span class="tag">client</span><span class="msg"><b>00:00:5E:00:53:C8</b> could not join uconfig-demo — wrong passphrase</span></div>
+          <div class="ev clients"><span class="t">10:04:32</span><span class="tag">client</span><span class="msg"><b>00:00:5E:00:53:C8</b> could not join uconfig-demo — wrong passphrase</span></div>
+          <div class="ev clients"><span class="t">09:57:52</span><span class="tag">dhcp</span><span class="msg">Handed <b>192.168.42.14</b> to kitchen-speaker</span></div>
+          <div class="ev clients"><span class="t">09:57:48</span><span class="tag">client</span><span class="msg"><b>kitchen-speaker</b> joined uconfig-demo on 5 GHz, channel 36</span></div>
+          <div class="ev clients"><span class="t">09:54:48</span><span class="tag">client</span><span class="msg"><b>kitchen-speaker</b> left after 2h 6m, 17.5 MB down</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Four filters, not a search box.</b> <em>All</em>, <em>Clients</em> (<code>client</code> and
+  <code>dhcp</code>), <em>Wi-Fi</em> (<code>wifi</code>), <em>Device</em> (<code>carrier</code>,
+  <code>ssh</code>, and anything unrecognised). A hundred entries do not need searching, and
+  <code>.tabs-inline</code> is already the app's control for exactly this — the traffic range picker on
+  Status › Internet is the same thing. The app has no search input anywhere and this is not the place to
+  introduce one.
+</div>
+
+<div class="warn">
+  <b>The vocabulary is open, so nothing may be dropped.</b> The <code>event</code> ubus method takes any
+  <code>object</code> and <code>verb</code> from any caller, and the <code>dhcp</code> verb is whatever
+  dnsmasq's notify says after the dot — <code>ack</code> is only the one that turns up most.
+  <code>wifi/channel-switch</code> forwards hostapd's payload unchanged and has no fixed shape at all. A page
+  that renders only the combinations it knows will silently swallow the rest, so the fallback prints
+  <code>object verb</code> and the remaining fields, and the <em>Device</em> filter is where it lands.
+</div>
+
+
+<!-- ========================= EVENTS, EMPTY ========================= -->
+<h2 class="sec">3 — System › Events, after a restart</h2>
+<p class="sec-lead">The log is a plain array in the daemon's memory with no file behind it. A reboot, or just
+   procd respawning <code>uconfig-event</code>, empties it.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body" style="min-height:230px">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📊</span> Overview</div>
+        <div class="nav-item on"><span class="ico">📜</span> Events</div>
+        <div class="nav-item"><span class="ico">🧠</span> Memory</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item"><span class="ico">🔌</span> Services</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+      </div>
+      <div class="content">
+        <div class="tabs-inline"><span class="on">All</span><span>Clients</span><span>Wi-Fi</span><span>Device</span></div>
+        <div class="empty">
+          <b>Nothing recorded yet</b>
+          The log is kept in memory and starts fresh when the device restarts.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>An empty log is a fact about the device, not about the network.</b> "No events" would read as "nothing has
+  happened", and someone would conclude their clients are not connecting. It has to say <em>why</em> it is
+  empty, which is the same reason it will be empty again after the next firmware upgrade.
+</div>
+
+
+<!-- ========================= MEMORY ========================= -->
+<h2 class="sec">4 — System › Memory</h2>
+<p class="sec-lead">Overview draws one memory gauge and stops. This says which process is growing, which is the
+   only version of the question anyone actually has. Reads <code>memory</code> and nothing else.</p>
+
+<div class="frame frame-scroll">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      <div class="tabs">
+        <span class="tab">Status</span>
+        <span class="tab">uCoord</span>
+        <span class="tab">Wireless</span>
+        <span class="tab">Network</span>
+        <span class="tab">Configure</span>
+        <span class="tab on">System</span>
+      </div>
+      <div class="host"><b>GL.iNet GL-MT6000</b> · localhost:8080</div>
+    </div>
+    <div class="body">
+      <div class="side">
+        <div class="nav-item"><span class="ico">📊</span> Overview</div>
+        <div class="nav-item"><span class="ico">📜</span> Events</div>
+        <div class="nav-item on"><span class="ico">🧠</span> Memory</div>
+        <div class="nav-item"><span class="ico">🕐</span> Time</div>
+        <div class="nav-item"><span class="ico">🔌</span> Services</div>
+        <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+        <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+        <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+      </div>
+      <div class="content">
+        <div class="stat">
+          <div>
+            <div class="big">334<span class="big-unit">MB used</span></div>
+            <div style="font-size:.75rem;color:var(--muted)">of 985 MB · 33%</div>
+          </div>
+          <div>
+            <div class="big">650<span class="big-unit">MB available</span></div>
+            <div style="font-size:.75rem;color:var(--muted)">including 116 MB of cache</div>
+          </div>
+        </div>
+        <div class="meter" style="margin-bottom:1.2rem"><i style="width:33%"></i></div>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><span class="card-title">System</span></div>
+            <div class="kv"><span class="k">Free</span><span class="v">600 MB</span></div>
+            <div class="kv"><span class="k">Buffers and cache</span><span class="v">116 MB</span></div>
+            <div class="kv"><span class="k">Available</span><span class="v">650 MB</span></div>
+            <div class="kv"><span class="k">Swap</span><span class="v">none configured</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Processes</span><span class="pill">44 watched</span></div>
+            <div class="kv"><span class="k">Grown since first seen</span><span class="v">18</span></div>
+            <div class="kv"><span class="k">Steady</span><span class="v">26</span></div>
+            <div class="kv"><span class="k">Largest growth</span><span class="v">ucode, +30.4 MB</span></div>
+            <div class="kv"><span class="k">Sampled</span><span class="v">hourly</span></div>
+          </div>
+        </div>
+
+        <div class="sub">Grown since first seen</div>
+          <div class="proc proc-head"><span class="cmd">Command</span><span class="pid">PID</span><span class="rss">RSS</span><span class="delta">Growth</span><span class="fd">FDs</span></div>
+          <div class="proc"><span class="cmd">ucode</span><span class="pid">5244</span><span class="rss">32.0 MB</span><span class="delta hot">+30.4 MB</span><span class="fd">25</span></div>
+          <div class="proc"><span class="cmd">ucode</span><span class="pid">4218</span><span class="rss">29.7 MB</span><span class="delta hot">+27.9 MB</span><span class="fd">21</span></div>
+          <div class="proc"><span class="cmd">AdGuardHome</span><span class="pid">5667</span><span class="rss">78.3 MB</span><span class="delta hot">+12.3 MB</span><span class="fd">16</span></div>
+          <div class="proc"><span class="cmd">ucode</span><span class="pid">5675</span><span class="rss">5.8 MB</span><span class="delta busy">+4.5 MB</span><span class="fd">14</span></div>
+          <div class="proc"><span class="cmd">ucode</span><span class="pid">4045</span><span class="rss">1.9 MB</span><span class="delta">+196 kB</span><span class="fd">17</span></div>
+          <div class="proc"><span class="cmd">hostapd</span><span class="pid">2096</span><span class="rss">7.6 MB</span><span class="delta">+188 kB</span><span class="fd">35</span></div>
+          <div class="proc"><span class="cmd">ucode</span><span class="pid">4134</span><span class="rss">2.7 MB</span><span class="delta">+172 kB</span><span class="fd">21</span></div>
+          <div class="proc"><span class="cmd">umdns</span><span class="pid">4375</span><span class="rss">1.2 MB</span><span class="delta">+140 kB</span><span class="fd">13</span></div>
+        <div class="disclosure"><span class="ico">▸</span> and 10 more, none above 108 kB</div>
+
+        <div class="sub">Steady</div>
+          <div class="proc"><span class="cmd">tailscaled</span><span class="pid">3980</span><span class="rss">43.3 MB</span><span class="delta">—</span><span class="fd">21</span></div>
+          <div class="proc"><span class="cmd">wpa_supplicant</span><span class="pid">2097</span><span class="rss">4.5 MB</span><span class="delta">—</span><span class="fd">15</span></div>
+          <div class="proc"><span class="cmd">uwsd</span><span class="pid">4928</span><span class="rss">3.1 MB</span><span class="delta">—</span><span class="fd">12</span></div>
+          <div class="proc"><span class="cmd">uwsd</span><span class="pid">4882</span><span class="rss">2.8 MB</span><span class="delta">—</span><span class="fd">11</span></div>
+        <div class="disclosure"><span class="ico">▸</span> and 22 more</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>The device says "leaking" and the page must not repeat it.</b> The entire rule in
+  <code>umemd</code> is <code>if (delta_rss &gt; 0 || delta_fds &gt; 0)</code> — any growth at all, by any
+  amount. On this reading that flags 18 of 44 processes, and the last of them has grown by 8 kB. Printing the
+  word would tell someone eleven daemons are leaking when none of them is. So the headings are
+  <em>Grown since first seen</em> and <em>Steady</em>, the figure is shown, and the number carries the
+  argument. The split is still worth keeping: it is the device's sort key, and everything above the fold
+  really is what grew.
+</div>
+
+<div class="note">
+  <b>Two halves, two ages.</b> <code>system</code> is read from <code>/proc/meminfo</code> when the call
+  arrives, so the gauge is live. The process lists come from a table resampled every hour, so polling this at
+  10s like the Status feeds would draw a frozen table beside a moving gauge. Poll at 60s and say
+  <em>sampled hourly</em> on the page, as the Processes card does.
+</div>
+
+<div class="note">
+  <b>"First seen" is umemd's first sighting, not the process's start.</b> New pids are picked up by a 60
+  second scan, so anything already running when <code>umemd</code> started is baselined at its first sweep —
+  <code>rss_startup_kb</code> for a boot-time daemon means "RSS shortly after boot", and <code>age_s</code> is
+  how long it has been watched, not how long it has run. After a <code>umemd</code> respawn every baseline
+  resets and the whole list reads steady for an hour. Hence the wording: <em>grown since first seen</em>,
+  which is exactly the claim the data supports. Note also that <em>Steady</em> holds processes that
+  <em>shrank</em> — <code>tailscaled</code> is 12 MB smaller than when it was first seen.
+</div>
+
+<div class="note">
+  <b>This page never reads <code>system-info</code>.</b> Overview's memory gauge comes from there, and the two
+  calls report the same quantity in different units — kB against bytes — sampled at different instants. A page
+  mixing them would show two totals that disagree by a few hundred kB and look broken.
+</div>
+
+
+<!-- ========================= WHERE THEY SIT ========================= -->
+<h2 class="sec">5 — Where they sit</h2>
+<p class="sec-lead">Both go under System, after Overview. Status is already at four entries, which the mobile
+   bottom bar shares with uCoord and which the status mockups called its whole budget; System is desktop-only
+   and has no such limit. Both are diagnostics rather than readings, which is the same thing Overview is.</p>
+
+<div class="split">
+  <div class="frame">
+    <div class="app" style="min-width:0">
+      <div class="topbar" style="padding:0 .7rem">
+        <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      </div>
+      <div class="body" style="min-height:200px">
+        <div class="side" style="width:150px">
+          <div class="nav-item"><span class="ico">📊</span> Overview</div>
+          <div class="nav-item"><span class="ico">🕐</span> Time</div>
+          <div class="nav-item"><span class="ico">🔌</span> Services</div>
+          <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+          <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+          <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+        </div>
+        <div class="content" style="padding:.9rem">
+          <p class="lead" style="margin:0">Today. System is where the device is operated on, and nowhere says
+             what it has been doing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="app" style="min-width:0">
+      <div class="topbar" style="padding:0 .7rem">
+        <div class="brand"><span class="brand-mark">⚙</span> uConfig</div>
+      </div>
+      <div class="body" style="min-height:200px">
+        <div class="side" style="width:150px">
+          <div class="nav-item"><span class="ico">📊</span> Overview</div>
+          <div class="nav-item on"><span class="ico">📜</span> Events</div>
+          <div class="nav-item on"><span class="ico">🧠</span> Memory</div>
+          <div class="nav-item"><span class="ico">🕐</span> Time</div>
+          <div class="nav-item"><span class="ico">🔌</span> Services</div>
+          <div class="nav-item"><span class="ico">↻</span> Reboot</div>
+          <div class="nav-item"><span class="ico">⬆</span> Firmware</div>
+          <div class="nav-item"><span class="ico">⚠</span> Factory reset</div>
+        </div>
+        <div class="content" style="padding:.9rem">
+          <p class="lead" style="margin:0">After. Overview says how the device is; Events says what it did;
+             Memory says what is growing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Keys are <code>events</code> and <code>memory</code>.</b> Page keys share one flat namespace across the
+  whole app, which is why the status pages ended up as <code>wired</code> and <code>airtime</code>. Both of
+  these are free. Plain <code>log</code> was avoided: <code>svc:log</code> already puts a "Log" entry in the
+  sidebar for configuring the log buffer, and two entries called Log that do different things is worse than a
+  slightly duller name.
+</div>
+
+
+<!-- ========================= WHAT THE CALLS RETURN ========================= -->
+<h2 class="sec">6 — What the calls return</h2>
+<p class="sec-lead">Both top level, both authenticated, neither addressed. Each passes the ubus reply through
+   unchanged, the same as <code>radios</code>, <code>ports</code> and <code>network</code>.</p>
+
+<div class="split">
+  <div class="card">
+    <div class="card-head"><span class="card-title">event-log</span><span class="pill">ubus exists</span><span class="pill vlan">new over the socket</span></div>
+    <div class="kv"><span class="k">log[]</span><span class="v">last 100, in slot order</span></div>
+    <div class="kv"><span class="k">object, verb</span><span class="v">what happened, open set</span></div>
+    <div class="kv"><span class="k">time</span><span class="v">unix seconds, device clock</span></div>
+    <div class="kv"><span class="k">…payload</span><span class="v">merged in flat, per verb</span></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">memory</span><span class="pill">ubus exists</span><span class="pill vlan">new over the socket</span></div>
+    <div class="kv"><span class="k">system</span><span class="v">/proc/meminfo, live</span></div>
+    <div class="kv"><span class="k">leaking[]</span><span class="v">grew at all, by growth</span></div>
+    <div class="kv"><span class="k">stable[]</span><span class="v">did not, by size</span></div>
+    <div class="kv"><span class="k">rss_delta_kb</span><span class="v">against first sighting</span></div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Neither is bridged, and they come from three different daemons.</b> Nothing in the AP's
+  <code>uwsd-handler.uc</code> calls <code>event</code> or <code>memory</code>; each needs a
+  <code>handle_&lt;name&gt;</code> following <code>handle_traffic</code> and one line in the
+  <code>handlers</code> table. <code>state</code> ships in <code>uconfig-mod-state</code>, <code>event</code>
+  in base uconfig, and <code>memory</code> in <code>umemd</code>, which is not in the uconfig tree at all — so
+  the bridge has to report a missing feature rather than an internal error when the object is absent, and the
+  Memory page needs a state for a device that cannot answer.
+</div>
+
+
+<!-- ========================= STILL TO PLACE ========================= -->
+<h2 class="sec">7 — Still to place</h2>
+<p class="sec-lead">Decisions these drawings do not make.</p>
+
+<div class="note">
+  <ul>
+    <li><b>No <code>sampled_at</code>.</b> The payload never says when the process figures were taken, so the
+      page can say "hourly" but not "11 minutes ago". The device adding one timestamp would fix it.</li>
+    <li><b><code>age_s</code> is observation time.</b> There is no process start time in the payload, so the
+      page cannot say how long something has actually been running — only how long it has been watched.</li>
+    <li><b>Growth needs a rate, not a total.</b> +30 MB over 32 hours and +30 MB over 20 minutes are very
+      different, and only the second is worth waking up for. Both <code>rss_delta_kb</code> and
+      <code>age_s</code> are there, so the page could divide; whether a rate reads better than a total to
+      someone who is not a developer is untested.</li>
+    <li><b>Whether the log should be live.</b> The <code>event</code> object supports ubus subscription and
+      pushes each entry as it happens. Polling is enough at a hundred entries, but a page someone leaves open
+      while walking a client round the house wants the push.</li>
+    <li><b><code>wifi/channel-switch</code> has no fixed shape</b> — it forwards hostapd's payload. The
+      sentence here reads <code>freq</code>, <code>channel</code> and <code>bandwidth</code>, which is what
+      hostapd sends today and not a contract.</li>
+    <li><b>Day boundaries.</b> The drawing shows one day. A hundred entries can span several, and the log
+      carries no timezone: the timestamps are the device's clock, so the page should read
+      <code>sysinfo.localtime</code> as "now" rather than the browser's, or a device with no working NTP will
+      report its own events in the future.</li>
+    <li><b>Nothing links out.</b> A client name in the log is the same client as on Status › Clients, and a
+      socket label is the same socket as on Status › Network. Neither is a link yet.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
