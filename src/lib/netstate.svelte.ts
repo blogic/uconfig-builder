@@ -134,18 +134,9 @@ export function uplink(data: NetworkData | null): [string, InterfaceState] | nul
 }
 
 // Everything that is not the uplink, which is what the wired page reports on.
-//
-// An access point commonly has exactly one interface, which is both its uplink
-// and the network its clients sit on -- a real GL-MT6000 in AP mode reports a
-// single `main` on `br-wan0v0` holding the DHCP lease. Subtracting the uplink
-// there would leave the page with nothing to show, so a lone interface counts
-// as local as well.
 export function local(data: NetworkData | null): [string, InterfaceState][] {
-  const entries = Object.entries(data ?? {})
-  if (entries.length < 2) return entries
-
   const up = uplink(data)?.[0]
-  return entries.filter(([name]) => name !== up)
+  return Object.entries(data ?? {}).filter(([name]) => name !== up)
 }
 
 // Sockets in the order they sit on the case, with the uplink kept apart: a WAN

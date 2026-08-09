@@ -9,11 +9,19 @@ Sources:
 - src/lib/connection.svelte.ts (what the client expects)
 
 ```
+pip install websockets jsonschema
 npm run mock
 ```
 
 Serves `ws://localhost:8080/uconfig`. Connect the UI to `localhost:8080` with
 password `a`, exactly as if it were a device.
+
+`jsonschema` is required rather than optional, and the server refuses to start
+without it. `config-test` and `config-apply` validate against the same
+`src/lib/data/schema.json` the device uses, and a mock that silently accepts
+whatever it is sent is worse than no mock: it was accepting documents no device
+would take, and the first sign of that was a bare "config test failed" on real
+hardware.
 
 ## Why
 
@@ -58,9 +66,18 @@ for a reason:
 - **`memory` keeps its real spread**: one process grown by 30 MB, several by a
   few hundred kB, and one by 8 kB. That spread is the whole reason the page does
   not repeat the device's word "leaking".
-- **Clients sit on `192.168.42.x`**, matching `network.main`. They used to be on
+- **Clients sit on `192.168.42.x`**, matching `network.lan`. They used to be on
   `192.168.1.x`, which put two contradictory addresses on screen at once — the
   Clients page against the Network status page.
+- **The interfaces are `wan` and `lan`**, matching `factory.json` rather than the
+  single `main` an older device baseline produced. That baseline is why
+  `uplink()` and `local()` in `netstate.svelte.ts` once had nothing to split:
+  one interface was both. `uconfig`'s `examples/webui.json` now ships the same
+  two, so the mock and a freshly flashed device agree.
+
+The mock is the reference for what a sane baseline looks like. When the device
+and the mock disagree about document shape, the device is what changes — the
+alternative is a client that carries a branch per historical baseline.
 
 The configuration is live. `config-apply` writes `state/config.json` and
 `config-get` returns it thereafter, so an edit made in the UI survives a

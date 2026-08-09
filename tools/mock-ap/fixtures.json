@@ -710,7 +710,7 @@
   }
  },
  "devices": {
-  "main": {
+  "lan": {
    "00:00:5E:00:53:01": {
     "mac": "00:00:5E:00:53:01",
     "online": true,
@@ -1534,7 +1534,7 @@
     "prefix": "2001:db8:1403:6fc::/62"
    }
   },
-  "main": {
+  "lan": {
    "up": true,
    "uptime": 102573,
    "device": "br-lan1v0",

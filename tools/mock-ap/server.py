@@ -26,9 +26,17 @@ from pathlib import Path
 import websockets
 from websockets.asyncio.server import serve
 
+try:
+    import jsonschema
+except ImportError:
+    sys.exit('mock-ap needs jsonschema to validate configs: pip install jsonschema')
+
 HERE = Path(__file__).parent
 FACTORY = HERE / 'factory.json'
 FIXTURES = HERE / 'fixtures.json'
+# The schema the app ships and the device validates against, so the mock rejects
+# exactly what a device would.
+SCHEMA = HERE.parent.parent / 'src/lib/data/schema.json'
 STATE = HERE / 'state'
 STATE_CONFIG = STATE / 'config.json'
 STATE_INCLUDES = STATE / 'includes'
@@ -63,15 +71,27 @@ ERROR_INVALID_PASSWORD = -32000
 # top level, since a singleton has nothing to address.
 ADDRESSED = {'peer-config-get', 'peer-config-apply', 'peer-info'}
 
+# What the setup wizard needs before the device has a password. Everything else
+# stays shut: an unconfigured device is not an open device. `ping` is here
+# because the client's keepalive would otherwise tear the socket down part-way
+# through the wizard.
+WIZARD_METHODS = {'ping', 'login', 'capabilities', 'change-password', 'config-apply'}
+
 # Which sockets each network holds, standing in for /tmp/uconfig/ports.<network>
 # on a device. uconfig writes one of those files per interface when it applies a
 # config, and `ports` reads it to narrow the reply.
 PORTS_BY_NETWORK = {
     'wan': ['eth1'],
-    'main': ['lan1', 'lan2', 'lan3', 'lan4', 'lan5']
+    'lan': ['lan1', 'lan2', 'lan3', 'lan4', 'lan5']
 }
 
 fixtures = json.loads(FIXTURES.read_text())
+_schema = json.loads(SCHEMA.read_text())
+# Draft-07 by declaration, and it depends on those semantics: `interfaces` is
+# `{"$ref": ..., "additionalProperties": false}`, where draft-07 ignores the
+# siblings of a $ref. Under 2020-12 the sibling applies against a schema with no
+# `properties`, and every interface is rejected as an unexpected property.
+SCHEMA_VALIDATOR = jsonschema.validators.validator_for(_schema)(_schema)
 
 
 def log(*parts):
@@ -88,6 +108,78 @@ def config_read():
 def config_write(doc):
     STATE.mkdir(exist_ok=True)
     STATE_CONFIG.write_text(json.dumps(doc, indent='\t') + '\n')
+
+
+def deep_merge(target, source):
+    """Merge source over target, recursing into objects. The fragment wins.
+
+    Mirrors deep_merge in uconfig's includes.uc and in src/lib/includes.ts.
+    """
+    out = dict(target)
+    for k, v in source.items():
+        cur = out.get(k)
+        if isinstance(v, dict) and isinstance(cur, dict):
+            out[k] = deep_merge(cur, v)
+        else:
+            out[k] = v
+    return out
+
+
+def at_path(value, path):
+    """Walk a dotted path into a fragment, or return it whole for a bare name."""
+    if path is None:
+        return value
+    for part in path.split('.'):
+        if not isinstance(value, dict) or part not in value:
+            return None
+        value = value[part]
+    return value
+
+
+def include_resolve(value, fragments):
+    """Resolve every `include` reference in a document, depth first.
+
+    uconfig merges the fragments in and strips both the references and the
+    top-level alias map before the schema ever sees the document, so validating
+    has to happen against the resolved form: `interfaces.guest.vlan` is an empty
+    object until its overlay lands, and would fail on its own.
+    """
+    if isinstance(value, list):
+        return [include_resolve(v, fragments) for v in value]
+    if not isinstance(value, dict):
+        return value
+
+    out = {k: include_resolve(v, fragments) for k, v in value.items() if k != 'include'}
+
+    refs = value.get('include')
+    if isinstance(refs, list):
+        for raw in refs:
+            if not isinstance(raw, str):
+                continue
+            source, _, path = raw.partition('.')
+            snippet = at_path(fragments.get(source), path or None)
+            if isinstance(snippet, dict):
+                out = deep_merge(out, snippet)
+    return out
+
+
+def config_validate(doc, fragments):
+    """First schema error in the resolved document, or None.
+
+    The device runs `uconfig-apply -t` here. Doing nothing -- which is what this
+    used to do -- meant the mock accepted documents no device would, and the
+    first sign of it was a bare "config test failed" on real hardware.
+    """
+    resolved = include_resolve(doc, fragments)
+    resolved.pop('includes', None)
+
+    errors = sorted(SCHEMA_VALIDATOR.iter_errors(resolved), key=lambda e: list(e.absolute_path))
+    if not errors:
+        return None
+
+    err = errors[0]
+    where = '/'.join(str(p) for p in err.absolute_path) or '(document root)'
+    return f'{where}: {err.message}'
 
 
 def includes_read():
@@ -156,16 +248,6 @@ class Session:
     def __init__(self, ws):
         self.ws = ws
         self.logged_in = False
-
-    def authorised(self):
-        """Whether this session may call an authenticated method.
-
-        An unconfigured device grants access so the wizard can run before any
-        password exists. That grant is evaluated per call rather than latched at
-        connect time: the moment the wizard pushes a config carrying `webui`,
-        the device is configured and the session has to log in like any other.
-        """
-        return self.logged_in or needs_setup()
 
     async def send(self, payload):
         await self.ws.send(json.dumps(payload))
@@ -287,7 +369,20 @@ class Session:
         doc = (params or {}).get('config')
         if not isinstance(doc, dict):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
+        detail = config_validate(doc, self.fragments_for(params))
+        if detail:
+            return await self.fail(rid, ERROR_INTERNAL, 'config test failed', {'detail': detail})
         await self.reply(rid, {'ok': True})
+
+    def fragments_for(self, params):
+        """The fragments to resolve against: what the client just sent, over
+        what is already stored. The device stores before it renders, so a client
+        that edits an overlay and applies in one call must validate against the
+        new value rather than the old one.
+        """
+        sent = (params or {}).get('includes')
+        stored = includes_read()
+        return {**stored, **sent} if isinstance(sent, dict) else stored
 
     async def m_config_apply(self, rid, params):
         doc = (params or {}).get('config')
@@ -298,6 +393,10 @@ class Session:
         fragments = (params or {}).get('includes')
         if fragments is not None and not isinstance(fragments, dict):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')
+        # The device tests before it applies, and refuses to apply what fails.
+        detail = config_validate(doc, self.fragments_for(params))
+        if detail:
+            return await self.fail(rid, ERROR_INTERNAL, 'config test failed', {'detail': detail})
         config_write(doc)
         if fragments is not None:
             includes_write(fragments)
@@ -351,7 +450,11 @@ class Session:
 
     def handlers(self):
         return {
-            'ping': (self.m_ping, False),
+            # `ping` needs a session, matching the device. A rejected ping is
+            # still traffic on the socket, so the keepalive does its job on the
+            # login screen either way; `login` is the only method a configured
+            # device answers before it has one.
+            'ping': (self.m_ping, True),
             'login': (self.m_login, False),
             'logout': (self.m_logout, True),
             'change-password': (self.m_change_password, True),
@@ -401,8 +504,18 @@ class Session:
             return await self.fail(rid, ERROR_METHOD_NOT_FOUND, 'Method not found')
 
         handler, needs_auth = entry
-        if needs_auth and not self.authorised():
-            return await self.fail(rid, ERROR_LOGIN_REQUIRED, 'login-required')
+        if needs_auth and not self.logged_in:
+            # A configured device asks for a password and answers nothing else
+            # until it gets one. An unconfigured device has no password to ask
+            # for, so the wizard runs instead -- but only the calls the wizard
+            # makes are open, and the error says so rather than saying
+            # `login-required`, which would prompt for a password that does not
+            # exist yet.
+            if not needs_setup():
+                return await self.fail(rid, ERROR_LOGIN_REQUIRED, 'login-required')
+            if method not in WIZARD_METHODS:
+                return await self.fail(rid, ERROR_INTERNAL,
+                                       'Setup wizard must be completed first')
 
         if method in ADDRESSED and (not params.get('venue') or not params.get('peer')):
             return await self.fail(rid, ERROR_INVALID_PARAMS, 'Invalid params')

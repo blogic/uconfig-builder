@@ -36,7 +36,10 @@ interface RpcEvent {
 interface RpcResponse {
   id: number
   result?: unknown
-  error?: { message?: string }
+  // `data` carries whatever the device could say beyond the message. A rejected
+  // config is the case that matters: "config test failed" on its own sends
+  // someone to the device with ssh to find out which field was wrong.
+  error?: { message?: string; data?: { detail?: string } }
 }
 
 const READY_TIMEOUT_MS = 8000
@@ -141,6 +144,12 @@ function keepalive_start() {
   }, KEEPALIVE_MS)
 }
 
+function error_text(err: { message?: string; data?: { detail?: string } }): string {
+  const message = err.message || 'request failed'
+  const detail = err.data?.detail
+  return detail ? `${message}: ${detail}` : message
+}
+
 function on_message(event: MessageEvent) {
   let msg: RpcEvent | RpcResponse
   try {
@@ -156,7 +165,7 @@ function on_message(event: MessageEvent) {
   const entry = pending.get(response.id)
   if (!entry) return
   pending.delete(response.id)
-  if (response.error) entry.reject(new Error(response.error.message || 'request failed'))
+  if (response.error) entry.reject(new Error(error_text(response.error)))
   else entry.resolve(response.result)
 }
 

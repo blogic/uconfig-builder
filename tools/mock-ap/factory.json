@@ -5,6 +5,10 @@
 	"interfaces": {
 		"wan": {
 			"role": "upstream",
+			"services": [
+				"ssh",
+				"uconfig-ui"
+			],
 			"ports": {
 				"wan*": "auto"
 			},

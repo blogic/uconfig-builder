@@ -56,7 +56,7 @@
     // structuredClones it, and a reactive proxy cannot be cloned.
     const payload = {
       config: wizard_document($state.snapshot(data), $state.snapshot(capabilities)),
-      includes: wizard_includes()
+      includes: wizard_includes($state.snapshot(data))
     }
     try {
       // Password first. A device in setup mode is already authenticated, so

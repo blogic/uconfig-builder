@@ -125,8 +125,11 @@ function radios_for(bands: string[]): Record<string, unknown> {
 export const GUEST_VLAN = 100
 export const GUEST_SUBNET = '192.168.100.1/24'
 
-// The fragments that go up alongside a wizard document.
-export function wizard_includes(): Record<string, IncludeFragment> {
+// The fragments that go up alongside a wizard document. Empty when there is no
+// guest network, because the VLAN is the only thing the include carries and the
+// device rejects a fragment the document does not declare a source for.
+export function wizard_includes(d: WizardData): Record<string, IncludeFragment> {
+  if (!d.guestOn) return {}
   return { [INCLUDE_NAME]: { [GUEST_VLAN_KEY]: { id: GUEST_VLAN } } }
 }
 
@@ -167,20 +170,19 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
     }
 
     // No address of its own: the access point only bridges guest traffic onto
-    // the VLAN, and the router answers DHCP on it. Present either way, disabled
-    // when off: uconfig drops a disabled interface whole, so nothing reaches the
-    // wire and switching it on later needs no rebuilding.
-    interfaces.guest = {
-      role: 'upstream',
-      ...(d.guestOn ? {} : { disable: true }),
-      ports: { 'wan*': 'auto', 'lan*': 'auto' },
-      vlan: guest_vlan_ref(),
-      ipv4: { addressing: 'none' },
-      ssids: { guest: guest() }
+    // the VLAN, and the router answers DHCP on it.
+    if (d.guestOn) {
+      interfaces.guest = {
+        role: 'upstream',
+        ports: { 'wan*': 'auto', 'lan*': 'auto' },
+        vlan: guest_vlan_ref(),
+        ipv4: { addressing: 'none' },
+        ssids: { guest: guest() }
+      }
     }
 
     doc.interfaces = interfaces
-    include_declare(doc)
+    if (d.guestOn) include_declare(doc)
     return doc as UconfigDocument
   }
 
@@ -207,24 +209,23 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
 
   // The router owns the guest subnet and serves DHCP on the VLAN, which is what
   // lets an access point bridge onto it. Barred from the networks upstream of
-  // it, so guests reach the internet and nothing else. Written either way: a
-  // disabled interface carries no VLAN onto the wire, and switching it on later
-  // needs no rebuilding.
-  interfaces.guest = {
-    role: 'downstream',
-    ...(d.guestOn ? {} : { disable: true }),
-    ports: { 'lan*': 'auto' },
-    vlan: guest_vlan_ref(),
-    ipv4: {
-      addressing: 'static',
-      subnet: GUEST_SUBNET,
-      'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' },
-      'disallow-upstream-subnet': true
-    },
-    ssids: { guest: guest() }
+  // it, so guests reach the internet and nothing else.
+  if (d.guestOn) {
+    interfaces.guest = {
+      role: 'downstream',
+      ports: { 'lan*': 'auto' },
+      vlan: guest_vlan_ref(),
+      ipv4: {
+        addressing: 'static',
+        subnet: GUEST_SUBNET,
+        'dhcp-pool': { 'lease-first': 10, 'lease-count': 100, 'lease-time': '6h' },
+        'disallow-upstream-subnet': true
+      },
+      ssids: { guest: guest() }
+    }
   }
 
   doc.interfaces = interfaces
-  include_declare(doc)
+  if (d.guestOn) include_declare(doc)
   return doc as UconfigDocument
 }
