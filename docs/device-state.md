@@ -119,6 +119,29 @@ Field by field, from each section's status: `ipv4-address[0]` and its mask;
 `ipv6-address[]`; `ipv6-prefix[]` for what was delegated to us and
 `ipv6-prefix-assignment[]` for what we handed on.
 
+## Who reads them
+
+`src/lib/netstate.svelte.ts` holds one store per call, refreshed on a ten second
+poll through the `poll_feed()` registry, plus the three derivations the pages
+share: `uplink()`, `local()` and `sorted_ports()`.
+
+| Page | Component | Feeds |
+|---|---|---|
+| Status › Internet | `InternetPage.svelte` | `network`, `ports`, `traffic` |
+| Status › Network | `WiredPage.svelte` | `network`, `ports`, `clients` |
+| Status › Wireless | `AirtimePage.svelte` | `radios`, `clients` |
+
+`uplink()` deserves a note. It looks for a gateway first, but an uplink that has
+lost its lease has none, and that is the state these pages exist to explain, so
+it falls back to an addressing protocol that goes upstream (`dhcp`, `pppoe`,
+`wwan` and the rest) and then to the name `wan`. Everything not the uplink is
+local, so getting this wrong puts a dead WAN on the Network page as a stray
+interface with no address.
+
+Per-radio client counts are not in `radios`. The Wireless page counts them by
+grouping `devices` on `wifi.band`, folding case to bridge `2g` and `2G`. The
+device could report them directly and save the join.
+
 ## What is broken on the device
 
 Two things, both in `../uconfig`, neither fixed here.

@@ -77,19 +77,41 @@ config doing nothing but waiting to leak. The document keeps it, so re-enabling
 before an apply loses nothing; applying while disabled means it has to be
 typed again.
 
-### No live status readouts
+### Live status readouts
 
-The mockups show a lease card on WAN and a channel-in-use panel on Radios.
-Neither was built: nothing in the RPC surface returned a per-interface address
-or a radio's operating state. `status` is ucoord topology, `system-info` is
-host resources, and `devices` is client-side.
+The mockups showed a lease card on WAN and a channel-in-use panel on Radios,
+and for a long time neither was built: nothing in the RPC surface returned a
+per-interface address or a radio's operating state. `status` is ucoord
+topology, `system-info` is host resources, and `devices` is client-side.
 
-Since answered. `radios`, `ports` and `network` report what the device is doing,
-and belong to Status rather than to a configuration page: see
+`radios`, `ports` and `network` answer it now, and they belong to Status rather
+than to a configuration page: a configuration page says what was asked for, and
+whether it happened is a different question. See
 [device-state.md](device-state.md) and
-[the mockups](mockups/status-pages.html). A configuration page says what was
-asked for; whether it happened is a different question and now has its own
-section.
+[the mockups](mockups/status-pages.html).
+
+Status is **Internet**, **Network**, **Wireless**, **Clients**. Traffic is gone
+as a page of its own and now opens Internet, because a throughput graph
+explains nothing without the address and lease beside it.
+
+Two things the pages have to get right, both learned from drawing them:
+
+The uplink is found by `uplink()` in `src/lib/netstate.svelte.ts`, and a
+gateway alone is not enough to go on. An uplink that has lost its lease has no
+gateway, which is precisely the state the page exists to explain, so it falls
+back to an addressing protocol that goes upstream (`dhcp`, `pppoe` and the
+rest) and finally to the name `wan`. Get this wrong and the dead uplink leaks
+onto Network as a nameless local interface.
+
+"Not working" is several different states and they are not interchangeable.
+No carrier, carrier but no address, and no upstream interface at all send
+someone to three different places; collapsing them into one message sends them
+to swap a cable that was never the problem.
+
+Two joins are still by case-folding rather than agreement. `radios` keys on
+`2g`/`5g` where the schema says `2G`/`5G`, and `ports` names sockets `WAN` and
+`LAN1` where `capabilities` calls them `eth1` and `lan1`. Both are folded
+client-side; the device emitting the schema's spelling would be better.
 
 ### Advanced disclosures
 
