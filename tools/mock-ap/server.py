@@ -63,6 +63,14 @@ ERROR_INVALID_PASSWORD = -32000
 # top level, since a singleton has nothing to address.
 ADDRESSED = {'peer-config-get', 'peer-config-apply', 'peer-info'}
 
+# Which sockets each network holds, standing in for /tmp/uconfig/ports.<network>
+# on a device. uconfig writes one of those files per interface when it applies a
+# config, and `ports` reads it to narrow the reply.
+PORTS_BY_NETWORK = {
+    'wan': ['eth1'],
+    'main': ['lan1', 'lan2', 'lan3', 'lan4', 'lan5']
+}
+
 fixtures = json.loads(FIXTURES.read_text())
 
 
@@ -233,6 +241,22 @@ class Session:
     async def m_traffic(self, rid, _params):
         await self.reply(rid, fixtures['traffic'])
 
+    async def m_radios(self, rid, _params):
+        await self.reply(rid, fixtures['radios'])
+
+    async def m_ports(self, rid, params):
+        # The ubus method narrows to the ports one network holds, reading
+        # /tmp/uconfig/ports.<network>; the fixture stands in for that file.
+        ports = fixtures['ports']
+        network = (params or {}).get('network')
+        if network:
+            want = PORTS_BY_NETWORK.get(network, [])
+            ports = {k: v for k, v in ports.items() if v['netdev'] in want}
+        await self.reply(rid, ports)
+
+    async def m_network(self, rid, _params):
+        await self.reply(rid, fixtures['network'])
+
     async def m_state(self, rid, _params):
         # The real daemon has no `state` object registered, and the UI is
         # written to tolerate that; failing here keeps the mock honest.
@@ -328,6 +352,9 @@ class Session:
             'modules': (self.m_modules, True),
             'devices': (self.m_devices, True),
             'traffic': (self.m_traffic, True),
+            'radios': (self.m_radios, True),
+            'ports': (self.m_ports, True),
+            'network': (self.m_network, True),
             'config-get': (self.m_config_get, True),
             'config-test': (self.m_config_test, True),
             'config-apply': (self.m_config_apply, True),

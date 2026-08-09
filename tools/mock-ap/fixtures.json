@@ -1352,5 +1352,203 @@
   "qosify",
   "tailscale",
   "ucoord"
- ]
+ ],
+ "radios": {
+  "2g": {
+   "htmode": "HE20",
+   "channel": "0",
+   "mode": "HE",
+   "bandwidth": "20",
+   "active_channel": "11",
+   "freq": 2462,
+   "utilization": 66,
+   "bandwidths": [
+    "20",
+    "40"
+   ],
+   "channels": {
+    "b20": [
+     "1",
+     "5",
+     "9",
+     "13"
+    ],
+    "b40": [
+     "1",
+     "9"
+    ]
+   }
+  },
+  "5g": {
+   "htmode": "HE80",
+   "channel": "36",
+   "mode": "HE",
+   "bandwidth": "80",
+   "active_channel": "36",
+   "freq": 5180,
+   "utilization": 11,
+   "bandwidths": [
+    "20",
+    "40",
+    "80",
+    "160"
+   ],
+   "channels": {
+    "b20": [
+     "36",
+     "40",
+     "44",
+     "48",
+     "52",
+     "56",
+     "60",
+     "64",
+     "100",
+     "104",
+     "108",
+     "112",
+     "116",
+     "120",
+     "124",
+     "128",
+     "132",
+     "136",
+     "140",
+     "144",
+     "149",
+     "153",
+     "157",
+     "161",
+     "165"
+    ],
+    "b40": [
+     "36",
+     "44",
+     "52",
+     "60",
+     "100",
+     "108",
+     "116",
+     "124",
+     "132",
+     "140",
+     "149",
+     "157"
+    ],
+    "b80": [
+     "36",
+     "52",
+     "100",
+     "116",
+     "132",
+     "149"
+    ],
+    "b160": [
+     "36",
+     "100"
+    ]
+   }
+  }
+ },
+ "ports": {
+  "WAN": {
+   "netdev": "eth1",
+   "index": 0,
+   "carrier": true,
+   "speed": "1000",
+   "macaddr": "00:00:5e:00:53:10",
+   "rx_bytes": 30227177075,
+   "tx_bytes": 4032852192
+  },
+  "LAN1": {
+   "netdev": "lan1",
+   "index": 0,
+   "carrier": false,
+   "speed": null,
+   "macaddr": "00:00:5e:00:53:11",
+   "rx_bytes": 0,
+   "tx_bytes": 0
+  },
+  "LAN2": {
+   "netdev": "lan2",
+   "index": 1,
+   "carrier": true,
+   "speed": "1000",
+   "macaddr": "00:00:5e:00:53:11",
+   "rx_bytes": 4052584209,
+   "tx_bytes": 29962764864
+  },
+  "LAN3": {
+   "netdev": "lan3",
+   "index": 2,
+   "carrier": true,
+   "speed": "1000",
+   "macaddr": "00:00:5e:00:53:11",
+   "rx_bytes": 68141287,
+   "tx_bytes": 437649305
+  },
+  "LAN4": {
+   "netdev": "lan4",
+   "index": 3,
+   "carrier": false,
+   "speed": null,
+   "macaddr": "00:00:5e:00:53:11",
+   "rx_bytes": 0,
+   "tx_bytes": 0
+  },
+  "LAN5": {
+   "netdev": "lan5",
+   "index": 4,
+   "carrier": false,
+   "speed": null,
+   "macaddr": "00:00:5e:00:53:11",
+   "rx_bytes": 0,
+   "tx_bytes": 0
+  }
+ },
+ "network": {
+  "wan": {
+   "up": true,
+   "uptime": 102567,
+   "device": "eth1",
+   "ipv4": {
+    "proto": "dhcp",
+    "address": "192.0.2.50/24",
+    "gateway": "192.0.2.1",
+    "dns": [
+     "192.0.2.1"
+    ],
+    "search": [
+     "example.net"
+    ],
+    "lease": {
+     "server": "192.0.2.1",
+     "time": 864000
+    }
+   },
+   "ipv6": {
+    "proto": "dhcpv6",
+    "addresses": [
+     "2001:db8:1403:600::1dd7/64"
+    ],
+    "prefix": "2001:db8:1403:6fc::/62"
+   }
+  },
+  "main": {
+   "up": true,
+   "uptime": 102573,
+   "device": "br-lan1v0",
+   "ipv4": {
+    "proto": "static",
+    "address": "192.168.42.1/24"
+   },
+   "ipv6": {
+    "proto": "static",
+    "assigned": [
+     "2001:db8:1403:6fc::1/64",
+     "fd00:db8:1::1/64"
+    ]
+   }
+  }
+ }
 }
