@@ -154,13 +154,18 @@ rather than by being offered on a network. AdGuard Home, Tailscale and Quality
 of Service are applications rather than plumbing and are waiting for a menu of
 their own.
 
-### Where a network toggle lands in the changes list
+### A service's networks are the service's changes
 
-Toggling a network writes the interface's `services` array, so the entry reads
-"Changed Services on interface 'lan'" and groups under **Network › LAN** rather
-than under the page that made it. Truthful, and it names the field, but the
-scope is per interface and cannot tell which service moved. Attributing it would
-need the diff scoped per service.
+Which networks offer a service is diffed per service rather than as one field of
+the interface, and scoped `service:<name>` to match the block. Without that the
+edit belonged to the interface: the page's own changes badge stayed empty while
+the entry appeared under **Network › LAN**, so a network toggle looked like it
+had not been recorded at all.
+
+One entry per service that moved, reading "Offered 'SSH' on wan". Resetting the
+service restores its networks as well as its settings, since one page wrote
+both, and `canon_iface` drops `services` so it is not reported twice. Resetting
+an interface leaves the list alone, the way it already leaves the SSIDs alone.
 
 ## Changes: one menu, conditionally rendered
 

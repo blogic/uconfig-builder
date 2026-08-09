@@ -56,7 +56,9 @@ function canon_radio(r: Radio | undefined, band: string): JsonObject | undefined
 
 function canon_iface(iface: Interface | undefined): JsonObject | undefined {
   if (!iface) return undefined
-  const { ssids, ...rest } = iface
+  // `services` is diffed per service by service_list_changes rather than as one
+  // field of the interface, so it is dropped here to avoid reporting it twice.
+  const { ssids, services, ...rest } = iface
   const stripped = strip(rest as JsonValue, def_get('interface'))
   const s: JsonObject = stripped && typeof stripped === 'object' && !Array.isArray(stripped) ? stripped : {}
   const def = iface.role === 'downstream' ? 'static' : 'dynamic'
@@ -87,6 +89,34 @@ function canon_ssid(ssid: Interface4 | undefined): JsonObject | undefined {
     if (!Object.keys(template).length) delete s.template
   }
   return clean(s)
+}
+
+// Which networks offer a service is the service's setting rather than the
+// interface's: it is written from the service's page, and it is what actually
+// starts the service. Scoped to the service so that page can show and reset it,
+// one entry per service that moved rather than one for the array.
+function service_list_changes(
+  iface: string,
+  cur: Interface | undefined,
+  base: Interface | undefined
+): ChangeEntry[] {
+  const now = new Set(Array.isArray(cur?.services) ? (cur.services as string[]) : [])
+  const was = new Set(Array.isArray(base?.services) ? (base.services as string[]) : [])
+  const out: ChangeEntry[] = []
+  for (const name of [...new Set([...now, ...was])].sort()) {
+    if (now.has(name) === was.has(name)) continue
+    out.push({
+      doc: MAIN,
+      section: 'Services',
+      scope: `service:${name}`,
+      kind: 'field',
+      key: `services/${iface}/${name}`,
+      label: now.has(name)
+        ? t("Offered ''{name}'' on {iface}", { name: title_for(name), iface })
+        : t("Stopped offering ''{name}'' on {iface}", { name: title_for(name), iface })
+    })
+  }
+  return out
 }
 
 function eq(a: JsonValue, b: JsonValue): boolean {
@@ -233,6 +263,7 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
       out.push(container_entry(ifaceMeta, t('Interface'), name, ci != null))
       continue
     }
+    out.push(...service_list_changes(name, ci, bi))
     out.push(
       ...diff_fields(canon_iface(ci), canon_iface(bi), {
         ...ifaceMeta,

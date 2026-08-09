@@ -182,12 +182,16 @@ export function scope_reset(scope: string) {
       delete ifaces[name]
       return
     }
-    // The SSIDs are tracked under their own scopes, so restoring the interface
-    // must leave them as they are rather than silently undoing a wireless edit.
+    // The SSIDs and the service list are tracked under their own scopes, so
+    // restoring the interface must leave them as they are rather than silently
+    // undoing a wireless edit or switching a service back on.
     const ssids = ifaces[name]?.ssids
+    const services = ifaces[name]?.services
     ifaces[name] = baseIface
     if (ssids !== undefined) ifaces[name].ssids = ssids
     else delete ifaces[name].ssids
+    if (services !== undefined) ifaces[name].services = services
+    else delete ifaces[name].services
     return
   }
 
@@ -226,6 +230,15 @@ export function scope_reset(scope: string) {
     if (baseServices?.[key] === undefined) delete services[key]
     else services[key] = baseServices[key]
     service_defaults(store.doc)
+
+    // The networks offering it are part of the same setting, written from the
+    // same page, so resetting the service restores those too.
+    const baseIfaces = base.interfaces as Record<string, Record<string, unknown>> | undefined
+    const ifaces = store.doc.interfaces as Record<string, Record<string, unknown>> | undefined
+    for (const name of Object.keys(ifaces ?? {})) {
+      const list = baseIfaces?.[name]?.services
+      service_iface_set(key, name, Array.isArray(list) && (list as string[]).includes(key))
+    }
   }
 }
 
