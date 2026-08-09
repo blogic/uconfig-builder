@@ -65,3 +65,37 @@ export function service_config_keys(modules: string[] | null = null): string[] {
 }
 
 export const SERVICE_CONFIG_KEYS: string[] = service_config_keys(null)
+
+// The services the live app gives a page of its own, in menu order.
+//
+// Named for what they do rather than for the protocol, which stays in the page's
+// prose so anyone searching for it still arrives. Only the ones with an honest
+// switch are here: a RADIUS server starts whenever its package is installed, and
+// 802.1X is switched by an interface's `ieee8021x-ports` rather than by being
+// offered on a network, so neither is a single switch and both are left out.
+export interface SystemService {
+  config: string
+  label: string
+  icon: string
+  // Started by a network offering it. `log` is the exception: nothing lists it,
+  // and its block existing is what starts it, so it has no networks to choose.
+  networks: boolean
+}
+
+export const SYSTEM_SERVICES: SystemService[] = [
+  { config: 'ssh', label: 'SSH', icon: 'bi-terminal', networks: true },
+  { config: 'mdns', label: 'Local discovery', icon: 'bi-broadcast', networks: true },
+  { config: 'lldp', label: 'Neighbour discovery', icon: 'bi-diagram-3', networks: true },
+  { config: 'log', label: 'Logging', icon: 'bi-journal-text', networks: false }
+]
+
+export function system_service(config: string): SystemService | undefined {
+  return SYSTEM_SERVICES.find((s) => s.config === config)
+}
+
+// Narrowed to what a connected device can run, the same way the editor's list
+// is: mDNS and LLDP are packages a device may not have.
+export function system_services(modules: string[] | null): SystemService[] {
+  const have = new Set(service_config_keys(modules))
+  return SYSTEM_SERVICES.filter((s) => have.has(s.config))
+}

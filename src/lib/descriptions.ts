@@ -53,7 +53,17 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   'net-radios': 'The radios your Wi-Fi networks run on. Channel and power settings per band.',
   wan: 'How this device reaches the internet.',
   lan: 'Your own network: the addresses this device hands out to everything that joins.',
-  'net-guest': 'The addresses on the visitor network. Only the router that owns the guest subnet sets these.'
+  'net-guest': 'The addresses on the visitor network. Only the router that owns the guest subnet sets these.',
+
+  // System services: what the device offers to its networks. Named for what
+  // they do, with the protocol kept in the prose so anyone searching for it
+  // still arrives here.
+  'svc:ssh': 'Shell and command-line access to the device itself.',
+  'svc:mdns':
+    'Lets this device be found by name instead of by address, and lets printers and speakers announce themselves to it. mDNS.',
+  'svc:lldp':
+    'Announces this device to the switches it is plugged into, so network maps and neighbouring equipment find it. LLDP.',
+  'svc:log': 'Keeps a local log buffer, and can copy it to a syslog server elsewhere.'
 }
 
 // Per-service page prose, keyed by the `services` schema key. ssh, radius-server,

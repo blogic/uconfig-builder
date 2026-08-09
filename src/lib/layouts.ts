@@ -360,4 +360,41 @@ export function services_layout(modules: string[] | null): LayoutNode[] {
   return layout_from(available_services(modules))
 }
 
+// Settings for the System > Services pages. The switch and the networks a
+// service is offered on are drawn by the page rather than listed here: neither
+// is a field of the service block, and both matter more than anything that is.
+// Ports and buffer sizes go behind Advanced because changing them is rare and a
+// service on a surprising port is hard to diagnose from anywhere else.
+export const serviceIntentLayouts: Record<string, LayoutNode[]> = {
+  ssh: [
+    { field: 'password-authentication', label: 'Allow password login', describe: 'Allow password login.' },
+    { field: 'authorized-keys', label: 'Authorised keys', widget: 'list', describe: 'Authorised SSH keys.' },
+    {
+      section: 'Advanced',
+      children: [
+        { field: 'port', describe: 'SSH server port.' },
+        { field: 'cli-port', label: 'CLI port', describe: 'CLI-over-SSH port.' }
+      ]
+    }
+  ],
+  mdns: [{ field: 'additional-hostnames', label: 'Extra names', widget: 'list', describe: 'Extra announced hostnames.' }],
+  lldp: [
+    { field: 'hostname', label: 'Announced name', describe: 'Announced hostname.' },
+    { field: 'description', describe: 'Announced description.' },
+    { field: 'location', describe: 'Announced location.' }
+  ],
+  log: [
+    { field: 'host', label: 'Syslog server', describe: 'Remote syslog host.' },
+    { field: 'port', describe: 'Remote syslog port.' },
+    { field: 'proto', label: 'Transport', describe: 'Syslog transport.' },
+    {
+      section: 'Advanced',
+      children: [
+        { field: 'size', describe: 'Log buffer size (KiB).' },
+        { field: 'priority', describe: 'Minimum syslog priority.' }
+      ]
+    }
+  ]
+}
+
 export const servicesLayout: LayoutNode[] = layout_from(SERVICES)
