@@ -111,6 +111,57 @@ Two of these look like pages in their own right rather than Advanced fodder:
 - `multi-psk` and `access-control-list` are both per-device Wi-Fi policy and
   might share one page.
 
+## System: the services the device offers
+
+Four services have a page of their own under **System › Services**, a group that
+expands in the sidebar the way Configure's does: SSH, Local discovery (mDNS),
+Neighbour discovery (LLDP) and Logging. Named for what they do, with the
+protocol kept in the page's prose so anyone searching for it still arrives.
+**Time** sits above them, holding `definitions.ntp-servers`.
+
+The live app never had these at all. Configure carries no `device` flag, so
+`sections_for()` drops it when `IS_EDITOR` is false, and the service pages went
+with it: a device build had nowhere to configure a service. Nothing moved out of
+Configure, which stays the raw editor for the offline build.
+
+Mockups: [docs/mockups/applications-services.html](mockups/applications-services.html).
+
+### One switch, two places written
+
+The switch is the substance of these pages. uconfig starts most services from
+the interfaces naming them, not from the settings block: each template calls
+`lookup_interfaces()` and returns early when nothing lists it. So switching SSH
+on writes `services.ssh` **and** `ssh` into an interface's `services` array,
+and the networks it is offered on are a first-class control rather than
+something buried.
+
+That is also why the old toggle was half a switch. `service_enable()` and
+`service_disable()` only add and remove the block, and the comment on the latter
+says interface lists are deliberately left alone. For SSH, mDNS and LLDP that
+means the editor's toggle starts nothing and stops nothing.
+
+**Off clears the networks and keeps the settings**, so the port, keys and
+announced names survive for whenever the service comes back. Logging is the
+exception in both directions: nothing lists it, its block existing is what
+starts it, so it has no networks to choose and its off removes the block.
+
+### Which services, and why not the rest
+
+Only the four with an honest switch. A RADIUS server starts whenever its package
+is installed — `services.set_enabled("radius", true)` is unconditional — so a
+switch would be a lie. 802.1X is started by an interface's `ieee8021x-ports`
+rather than by being offered on a network. AdGuard Home, Tailscale and Quality
+of Service are applications rather than plumbing and are waiting for a menu of
+their own.
+
+### Where a network toggle lands in the changes list
+
+Toggling a network writes the interface's `services` array, so the entry reads
+"Changed Services on interface 'lan'" and groups under **Network › LAN** rather
+than under the page that made it. Truthful, and it names the field, but the
+scope is per interface and cannot tell which service moved. Attributing it would
+need the diff scoped per service.
+
 ## Changes: one menu, conditionally rendered
 
 Edits now originate in several sections, so a pending-changes item inside one
@@ -149,11 +200,10 @@ follows `activeSection` rather than the stale value. The app lands on Status.
 
 ## Open questions
 
-1. **Configure's fate.** The live app is moving to intent pages throughout, so
-   the Configure section's schema-driven forms are not the long-term shape.
-   Whatever it covered still needs a home: `unit`, the nine `services`, and
-   `definitions.ntp-servers` are not network settings and have no page in the
-   Network set. To be decided.
+1. **Configure's fate.** Partly answered: four services and `ntp-servers` now
+   have homes under System, and Configure keeps them too as the raw editor for
+   the offline build. Still without one: `unit`, which the changes list already
+   labels "System › Device", and the three applications. To be decided.
 2. **AP mode.** There is no lan interface and wan carries every port, so LAN
    and much of WAN do not apply. Either hide the pages, or show them explaining
    that the upstream router owns those settings.
