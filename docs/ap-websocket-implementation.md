@@ -196,8 +196,12 @@ every socket.
   visible to the user in different places.
 - `speed: null` with `carrier: false` is the normal unplugged state and must not
   be reported as an error.
-- Filtering by `network` reads `/tmp/uconfig/ports.<network>`; a name with no
-  such file yields an empty result rather than an error.
+- Filtering by `network` reads `/tmp/uconfig/ports.<network>`. **A name with no
+  such file yields the full port list, not an empty one** — the filter is only
+  applied when the file parsed. Verified on a lab AP that writes no such file:
+  `ports {"network":"main"}` returned both WAN and LAN. A client cannot treat
+  the filtered reply as authoritative for "which sockets does this network
+  hold".
 
 ---
 
