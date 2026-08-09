@@ -37,6 +37,13 @@ The client list is synthetic. MAC addresses are from the documentation range
 reserved by RFC 7042, and hostnames, SSIDs and addresses are generic, so the
 fixture carries nothing from the network it was captured on.
 
+`radios`, `ports` and `network` are the live-state calls, described in
+[device-state.md](device-state.md). Their fixtures were read off a real
+GL-MT6000 and then scrubbed the same way: the ISP's delegated prefix became
+`2001:db8::/32`, the upstream became `192.0.2.0/24`, and the port MACs came from
+the RFC 7042 range. The 2.4 GHz radio keeps the 66% airtime it was measured at,
+because a congested band is the state worth being able to draw.
+
 The configuration is live. `config-apply` writes `state/config.json` and
 `config-get` returns it thereafter, so an edit made in the UI survives a
 reload. `state/` is gitignored; `factory-reset` deletes it and the next

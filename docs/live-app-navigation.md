@@ -80,10 +80,16 @@ typed again.
 ### No live status readouts
 
 The mockups show a lease card on WAN and a channel-in-use panel on Radios.
-Neither was built: nothing in the RPC surface returns a per-interface address
+Neither was built: nothing in the RPC surface returned a per-interface address
 or a radio's operating state. `status` is ucoord topology, `system-info` is
-host resources, and `devices` is client-side. Both need a device-side method
-that does not exist yet.
+host resources, and `devices` is client-side.
+
+Since answered. `radios`, `ports` and `network` report what the device is doing,
+and belong to Status rather than to a configuration page: see
+[device-state.md](device-state.md) and
+[the mockups](mockups/status-pages.html). A configuration page says what was
+asked for; whether it happened is a different question and now has its own
+section.
 
 ### Advanced disclosures
 
