@@ -2,7 +2,7 @@
   // The wired side: what this device calls itself on the local network, and
   // which sockets have anything in them.
   import { network, ports, local, sorted_ports } from '../netstate.svelte.js'
-  import { deviceStore } from '../devices.svelte.js'
+  import { deviceStore, clients_all } from '../devices.svelte.js'
   import { bytes_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { poll_feed } from '../poll.svelte.js'
@@ -13,9 +13,7 @@
   const linked = $derived(switchPorts.filter(([, p]) => p.carrier).length)
 
   // A client is on a cable when nothing reported it over the air.
-  const clients = $derived(
-    Object.values(deviceStore.data ?? {}).flatMap((macs) => Object.values(macs))
-  )
+  const clients = $derived(clients_all(deviceStore.data))
   const online = $derived(clients.filter((c) => c.online))
   const wireless = $derived(online.filter((c) => c.wifi).length)
 

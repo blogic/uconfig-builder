@@ -99,13 +99,23 @@ def log(*parts):
 
 
 def config_read():
-    """The applied config if one exists, otherwise what the AP ships with."""
+    """The applied config if one exists, otherwise what the AP ships with.
+
+    The shipped baseline carries no uuid -- a device stamps one the first time
+    it applies it, so `config-get` never returns a document without one. Stamped
+    here for the same reason: a client that round-trips what it was given must
+    get something the config methods will accept back.
+    """
     if STATE_CONFIG.exists():
         return json.loads(STATE_CONFIG.read_text())
-    return json.loads(FACTORY.read_text())
+    return {**json.loads(FACTORY.read_text()), 'uuid': int(time.time())}
 
 
 def config_write(doc):
+    # `uconfig-apply` re-stamps the uuid on every apply unless it is given `-u`,
+    # and the web UI never passes it. The stored config therefore carries the
+    # time it was applied, not whatever the client sent.
+    doc = {**doc, 'uuid': int(time.time())}
     STATE.mkdir(exist_ok=True)
     STATE_CONFIG.write_text(json.dumps(doc, indent='\t') + '\n')
 
@@ -172,6 +182,14 @@ def config_validate(doc, fragments):
     """
     resolved = include_resolve(doc, fragments)
     resolved.pop('includes', None)
+
+    # Strict mode rejects a document with no integer uuid, and this is not a
+    # schema rule -- the schema has `uuid` as an optional integer. `uconfig-apply`
+    # stamps one itself, but only under `if (!opts.no_apply)`, and `-t` sets
+    # no_apply, so the test that gates every apply never does. Checked here in
+    # the same words the device uses.
+    if not isinstance(resolved.get('uuid'), int) or isinstance(resolved.get('uuid'), bool):
+        return 'Configuration must contain a valid UUID'
 
     errors = sorted(SCHEMA_VALIDATOR.iter_errors(resolved), key=lambda e: list(e.absolute_path))
     if not errors:

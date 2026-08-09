@@ -5,7 +5,7 @@
   // network that every other page reports as healthy.
   import UsageGauge from './UsageGauge.svelte'
   import { radios } from '../netstate.svelte.js'
-  import { deviceStore } from '../devices.svelte.js'
+  import { deviceStore, clients_all } from '../devices.svelte.js'
   import { title_for } from '../labels.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { poll_feed } from '../poll.svelte.js'
@@ -15,9 +15,7 @@
   // schema and the client list use 2G and 5G. Fold case to join the two.
   const bands = $derived(Object.entries(radios.data ?? {}))
 
-  const clients = $derived(
-    Object.values(deviceStore.data ?? {}).flatMap((macs) => Object.values(macs))
-  )
+  const clients = $derived(clients_all(deviceStore.data))
 
   function on_band(band: string): number {
     return clients.filter((c) => c.online && c.wifi?.band?.toLowerCase() === band.toLowerCase()).length

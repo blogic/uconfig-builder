@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { deviceStore } from '../devices.svelte.js'
-  import type { DeviceEntry, DevicesData } from '../devices.svelte.js'
+  import { deviceStore, clients_all } from '../devices.svelte.js'
   import { device_name } from '../device-icons.js'
   import DeviceRow from './DeviceRow.svelte'
   import Spinner from './Spinner.svelte'
@@ -10,16 +9,9 @@
 
   // `online` is absent rather than false on devices only ever seen via ARP,
   // so anything without it counts as offline.
-  function flatten(data: DevicesData | null): DeviceEntry[] {
-    if (!data) return []
-    const out: DeviceEntry[] = []
-    for (const macs of Object.values(data)) {
-      for (const [mac, dev] of Object.entries(macs)) out.push({ ...dev, mac: dev.mac || mac })
-    }
-    return out.sort((a, b) => device_name(a).localeCompare(device_name(b)))
-  }
-
-  const devices = $derived(flatten(deviceStore.data))
+  const devices = $derived(
+    clients_all(deviceStore.data).sort((a, b) => device_name(a).localeCompare(device_name(b)))
+  )
   const online = $derived(devices.filter((d) => d.online))
   const offline = $derived(devices.filter((d) => !d.online))
 

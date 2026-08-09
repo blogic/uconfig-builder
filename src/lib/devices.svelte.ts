@@ -38,6 +38,22 @@ export const deviceStore = $state<{
   loading: boolean
 }>({ data: null, error: null, loading: false })
 
+// Every client across every network, one flat list.
+//
+// The map key fills in as the mac when an entry does not carry one, and both
+// levels tolerate a null: a real device returns a network whose value is null,
+// and `Object.values(null)` throws rather than yielding nothing. Four pages
+// walked this by hand and three of them crashed the first time a device did it.
+export function clients_all(data: DevicesData | null): DeviceEntry[] {
+  const out: DeviceEntry[] = []
+  for (const macs of Object.values(data ?? {})) {
+    for (const [mac, dev] of Object.entries(macs ?? {})) {
+      if (dev) out.push({ ...dev, mac: dev.mac || mac })
+    }
+  }
+  return out
+}
+
 export async function devices_refresh() {
   deviceStore.loading = true
   try {

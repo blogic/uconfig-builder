@@ -4,7 +4,7 @@
   // seated, someone at the door with last year's passphrase.
   import { events, events_recent, event_group } from '../diagnostics.svelte.js'
   import type { EventEntry } from '../diagnostics.svelte.js'
-  import { deviceStore } from '../devices.svelte.js'
+  import { deviceStore, clients_all } from '../devices.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import {
     bytes_format,
@@ -39,9 +39,7 @@
   // seen keeps its MAC, which is the honest answer rather than a gap.
   const names = $derived.by(() => {
     const out: Record<string, string> = {}
-    for (const macs of Object.values(deviceStore.data ?? {}))
-      for (const [mac, d] of Object.entries(macs))
-        out[mac.toUpperCase()] = device_name({ ...d, mac: d.mac || mac })
+    for (const d of clients_all(deviceStore.data)) out[d.mac.toUpperCase()] = device_name(d)
     return out
   })
 

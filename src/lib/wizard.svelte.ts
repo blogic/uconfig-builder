@@ -145,6 +145,12 @@ export function wizard_document(d: WizardData, capabilities: unknown): UconfigDo
   const guest = () => ssid_block(d.guestSsid, d.guestKey, d.guestSecurity, bands)
 
   const doc: Record<string, unknown> = {
+    // uconfig rejects a document with no integer uuid in strict mode, and the
+    // client has to be the one to supply it. `uconfig-apply` does stamp one --
+    // but that block is guarded by `if (!opts.no_apply)`, and `-t` sets
+    // no_apply, so the test run that gates every apply never reaches it. The
+    // device re-stamps this on apply; the value only has to be there.
+    uuid: Math.floor(Date.now() / 1000),
     // No password here: `unit.password` is the /etc/shadow hash, which only the
     // device can produce. The chosen password goes over `change-password`.
     unit: { hostname: d.hostname.trim(), timezone: d.timezone },
