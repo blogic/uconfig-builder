@@ -25,6 +25,9 @@ function encode(r: Route): string | null {
       return `#/config/interfaces/${encodeURIComponent(r.openInterface)}`
     if (r.page?.startsWith('service:')) return `#/config/service/${r.page.slice(8)}`
   }
+  // The live app's own service pages, kept apart from the editor's above: a
+  // colon in a path segment is legal but reads as an accident.
+  if (r.page?.startsWith('svc:')) return `#/${r.section}/service/${r.page.slice(4)}`
   return `#/${r.section}/${r.page ?? ''}`.replace(/\/$/, '')
 }
 
@@ -38,6 +41,7 @@ export function route_parse(hash: string | null | undefined): Route | null {
     return { section, page: 'interfaces', openInterface: decodeURIComponent(parts[2]) }
   if (section === 'config' && parts[1] === 'service' && parts[2])
     return { section, page: `service:${parts[2]}` }
+  if (parts[1] === 'service' && parts[2]) return { section, page: `svc:${parts[2]}` }
 
   return { section, page: parts[1] ?? null, openInterface: null }
 }

@@ -2,7 +2,7 @@
 // Bootstrap Icons match the ones the previous builder used per entry.
 
 import { iface_enabled } from './interfaces.ts'
-import { SERVICES, available_services } from './services.ts'
+import { SERVICES, available_services, system_services } from './services.ts'
 import type { ServiceEntry } from './services.ts'
 import { title_for } from './labels.ts'
 import type { UconfigDocument } from './types/uconfig'
@@ -123,13 +123,25 @@ export const CHANGES_ITEMS: NavItem[] = [
   { key: 'changes', label: 'Pending', icon: 'bi-exclamation-circle' }
 ]
 
-// State reports on the device; the rest are one irreversible action per page.
+// Pages of the System section: what the device itself offers and does, rather
+// than what its networks are for. State reports on it; the last three are one
+// irreversible action each. Services expands rather than linking to a page,
+// because a page holding only links to pages earns nothing.
 export const SYSTEM_ITEMS: NavItem[] = [
+  { key: 'ntp', label: 'Time', icon: 'bi-clock' },
+  { key: 'system-services', label: 'Services', icon: 'bi-hdd-network', group: true },
   { key: 'state', label: 'State', icon: 'bi-speedometer2' },
   { key: 'reboot', label: 'Reboot', icon: 'bi-arrow-clockwise' },
   { key: 'firmware', label: 'Firmware', icon: 'bi-cpu' },
   { key: 'factory-reset', label: 'Factory Reset', icon: 'bi-exclamation-triangle' }
 ]
+
+// Children of the System Services group. `svc:` rather than `service:` because
+// these are the intent pages, not the schema-shaped ones the editor keeps under
+// Configure, and page keys share one flat namespace.
+export function system_service_entries(modules: string[] | null): NavItem[] {
+  return system_services(modules).map((s) => ({ key: `svc:${s.config}`, label: s.label, icon: s.icon }))
+}
 
 // Top-level sections. `device` marks the ones that need a live connection, so
 // the editor build drops them; `desktopOnly` keeps reboot and firmware actions
@@ -154,6 +166,13 @@ export const SECTIONS: NavSection[] = [
     whenChanges: true
   }
 ]
+
+// Pages that live inside a group rather than in a section's own item list.
+// Anything asking whether the open page still exists has to look here too, or
+// it will treat every grouped page as gone and navigate away from it.
+export function group_pages(groups: Record<string, NavItem[]>): string[] {
+  return Object.values(groups).flatMap((items) => items.map((i) => i.key))
+}
 
 // The pages of a section that apply right now. One place, because the sidebar
 // and the effect that keeps the open page valid have to agree: a page the

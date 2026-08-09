@@ -7,6 +7,7 @@
   import GuestSection from './lib/components/GuestSection.svelte'
   import PageHeader from './lib/components/PageHeader.svelte'
   import ServicePage from './lib/components/ServicePage.svelte'
+  import SystemServicePage from './lib/components/SystemServicePage.svelte'
   import JsonPage from './lib/components/JsonPage.svelte'
   import NtpPage from './lib/components/NtpPage.svelte'
   import InterfaceAddForm from './lib/components/InterfaceAddForm.svelte'
@@ -18,7 +19,16 @@
   import Button from './lib/components/Button.svelte'
   import BrandMark from './lib/components/BrandMark.svelte'
   import { def_get } from './lib/schema.js'
-  import { SERVICE_ENTRIES, SECTIONS, STATUS_ITEMS, items_for, sections_for, service_entries } from './lib/nav.js'
+  import {
+    SERVICE_ENTRIES,
+    SECTIONS,
+    STATUS_ITEMS,
+    group_pages,
+    items_for,
+    sections_for,
+    service_entries,
+    system_service_entries
+  } from './lib/nav.js'
   import { IS_DEVICE, IS_EDITOR } from './lib/flavour.js'
   import { iface_enabled } from './lib/interfaces.js'
   import { PAGE_DESCRIPTIONS } from './lib/descriptions.js'
@@ -141,6 +151,12 @@
   const serviceEntries = $derived(
     deviceSession ? service_entries(connection.modules ?? null) : SERVICE_ENTRIES
   )
+
+  // Children of every expandable nav group, by the group item's key.
+  const navGroups = $derived({
+    services: serviceEntries,
+    'system-services': system_service_entries(deviceSession ? (connection.modules ?? null) : null)
+  })
   function start_default() {
     section = 'config'
     view.section = 'unit'
@@ -373,11 +389,15 @@
     view.section = key
   }
 
-  // Keep the current page valid for the active section.
+  // Keep the current page valid for the active section. A page inside a group is
+  // not in the section's own item list, so it has to be counted separately or
+  // opening one would immediately navigate away from it.
   $effect(() => {
     const keys = sectionItems.map((i) => i.key)
-    const inServices = view.section?.startsWith('service:') || view.section === 'ntp'
-    if (keys.length && !keys.includes(view.section) && !inServices) view.section = keys[0]
+    const grouped = group_pages(navGroups)
+    if (keys.length && !keys.includes(view.section) && !grouped.includes(view.section ?? '')) {
+      view.section = keys[0]
+    }
   })
 </script>
 
@@ -562,6 +582,7 @@
   {:else if key === 'changes'}{@render changesBody()}
   {:else if key === 'json'}<JsonPage {preview} />
   {:else if key === 'ntp'}<NtpPage {changes} />
+  {:else if key?.startsWith('svc:')}<SystemServicePage serviceKey={key.slice(4)} {changes} />
   {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} toggleable={!deviceSession} />
   {:else if IS_DEVICE && DP}
     {#if key === 'clients'}<DP.NetworkPage />
@@ -709,7 +730,7 @@
 
     <div class="flex min-h-0 flex-1 overflow-hidden">
       {#if wide && sectionItems.length > 0}
-        <SectionNav items={sectionItems} {serviceEntries} page={view.section} onSelect={section_select_page} changes={changes.length} />
+        <SectionNav items={sectionItems} groups={navGroups} page={view.section} onSelect={section_select_page} changes={changes.length} />
       {/if}
       <main class="min-w-0 flex-1 overflow-y-auto px-6 py-6 pr-4 {wide ? '' : 'pb-24'}">
         {#if loadWarning}
