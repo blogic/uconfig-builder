@@ -57,8 +57,11 @@ function walk_schema(node) {
 }
 walk_schema(schema)
 
-// t('...') calls, plus inlined label:/describe: metadata in layouts.
-const PATTERNS = [/\bt\(\s*(['"])((?:\\.|(?!\1).)*)\1/g, /\b(?:label|describe)\s*:\s*(['"])((?:\\.|(?!\1).)*)\1/g]
+// t('...') calls, plus inlined label:/describe: metadata in layouts. The
+// separator is [:=] because the same strings reach components as attributes:
+// <Gauge label="Airtime in use" /> is translated by the callee, so the literal
+// never appears inside a t() the scanner would otherwise see.
+const PATTERNS = [/\bt\(\s*(['"])((?:\\.|(?!\1).)*)\1/g, /\b(?:label|describe)\s*[:=]\s*(['"])((?:\\.|(?!\1).)*)\1/g]
 function unescape(s) {
   return s.replace(/\\(['"\\nt])/g, (_, c) => ({ "'": "'", '"': '"', '\\': '\\', n: '\n', t: '\t' }[c]))
 }

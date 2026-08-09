@@ -6,6 +6,14 @@
 // from the store it already has.
 
 import { devices_refresh, devices_clear } from './devices.svelte.ts'
+import {
+  network_refresh,
+  network_clear,
+  ports_refresh,
+  ports_clear,
+  radios_refresh,
+  radios_clear
+} from './netstate.svelte.ts'
 import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.ts'
 import { traffic_refresh, traffic_clear } from './traffic.svelte.ts'
 import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.ts'
@@ -17,6 +25,12 @@ const FEEDS = [
   { key: 'clients', refresh: devices_refresh, clear: devices_clear, every: 5000 },
   { key: 'state', refresh: sysinfo_refresh, clear: sysinfo_clear, every: 5000 },
   { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 },
+  // Device state. Addresses and link state change on an event rather than
+  // continuously, so these are slower than the client list; a radio's airtime
+  // moves constantly but nobody watches it by the second.
+  { key: 'network', refresh: network_refresh, clear: network_clear, every: 10000 },
+  { key: 'ports', refresh: ports_refresh, clear: ports_clear, every: 10000 },
+  { key: 'radios', refresh: radios_refresh, clear: radios_clear, every: 10000 },
   // Peer entries only change on a state transition, so this is near-static; the
   // cost is one status call plus an info call per connected peer.
   { key: 'ucoord', refresh: ucoord_refresh, clear: ucoord_clear, every: 10000 }

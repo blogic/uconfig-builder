@@ -588,7 +588,9 @@
   {:else if key?.startsWith('service:')}<ServicePage serviceKey={key.slice(8)} {changes} toggleable={!deviceSession} />
   {:else if IS_DEVICE && DP}
     {#if key === 'clients'}<DP.NetworkPage />
-    {:else if key === 'traffic'}<DP.TrafficPage />
+    {:else if key === 'internet'}<DP.InternetPage />
+    {:else if key === 'wired'}<DP.WiredPage />
+    {:else if key === 'airtime'}<DP.AirtimePage />
     {:else if key === 'state'}<DP.StatePage />
     {:else if key === 'overview'}<DP.UcoordPage />
     {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}

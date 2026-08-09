@@ -69,9 +69,16 @@ export function service_entries(modules: string[] | null): NavItem[] {
 
 export const SERVICE_ENTRIES: NavItem[] = entries_from(SERVICES)
 
-// Pages of the Status section: what the device is doing right now.
+// Pages of the Status section: what the device is doing right now, as opposed
+// to what it was told to do. Internet leads because it is the question most
+// sessions open with, and it is where a session lands after login.
+//
+// `wired` and `airtime` rather than `network` and `wireless`: page keys share
+// one flat namespace and both of those name a section already.
 export const STATUS_ITEMS: NavItem[] = [
-  { key: 'traffic', label: 'Traffic', icon: 'bi-graph-up' },
+  { key: 'internet', label: 'Internet', icon: 'bi-globe' },
+  { key: 'wired', label: 'Network', icon: 'bi-ethernet' },
+  { key: 'airtime', label: 'Wireless', icon: 'bi-wifi' },
   { key: 'clients', label: 'Clients', icon: 'bi-people' }
 ]
 
