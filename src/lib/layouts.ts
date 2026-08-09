@@ -377,21 +377,23 @@ export const serviceIntentLayouts: Record<string, LayoutNode[]> = {
       ]
     }
   ],
-  mdns: [{ field: 'additional-hostnames', label: 'Extra names', widget: 'list', describe: 'Extra announced hostnames.' }],
   lldp: [
     { field: 'hostname', label: 'Announced name', describe: 'Announced hostname.' },
     { field: 'description', describe: 'Announced description.' },
     { field: 'location', describe: 'Announced location.' }
   ],
+  // The buffer is not behind a disclosure: the device keeps one whatever the
+  // config says, so it is the plain state of the page. Sending a copy elsewhere
+  // is the part that is optional.
   log: [
-    { field: 'host', label: 'Syslog server', describe: 'Remote syslog host.' },
-    { field: 'port', describe: 'Remote syslog port.' },
-    { field: 'proto', label: 'Transport', describe: 'Syslog transport.' },
+    { field: 'size', label: 'Buffer size', describe: 'Log buffer size (KiB).' },
+    { field: 'priority', describe: 'Minimum syslog priority.' },
     {
-      section: 'Advanced',
+      section: 'Remote Logging',
       children: [
-        { field: 'size', describe: 'Log buffer size (KiB).' },
-        { field: 'priority', describe: 'Minimum syslog priority.' }
+        { field: 'host', label: 'Syslog server', describe: 'Remote syslog host.' },
+        { field: 'port', describe: 'Remote syslog port.' },
+        { field: 'proto', label: 'Transport', describe: 'Syslog transport.' }
       ]
     }
   ]

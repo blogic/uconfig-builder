@@ -77,16 +77,18 @@ export interface SystemService {
   config: string
   label: string
   icon: string
-  // Started by a network offering it. `log` is the exception: nothing lists it,
-  // and its block existing is what starts it, so it has no networks to choose.
+  // Started by a network offering it. `log` is the exception: nothing lists it.
   networks: boolean
+  // The device runs it whatever the config says, so the block only tunes it and
+  // the page has no switch. Logging is the case: the local buffer is always
+  // there, and a switch offering to turn it off would be a lie.
+  always?: boolean
 }
 
 export const SYSTEM_SERVICES: SystemService[] = [
   { config: 'ssh', label: 'SSH', icon: 'bi-terminal', networks: true },
-  { config: 'mdns', label: 'Local discovery', icon: 'bi-broadcast', networks: true },
-  { config: 'lldp', label: 'Neighbour discovery', icon: 'bi-diagram-3', networks: true },
-  { config: 'log', label: 'Logging', icon: 'bi-journal-text', networks: false }
+  { config: 'lldp', label: 'LLDP', icon: 'bi-diagram-3', networks: true },
+  { config: 'log', label: 'Logging', icon: 'bi-journal-text', networks: false, always: true }
 ]
 
 export function system_service(config: string): SystemService | undefined {

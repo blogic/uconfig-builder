@@ -1,4 +1,5 @@
 import { ref_resolve, def_get, title_for, pattern_value_schema, rootSchema } from './schema'
+import { SYSTEM_SERVICES } from './services'
 import type { JsonSchemaNode } from './schema'
 import type { IncludeFragment } from './store.svelte'
 import { default_width } from './channels'
@@ -134,6 +135,8 @@ function keys_union(
 // addressing edit reads "Changed IPv4 on interface 'lan'" instead of listing
 // every field inside it.
 const GROUPED = new Set(['ipv4', 'ipv6', 'template', 'dhcpv6', 'vlan', 'dhcp-pool', 'dhcp-leases'])
+
+const ALWAYS_ON = new Set(SYSTEM_SERVICES.filter((s) => s.always).map((s) => s.config))
 
 export interface ChangeContainer {
   noun: string
@@ -310,9 +313,14 @@ export function changes_list(cur: UconfigDocument | null | undefined, base: Ucon
     const schema = svcResolved?.properties?.[svc] ? ref_resolve(svcResolved.properties[svc]) : undefined
     // A service is enabled by being present, so its whole block appearing or
     // disappearing is one decision, not a list of field edits.
+    //
+    // Except for one the device runs whatever the config says: it has no on and
+    // off, its page materialises a block only to have somewhere to write, and a
+    // block holding nothing but schema defaults says what no block says. So its
+    // presence is not an edit and only its fields are compared.
     const isOn = curServices?.[svc] !== undefined
     const wasOn = baseServices?.[svc] !== undefined
-    if (isOn !== wasOn) {
+    if (!ALWAYS_ON.has(svc) && isOn !== wasOn) {
       out.push({
         doc: MAIN,
         section: 'Services',

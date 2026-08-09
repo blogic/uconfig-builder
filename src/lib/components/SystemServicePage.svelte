@@ -47,8 +47,17 @@
   )
   const offered = $derived(service_ifaces(serviceKey))
 
-  // With no network of its own, the block existing is the whole of what starts it.
-  const enabled = $derived(meta?.networks ? offered.length > 0 : service_enabled(serviceKey))
+  // With no network of its own, the block existing is the whole of what starts
+  // it. A service the device runs regardless is simply on.
+  const enabled = $derived(
+    meta?.always ? true : meta?.networks ? offered.length > 0 : service_enabled(serviceKey)
+  )
+
+  // Its settings need somewhere to live, and the block carrying nothing but
+  // schema defaults reads as no change, so materialising it costs nothing.
+  $effect(() => {
+    if (meta?.always && !service_enabled(serviceKey)) service_enable(serviceKey)
+  })
 
   function toggle() {
     if (!meta) return
@@ -80,25 +89,27 @@
 {/if}
 
 <div class="flex max-w-sm flex-col gap-4">
-  <div class="flex items-center gap-2">
-    <button
-      type="button"
-      role="switch"
-      aria-checked={enabled}
-      aria-label={t(meta?.label ?? serviceKey)}
-      onclick={toggle}
-      class="relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition {enabled
-        ? 'bg-accent'
-        : 'bg-zinc-300'}"
-    >
-      <span
-        class="inline-block h-4 w-4 transform rounded-full bg-surface shadow transition {enabled
-          ? 'translate-x-4'
-          : 'translate-x-0.5'}"
-      ></span>
-    </button>
-    <span class="text-sm font-semibold text-zinc-900">{t(meta?.label ?? serviceKey)}</span>
-  </div>
+  {#if !meta?.always}
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        aria-label={t(meta?.label ?? serviceKey)}
+        onclick={toggle}
+        class="relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition {enabled
+          ? 'bg-accent'
+          : 'bg-zinc-300'}"
+      >
+        <span
+          class="inline-block h-4 w-4 transform rounded-full bg-surface shadow transition {enabled
+            ? 'translate-x-4'
+            : 'translate-x-0.5'}"
+        ></span>
+      </button>
+      <span class="text-sm font-semibold text-zinc-900">{t(meta?.label ?? serviceKey)}</span>
+    </div>
+  {/if}
 
   {#if enabled && meta?.networks}
     <div class="flex flex-col gap-1">
@@ -133,7 +144,7 @@
 </div>
 
 {#if enabled && data}
-  <div class="mt-4">
+  <div class={meta?.always ? '' : 'mt-4'}>
     <LayoutRenderer {data} {schema} {layout} />
   </div>
 {/if}

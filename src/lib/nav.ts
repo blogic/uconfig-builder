@@ -128,11 +128,14 @@ export const CHANGES_ITEMS: NavItem[] = [
 // irreversible action each. Services expands rather than linking to a page,
 // because a page holding only links to pages earns nothing.
 export const SYSTEM_ITEMS: NavItem[] = [
+  // First, because it is the one page here that answers a question rather than
+  // asking one: arriving at System usually means wanting to know how the device
+  // is doing.
+  { key: 'state', label: 'Overview', icon: 'bi-speedometer2' },
   // `time` rather than `ntp`: the page holds the timezone as well, and the
   // editor's raw NTP page keeps that key.
   { key: 'time', label: 'Time', icon: 'bi-clock' },
   { key: 'system-services', label: 'Services', icon: 'bi-hdd-network', group: true },
-  { key: 'state', label: 'State', icon: 'bi-speedometer2' },
   { key: 'reboot', label: 'Reboot', icon: 'bi-arrow-clockwise' },
   { key: 'firmware', label: 'Firmware', icon: 'bi-cpu' },
   { key: 'factory-reset', label: 'Factory Reset', icon: 'bi-exclamation-triangle' }

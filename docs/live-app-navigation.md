@@ -113,11 +113,10 @@ Two of these look like pages in their own right rather than Advanced fodder:
 
 ## System: the services the device offers
 
-Four services have a page of their own under **System › Services**, a group that
-expands in the sidebar the way Configure's does: SSH, Local discovery (mDNS),
-Neighbour discovery (LLDP) and Logging. Named for what they do, with the
-protocol kept in the page's prose so anyone searching for it still arrives.
-**Time** sits above them, holding `definitions.ntp-servers`.
+Three services have a page of their own under **System › Services**, a group that
+expands in the sidebar the way Configure's does: SSH, LLDP and Logging. Above
+them sit **Overview**, which reports rather than asks and so comes first, and
+**Time**, holding the timezone and `definitions.ntp-servers`.
 
 The live app never had these at all. Configure carries no `device` flag, so
 `sections_for()` drops it when `IS_EDITOR` is false, and the service pages went
@@ -141,9 +140,15 @@ says interface lists are deliberately left alone. For SSH, mDNS and LLDP that
 means the editor's toggle starts nothing and stops nothing.
 
 **Off clears the networks and keeps the settings**, so the port, keys and
-announced names survive for whenever the service comes back. Logging is the
-exception in both directions: nothing lists it, its block existing is what
-starts it, so it has no networks to choose and its off removes the block.
+announced names survive for whenever the service comes back.
+
+Logging has no switch at all. The device keeps a local log buffer whatever the
+config says, so an off would be a lie; the block only tunes it, and sending a
+copy to a syslog server is the part that is optional, behind a **Remote
+Logging** disclosure. The page materialises the block to have somewhere to
+write, which is why the diff skips the presence check for it: a block holding
+nothing but schema defaults says what no block says, and opening a page should
+not leave an edit behind.
 
 ### Which services, and why not the rest
 
