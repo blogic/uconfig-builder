@@ -112,23 +112,20 @@ function ready_reject_now(message: string) {
   reject?.(new Error(message))
 }
 
+// An unconfigured device has no password to ask for, so it says so instead and
+// the wizard runs in place of a login.
+//
+// Either way the keepalive starts here rather than at login. The device closes
+// an idle socket after two minutes, and both of these states are ones someone
+// sits in for longer than that while sending nothing: a login card waiting on a
+// password, or six wizard steps. Before a login `ping` is refused rather than
+// answered, which is fine. What holds the socket open is the traffic, not the
+// reply, and the rejection is swallowed where the interval sends it.
 function handle_event(msg: RpcEvent) {
-  if (msg.method === 'login-required') {
-    connection.setupRequired = false
-    ready_resolve_now()
-    return
-  }
-  // An unconfigured device has no password to ask for, so it says so instead
-  // and the wizard runs first. The wizard then holds the socket for as long as
-  // someone takes to fill in six steps while sending nothing, so the keepalive
-  // has to start here rather than at login: otherwise the device times the
-  // socket out mid-wizard and everything entered so far is lost. Setup mode
-  // answers ping without a login, which is what makes this possible.
-  if (msg.method === 'setup-required') {
-    connection.setupRequired = true
-    keepalive_start()
-    ready_resolve_now()
-  }
+  if (msg.method !== 'login-required' && msg.method !== 'setup-required') return
+  connection.setupRequired = msg.method === 'setup-required'
+  keepalive_start()
+  ready_resolve_now()
 }
 
 function keepalive_stop() {
