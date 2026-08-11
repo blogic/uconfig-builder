@@ -1,6 +1,8 @@
 <script lang="ts">
   import { capabilities } from '../capabilities.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
+  import { cpu, cpu_current, cpu_window_s } from '../cpu.svelte.js'
+  import CpuChart from './CpuChart.svelte'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
@@ -17,12 +19,19 @@
   const model = $derived(capabilities.data?.capabilities?.model)
   const board = $derived(sysinfo.board)
 
-  // ubus loadavg is fixed-point, scaled by 1<<16.
-  const load = $derived((info?.load ?? []).map((v) => (v / 65536).toFixed(2)))
-
+  // Utilisation rather than the load average this card used to show. loadavg
+  // counts tasks blocked in uninterruptible sleep as well as runnable ones, so a
+  // device stalled on flash reads as loaded with an idle CPU, and its 1/5/15
+  // minute time constants cannot resolve anything shorter than a minute. The
+  // device computes these from /proc/stat instead. `info.load` is still in
+  // `system-info` for anyone who wants the run queue.
+  const usage = $derived(cpu.data?.usage ?? [])
+  const current = $derived(cpu_current())
+  const window_min = $derived(Math.round(cpu_window_s() / 60))
 
   // Refresh on arrival, then poll while this page is open.
   $effect(() => poll_feed('state'))
+  $effect(() => poll_feed('cpu'))
 </script>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.state)}</p>
@@ -45,11 +54,21 @@
   </div>
 
   <div class="rounded-base border border-zinc-200 bg-surface p-4">
-    <h3 class="text-sm font-semibold text-zinc-900">{t('CPU load')}</h3>
-    <dl class="mt-2 space-y-1 text-sm">
-      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('1 min')}</dt><dd class="font-mono text-zinc-800">{load[0] ?? '—'}</dd></div>
-      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('5 min')}</dt><dd class="font-mono text-zinc-800">{load[1] ?? '—'}</dd></div>
-      <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('15 min')}</dt><dd class="font-mono text-zinc-800">{load[2] ?? '—'}</dd></div>
-    </dl>
+    <div class="flex items-baseline justify-between gap-4">
+      <h3 class="text-sm font-semibold text-zinc-900">{t('CPU usage')}</h3>
+      <span class="text-2xl font-bold tabular-nums tracking-tight text-zinc-900">
+        {current ?? '—'}<span class="ml-0.5 text-sm font-medium text-zinc-500">%</span>
+      </span>
+    </div>
+    {#if usage.length}
+      <CpuChart
+        {usage}
+        capacity={cpu.data?.samples ?? 0}
+        leftLabel={t('{count} min ago', { count: window_min })}
+        rightLabel={t('now')}
+      />
+    {:else}
+      <p class="mt-2 text-sm text-zinc-500">{t('This device does not report CPU usage.')}</p>
+    {/if}
   </div>
 </div>

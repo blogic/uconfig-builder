@@ -1,1744 +1,3354 @@
 {
- "status": {
-  "venues": {
-   "home": {
-    "main": {
-     "state": "connected",
-     "ts": 1785927114,
-     "capabilities": {
+  "status": {
+    "venues": {
+      "home": {
+        "main": {
+          "state": "connected",
+          "ts": 1785927114,
+          "capabilities": {
+            "compatible": "glinet,gl-mt6000",
+            "model": "GL.iNet GL-MT6000",
+            "network": {
+              "lan": [
+                "lan1",
+                "lan2",
+                "lan3",
+                "lan4",
+                "lan5"
+              ],
+              "wan": [
+                "eth1"
+              ]
+            }
+          },
+          "board": {
+            "kernel": "6.18.31",
+            "hostname": "main",
+            "system": "ARMv8 Processor rev 4",
+            "model": "GL.iNet GL-MT6000",
+            "board_name": "glinet,gl-mt6000",
+            "rootfs_type": "squashfs",
+            "release": {
+              "distribution": "OpenWrt",
+              "version": "SNAPSHOT",
+              "firmware_url": "https://downloads.openwrt.org/",
+              "revision": "r34553-74da669505",
+              "target": "mediatek/filogic",
+              "description": "OpenWrt SNAPSHOT r34553-74da669505",
+              "builddate": "1779454569"
+            }
+          },
+          "includes": {},
+          "local_macs": [
+            "00:00:5E:00:53:64"
+          ]
+        },
+        "peer1": {
+          "state": "connected",
+          "ts": 1784945539,
+          "capabilities": {
+            "compatible": "openwrt,one",
+            "model": "OpenWrt One",
+            "network": {
+              "lan": [
+                "eth1"
+              ],
+              "wan": [
+                "eth0"
+              ]
+            }
+          },
+          "board": {
+            "kernel": "6.18.31",
+            "hostname": "peer1",
+            "system": "ARMv8 Processor rev 4",
+            "model": "OpenWrt One",
+            "board_name": "openwrt,one",
+            "rootfs_type": "squashfs",
+            "release": {
+              "distribution": "OpenWrt",
+              "version": "SNAPSHOT",
+              "firmware_url": "https://downloads.openwrt.org/",
+              "revision": "r34553-74da669505",
+              "target": "mediatek/filogic",
+              "description": "OpenWrt SNAPSHOT r34553-74da669505",
+              "builddate": "1779454569"
+            }
+          },
+          "includes": {},
+          "local_macs": null
+        },
+        "peer2": {
+          "state": "connected",
+          "ts": 1784945539,
+          "capabilities": {
+            "compatible": "openwrt,one",
+            "model": "OpenWrt One",
+            "network": {
+              "lan": [
+                "eth1"
+              ],
+              "wan": [
+                "eth0"
+              ]
+            }
+          },
+          "board": {
+            "kernel": "6.18.31",
+            "hostname": "peer2",
+            "system": "ARMv8 Processor rev 4",
+            "model": "OpenWrt One",
+            "board_name": "openwrt,one",
+            "rootfs_type": "squashfs",
+            "release": {
+              "distribution": "OpenWrt",
+              "version": "SNAPSHOT",
+              "firmware_url": "https://downloads.openwrt.org/",
+              "revision": "r34553-74da669505",
+              "target": "mediatek/filogic",
+              "description": "OpenWrt SNAPSHOT r34553-74da669505",
+              "builddate": "1779454569"
+            }
+          },
+          "includes": {},
+          "local_macs": null
+        }
+      }
+    }
+  },
+  "capabilities": {
+    "capabilities": {
       "compatible": "glinet,gl-mt6000",
       "model": "GL.iNet GL-MT6000",
       "network": {
-       "lan": [
-        "lan1",
-        "lan2",
-        "lan3",
-        "lan4",
-        "lan5"
-       ],
-       "wan": [
-        "eth1"
-       ]
+        "lan": [
+          "lan1",
+          "lan2",
+          "lan3",
+          "lan4",
+          "lan5"
+        ],
+        "wan": [
+          "eth1"
+        ]
       }
-     },
-     "board": {
-      "kernel": "6.18.31",
-      "hostname": "main",
-      "system": "ARMv8 Processor rev 4",
-      "model": "GL.iNet GL-MT6000",
-      "board_name": "glinet,gl-mt6000",
-      "rootfs_type": "squashfs",
-      "release": {
-       "distribution": "OpenWrt",
-       "version": "SNAPSHOT",
-       "firmware_url": "https://downloads.openwrt.org/",
-       "revision": "r34553-74da669505",
-       "target": "mediatek/filogic",
-       "description": "OpenWrt SNAPSHOT r34553-74da669505",
-       "builddate": "1779454569"
-      }
-     },
-     "includes": {},
-     "local_macs": [
-      "00:00:5E:00:53:64"
-     ]
     },
-    "peer1": {
-     "state": "connected",
-     "ts": 1784945539,
-     "capabilities": {
-      "compatible": "openwrt,one",
-      "model": "OpenWrt One",
-      "network": {
-       "lan": [
-        "eth1"
-       ],
-       "wan": [
-        "eth0"
-       ]
+    "wiphy": [
+      {
+        "phy": "phy0",
+        "wiphy": 0,
+        "path": "platform/soc/18000000.wifi",
+        "bands": {
+          "2G": {
+            "channels": [
+              {
+                "channel": 1,
+                "freq": 2412,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 2,
+                "freq": 2417,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 3,
+                "freq": 2422,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 4,
+                "freq": 2427,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 5,
+                "freq": 2432,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 6,
+                "freq": 2437,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 7,
+                "freq": 2442,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 8,
+                "freq": 2447,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 9,
+                "freq": 2452,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 10,
+                "freq": 2457,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 11,
+                "freq": 2462,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 12,
+                "freq": 2467,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 13,
+                "freq": 2472,
+                "max_power": 20,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": true,
+                "no_160mhz": true,
+                "no_320mhz": true
+              }
+            ],
+            "modes": [
+              "HT20",
+              "HT40",
+              "HE20",
+              "HE40"
+            ],
+            "widths": [
+              20,
+              40
+            ],
+            "ht_capa": 2559,
+            "vht_capa": null,
+            "default_channel": 1
+          }
+        },
+        "antenna_rx": 15,
+        "antenna_tx": 15
+      },
+      {
+        "phy": "phy1",
+        "wiphy": 1,
+        "path": "platform/soc/18000000.wifi+1",
+        "bands": {
+          "5G": {
+            "channels": [
+              {
+                "channel": 36,
+                "freq": 5180,
+                "max_power": 23,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 40,
+                "freq": 5200,
+                "max_power": 23,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 44,
+                "freq": 5220,
+                "max_power": 23,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 48,
+                "freq": 5240,
+                "max_power": 23,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 52,
+                "freq": 5260,
+                "max_power": 20,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 56,
+                "freq": 5280,
+                "max_power": 20,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 60,
+                "freq": 5300,
+                "max_power": 20,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 64,
+                "freq": 5320,
+                "max_power": 20,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 100,
+                "freq": 5500,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 104,
+                "freq": 5520,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 108,
+                "freq": 5540,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 112,
+                "freq": 5560,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 116,
+                "freq": 5580,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 120,
+                "freq": 5600,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 124,
+                "freq": 5620,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 128,
+                "freq": 5640,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 132,
+                "freq": 5660,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 136,
+                "freq": 5680,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 140,
+                "freq": 5700,
+                "max_power": 26,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": false,
+                "no_320mhz": true
+              },
+              {
+                "channel": 144,
+                "freq": 5720,
+                "max_power": 13,
+                "dfs": true,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 149,
+                "freq": 5745,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": true,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 153,
+                "freq": 5765,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 157,
+                "freq": 5785,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 161,
+                "freq": 5805,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 165,
+                "freq": 5825,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 169,
+                "freq": 5845,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": false,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              },
+              {
+                "channel": 173,
+                "freq": 5865,
+                "max_power": 13,
+                "dfs": false,
+                "no_ir": false,
+                "no_ht40_minus": false,
+                "no_ht40_plus": true,
+                "no_80mhz": false,
+                "no_160mhz": true,
+                "no_320mhz": true
+              }
+            ],
+            "modes": [
+              "HT20",
+              "HT40",
+              "VHT20",
+              "VHT40",
+              "VHT80",
+              "VHT160",
+              "HE20",
+              "HE40",
+              "HE80",
+              "HE160"
+            ],
+            "widths": [
+              20,
+              40,
+              80,
+              160
+            ],
+            "ht_capa": 2559,
+            "vht_capa": 865827318,
+            "default_channel": 36
+          }
+        },
+        "antenna_rx": 240,
+        "antenna_tx": 240
       }
-     },
-     "board": {
-      "kernel": "6.18.31",
-      "hostname": "peer1",
-      "system": "ARMv8 Processor rev 4",
-      "model": "OpenWrt One",
-      "board_name": "openwrt,one",
-      "rootfs_type": "squashfs",
-      "release": {
-       "distribution": "OpenWrt",
-       "version": "SNAPSHOT",
-       "firmware_url": "https://downloads.openwrt.org/",
-       "revision": "r34553-74da669505",
-       "target": "mediatek/filogic",
-       "description": "OpenWrt SNAPSHOT r34553-74da669505",
-       "builddate": "1779454569"
-      }
-     },
-     "includes": {},
-     "local_macs": null
-    },
-    "peer2": {
-     "state": "connected",
-     "ts": 1784945539,
-     "capabilities": {
-      "compatible": "openwrt,one",
-      "model": "OpenWrt One",
-      "network": {
-       "lan": [
-        "eth1"
-       ],
-       "wan": [
-        "eth0"
-       ]
-      }
-     },
-     "board": {
-      "kernel": "6.18.31",
-      "hostname": "peer2",
-      "system": "ARMv8 Processor rev 4",
-      "model": "OpenWrt One",
-      "board_name": "openwrt,one",
-      "rootfs_type": "squashfs",
-      "release": {
-       "distribution": "OpenWrt",
-       "version": "SNAPSHOT",
-       "firmware_url": "https://downloads.openwrt.org/",
-       "revision": "r34553-74da669505",
-       "target": "mediatek/filogic",
-       "description": "OpenWrt SNAPSHOT r34553-74da669505",
-       "builddate": "1779454569"
-      }
-     },
-     "includes": {},
-     "local_macs": null
-    }
-   }
-  }
- },
- "capabilities": {
-  "capabilities": {
-   "compatible": "glinet,gl-mt6000",
-   "model": "GL.iNet GL-MT6000",
-   "network": {
-    "lan": [
-     "lan1",
-     "lan2",
-     "lan3",
-     "lan4",
-     "lan5"
-    ],
-    "wan": [
-     "eth1"
     ]
-   }
   },
-  "wiphy": [
-   {
-    "phy": "phy0",
-    "wiphy": 0,
-    "path": "platform/soc/18000000.wifi",
-    "bands": {
-     "2G": {
-      "channels": [
-       {
-        "channel": 1,
-        "freq": 2412,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 2,
-        "freq": 2417,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 3,
-        "freq": 2422,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 4,
-        "freq": 2427,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 5,
-        "freq": 2432,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 6,
-        "freq": 2437,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 7,
-        "freq": 2442,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 8,
-        "freq": 2447,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 9,
-        "freq": 2452,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 10,
-        "freq": 2457,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 11,
-        "freq": 2462,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 12,
-        "freq": 2467,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 13,
-        "freq": 2472,
-        "max_power": 20,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": true,
-        "no_160mhz": true,
-        "no_320mhz": true
-       }
-      ],
-      "modes": [
-       "HT20",
-       "HT40",
-       "HE20",
-       "HE40"
-      ],
-      "widths": [
-       20,
-       40
-      ],
-      "ht_capa": 2559,
-      "vht_capa": null,
-      "default_channel": 1
-     }
+  "info": {
+    "localtime": 1786020072,
+    "uptime": 1051414,
+    "load": [
+      0,
+      1056,
+      0
+    ],
+    "memory": {
+      "total": 1032966144,
+      "free": 47046656,
+      "shared": 91566080,
+      "buffered": 16384,
+      "available": 67543040,
+      "cached": 153772032
     },
-    "antenna_rx": 15,
-    "antenna_tx": 15
-   },
-   {
-    "phy": "phy1",
-    "wiphy": 1,
-    "path": "platform/soc/18000000.wifi+1",
-    "bands": {
-     "5G": {
-      "channels": [
-       {
+    "root": {
+      "total": 7561920,
+      "free": 7365460,
+      "used": 196460,
+      "avail": 7365460
+    },
+    "tmp": {
+      "total": 504376,
+      "free": 414956,
+      "used": 89420,
+      "avail": 414956
+    },
+    "swap": {
+      "total": 0,
+      "free": 0
+    }
+  },
+  "devices": {
+    "lan": {
+      "00:00:5E:00:53:01": {
+        "mac": "00:00:5E:00:53:01",
+        "online": true,
+        "ipv4": "192.168.42.10",
+        "fingerprint": {
+          "vendor": "Apple",
+          "class": "laptop",
+          "device_name": "studio-laptop",
+          "device": "MacBook Air"
+        },
+        "hostname": "studio-laptop",
+        "dhcp": "dynamic",
+        "bytes": 37000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 800000
+          },
+          "DNS": {
+            "bytes": 4200
+          }
+        },
+        "created": 1779700000,
+        "ignore": false,
+        "wifi": {
+          "band": "5G",
+          "freq": 5180,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 300000,
+          "tx_bytes": 400000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -52,
+          "host": "main",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:02": {
+        "mac": "00:00:5E:00:53:02",
+        "online": true,
+        "ipv4": "192.168.42.11",
+        "fingerprint": {
+          "vendor": "Google",
+          "class": "phone",
+          "device_name": "handset",
+          "device": "Pixel 8"
+        },
+        "hostname": "handset",
+        "dhcp": "dynamic",
+        "bytes": 74000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 1600000
+          },
+          "DNS": {
+            "bytes": 8400
+          }
+        },
+        "created": 1779700900,
+        "ignore": false,
+        "wifi": {
+          "band": "2G",
+          "freq": 2412,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 301000,
+          "tx_bytes": 401000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -55,
+          "host": "peer1",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:03": {
+        "mac": "00:00:5E:00:53:03",
+        "online": true,
+        "ipv4": "192.168.42.12",
+        "fingerprint": {
+          "vendor": "Samsung",
+          "class": "tv",
+          "device_name": "living-room-tv",
+          "device": "Smart TV"
+        },
+        "hostname": "living-room-tv",
+        "dhcp": "dynamic",
+        "bytes": 111000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 2400000
+          },
+          "DNS": {
+            "bytes": 12600
+          }
+        },
+        "created": 1779701800,
+        "ignore": false,
+        "wifi": {
+          "band": "5G",
+          "freq": 5180,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 302000,
+          "tx_bytes": 402000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -58,
+          "host": "peer2",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:04": {
+        "mac": "00:00:5E:00:53:04",
+        "online": true,
+        "ipv4": "192.168.42.13",
+        "fingerprint": {
+          "vendor": "HP",
+          "class": "printer",
+          "device_name": "printer",
+          "device": "OfficeJet"
+        },
+        "hostname": "printer",
+        "dhcp": "dynamic",
+        "bytes": 148000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 3200000
+          },
+          "DNS": {
+            "bytes": 16800
+          }
+        },
+        "created": 1779702700,
+        "ignore": false,
+        "ipv6": [
+          "fe80::200:5eff:fe00:5304"
+        ]
+      },
+      "00:00:5E:00:53:05": {
+        "mac": "00:00:5E:00:53:05",
+        "online": true,
+        "ipv4": "192.168.42.14",
+        "fingerprint": {
+          "vendor": "Sonos",
+          "class": "speaker",
+          "device_name": "kitchen-speaker",
+          "device": "One"
+        },
+        "hostname": "kitchen-speaker",
+        "dhcp": "dynamic",
+        "bytes": 185000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 4000000
+          },
+          "DNS": {
+            "bytes": 21000
+          }
+        },
+        "created": 1779703600,
+        "ignore": false,
+        "wifi": {
+          "band": "5G",
+          "freq": 5180,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 304000,
+          "tx_bytes": 404000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -64,
+          "host": "peer1",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:06": {
+        "mac": "00:00:5E:00:53:06",
+        "online": true,
+        "ipv4": "192.168.42.15",
+        "fingerprint": {
+          "vendor": "OpenWrt",
+          "class": "router",
+          "device_name": "peer1"
+        },
+        "hostname": "peer1",
+        "dhcp": "dynamic",
+        "bytes": 222000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 4800000
+          },
+          "DNS": {
+            "bytes": 25200
+          }
+        },
+        "created": 1779704500,
+        "ignore": false,
+        "ipv6": [
+          "fe80::200:5eff:fe00:5306"
+        ]
+      },
+      "00:00:5E:00:53:07": {
+        "mac": "00:00:5E:00:53:07",
+        "online": true,
+        "ipv4": "192.168.42.16",
+        "fingerprint": {
+          "vendor": "OpenWrt",
+          "class": "router",
+          "device_name": "peer2"
+        },
+        "hostname": "peer2",
+        "dhcp": "dynamic",
+        "bytes": 259000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 5600000
+          },
+          "DNS": {
+            "bytes": 29400
+          }
+        },
+        "created": 1779705400,
+        "ignore": false,
+        "ipv6": [
+          "fe80::200:5eff:fe00:5307"
+        ]
+      },
+      "00:00:5E:00:53:08": {
+        "mac": "00:00:5E:00:53:08",
+        "online": true,
+        "ipv4": "192.168.42.17",
+        "fingerprint": {
+          "vendor": "Intel",
+          "class": "desktop",
+          "device_name": "workshop-pc",
+          "device": "NUC"
+        },
+        "hostname": "workshop-pc",
+        "dhcp": "dynamic",
+        "bytes": 296000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 6400000
+          },
+          "DNS": {
+            "bytes": 33600
+          }
+        },
+        "created": 1779706300,
+        "ignore": false,
+        "ipv6": [
+          "fe80::200:5eff:fe00:5308"
+        ]
+      },
+      "00:00:5E:00:53:09": {
+        "mac": "00:00:5E:00:53:09",
+        "online": true,
+        "ipv4": "192.168.42.18",
+        "fingerprint": {
+          "vendor": "Apple",
+          "class": "tablet",
+          "device_name": "tablet",
+          "device": "iPad"
+        },
+        "hostname": "tablet",
+        "dhcp": "dynamic",
+        "bytes": 333000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 7200000
+          },
+          "DNS": {
+            "bytes": 37800
+          }
+        },
+        "created": 1779707200,
+        "ignore": false,
+        "wifi": {
+          "band": "5G",
+          "freq": 5180,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 308000,
+          "tx_bytes": 408000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -76,
+          "host": "peer2",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:0A": {
+        "mac": "00:00:5E:00:53:0A",
+        "online": true,
+        "ipv4": "192.168.42.19",
+        "fingerprint": {
+          "vendor": "Ubiquiti",
+          "class": "camera",
+          "device_name": "doorbell",
+          "device": "G4 Doorbell"
+        },
+        "hostname": "doorbell",
+        "dhcp": "dynamic",
+        "bytes": 370000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 8000000
+          },
+          "DNS": {
+            "bytes": 42000
+          }
+        },
+        "created": 1779708100,
+        "ignore": false,
+        "wifi": {
+          "band": "2G",
+          "freq": 2412,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 309000,
+          "tx_bytes": 409000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -79,
+          "host": "main",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:0B": {
+        "mac": "00:00:5E:00:53:0B",
+        "online": true,
+        "ipv4": "192.168.42.20",
+        "fingerprint": {
+          "vendor": "Synology",
+          "class": "nas",
+          "device_name": "nas",
+          "device": "DS220+"
+        },
+        "hostname": "nas",
+        "dhcp": "dynamic",
+        "bytes": 407000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 8800000
+          },
+          "DNS": {
+            "bytes": 46200
+          }
+        },
+        "created": 1779709000,
+        "ignore": false,
+        "ipv6": [
+          "fe80::200:5eff:fe00:530b"
+        ]
+      },
+      "00:00:5E:00:53:0C": {
+        "mac": "00:00:5E:00:53:0C",
+        "online": true,
+        "ipv4": "192.168.42.21",
+        "fingerprint": {
+          "vendor": "Nintendo",
+          "class": "game-console",
+          "device_name": "console",
+          "device": "Switch"
+        },
+        "hostname": "console",
+        "dhcp": "dynamic",
+        "bytes": 444000000,
+        "traffic": {
+          "HTTPS": {
+            "bytes": 9600000
+          },
+          "DNS": {
+            "bytes": 50400
+          }
+        },
+        "created": 1779709900,
+        "ignore": false,
+        "wifi": {
+          "band": "2G",
+          "freq": 2412,
+          "ssid": "uconfig-demo",
+          "rx_bytes": 311000,
+          "tx_bytes": 411000,
+          "rx_rate": 57640000,
+          "tx_rate": 64850000,
+          "signal": -55,
+          "host": "peer2",
+          "mode": "he"
+        }
+      },
+      "00:00:5E:00:53:C8": {
+        "mac": "00:00:5E:00:53:C8",
+        "fingerprint": {
+          "vendor": "Example Corp",
+          "class": "phone"
+        },
+        "created": 1779000000,
+        "ignore": false
+      },
+      "00:00:5E:00:53:C9": {
+        "mac": "00:00:5E:00:53:C9",
+        "fingerprint": {
+          "vendor": "Example Corp",
+          "class": "laptop"
+        },
+        "created": 1779001000,
+        "ignore": false
+      }
+    }
+  },
+  "traffic": {
+    "up": [
+      [
+        5934,
+        3195,
+        1851,
+        3054,
+        3914,
+        1270,
+        1126,
+        671,
+        1120,
+        924,
+        274,
+        986
+      ],
+      [
+        143198,
+        10227,
+        10849,
+        5148,
+        14341,
+        12457,
+        6970,
+        7596,
+        17541,
+        15062,
+        4881,
+        5375,
+        5651,
+        3663,
+        160228,
+        126452,
+        8756,
+        191962,
+        162996,
+        40421,
+        46769,
+        34975,
+        138114,
+        75804,
+        113584,
+        40573,
+        138509,
+        104747,
+        88552,
+        273906,
+        143390,
+        221751,
+        67083,
+        71970,
+        67781,
+        72206,
+        54339,
+        99617,
+        92248,
+        43770,
+        85223,
+        65847,
+        37241,
+        141585,
+        43102,
+        35297,
+        52023,
+        234167,
+        59619,
+        52688,
+        51542,
+        38591,
+        38894,
+        35222,
+        72741,
+        36057,
+        36748,
+        268288,
+        19218,
+        5101
+      ],
+      [
+        15854278,
+        6104854,
+        8436305,
+        15463592,
+        6608282,
+        1745335,
+        6115344,
+        6967351,
+        8073060,
+        9496560,
+        3485034,
+        1954374,
+        2182625,
+        1525147,
+        1848270,
+        1844072,
+        2263320,
+        1805584,
+        5655236,
+        3813778,
+        8135308,
+        29273777,
+        2340505,
+        2277950
+      ],
+      [
+        1154908247,
+        1010586698,
+        71302489,
+        45715353,
+        56341511,
+        167762406,
+        283064744
+      ]
+    ],
+    "down": [
+      [
+        3920,
+        2476,
+        3022,
+        2884,
+        2665,
+        2432,
+        3393,
+        1669,
+        2421,
+        2620,
+        1315,
+        1922
+      ],
+      [
+        179464,
+        29455,
+        14596,
+        10354,
+        15807,
+        20614,
+        17079,
+        18638,
+        67491,
+        30161,
+        12792,
+        23767,
+        10870,
+        8645,
+        248366,
+        132805,
+        16485,
+        289177,
+        108747,
+        36390,
+        46265,
+        37011,
+        254241,
+        55705,
+        144943,
+        27115,
+        1016269,
+        82584,
+        75980,
+        209625,
+        91881,
+        278517,
+        74163,
+        70977,
+        65021,
+        99756,
+        86396,
+        132338,
+        80212,
+        43176,
+        110961,
+        85496,
+        22756,
+        177859,
+        33776,
+        22049,
+        59001,
+        289557,
+        53416,
+        32718,
+        57597,
+        42983,
+        29423,
+        20310,
+        51129,
+        20282,
+        20867,
+        446542,
+        17399,
+        13340
+      ],
+      [
+        7476712,
+        6054087,
+        5531328,
+        8552698,
+        9190118,
+        2712139,
+        5899654,
+        7290694,
+        5504699,
+        4823957,
+        7587813,
+        3564595,
+        4246486,
+        2750232,
+        3115850,
+        59191467,
+        9544082,
+        2897687,
+        7811935,
+        6105800,
+        11063943,
+        977770507,
+        8475324,
+        3637238
+      ],
+      [
+        865645906,
+        800895101,
+        912262906,
+        141125124,
+        199449210,
+        241292385,
+        1612512646
+      ]
+    ]
+  },
+  "modules": [
+    "adguardhome",
+    "batman-adv",
+    "lldp",
+    "mdns",
+    "qosify",
+    "tailscale",
+    "ucoord"
+  ],
+  "radios": {
+    "2g": {
+      "htmode": "HE20",
+      "channel": "0",
+      "mode": "HE",
+      "bandwidth": "20",
+      "active_channel": "11",
+      "freq": 2462,
+      "utilization": 66,
+      "bandwidths": [
+        "20",
+        "40"
+      ],
+      "channels": {
+        "b20": [
+          "1",
+          "5",
+          "9",
+          "13"
+        ],
+        "b40": [
+          "1",
+          "9"
+        ]
+      }
+    },
+    "5g": {
+      "htmode": "HE80",
+      "channel": "36",
+      "mode": "HE",
+      "bandwidth": "80",
+      "active_channel": "36",
+      "freq": 5180,
+      "utilization": 11,
+      "bandwidths": [
+        "20",
+        "40",
+        "80",
+        "160"
+      ],
+      "channels": {
+        "b20": [
+          "36",
+          "40",
+          "44",
+          "48",
+          "52",
+          "56",
+          "60",
+          "64",
+          "100",
+          "104",
+          "108",
+          "112",
+          "116",
+          "120",
+          "124",
+          "128",
+          "132",
+          "136",
+          "140",
+          "144",
+          "149",
+          "153",
+          "157",
+          "161",
+          "165"
+        ],
+        "b40": [
+          "36",
+          "44",
+          "52",
+          "60",
+          "100",
+          "108",
+          "116",
+          "124",
+          "132",
+          "140",
+          "149",
+          "157"
+        ],
+        "b80": [
+          "36",
+          "52",
+          "100",
+          "116",
+          "132",
+          "149"
+        ],
+        "b160": [
+          "36",
+          "100"
+        ]
+      }
+    }
+  },
+  "ports": {
+    "WAN": {
+      "netdev": "eth1",
+      "index": 0,
+      "carrier": true,
+      "speed": "1000",
+      "macaddr": "00:00:5e:00:53:10",
+      "rx_bytes": 30227177075,
+      "tx_bytes": 4032852192
+    },
+    "LAN1": {
+      "netdev": "lan1",
+      "index": 0,
+      "carrier": false,
+      "speed": null,
+      "macaddr": "00:00:5e:00:53:11",
+      "rx_bytes": 0,
+      "tx_bytes": 0
+    },
+    "LAN2": {
+      "netdev": "lan2",
+      "index": 1,
+      "carrier": true,
+      "speed": "1000",
+      "macaddr": "00:00:5e:00:53:11",
+      "rx_bytes": 4052584209,
+      "tx_bytes": 29962764864
+    },
+    "LAN3": {
+      "netdev": "lan3",
+      "index": 2,
+      "carrier": true,
+      "speed": "1000",
+      "macaddr": "00:00:5e:00:53:11",
+      "rx_bytes": 68141287,
+      "tx_bytes": 437649305
+    },
+    "LAN4": {
+      "netdev": "lan4",
+      "index": 3,
+      "carrier": false,
+      "speed": null,
+      "macaddr": "00:00:5e:00:53:11",
+      "rx_bytes": 0,
+      "tx_bytes": 0
+    },
+    "LAN5": {
+      "netdev": "lan5",
+      "index": 4,
+      "carrier": false,
+      "speed": null,
+      "macaddr": "00:00:5e:00:53:11",
+      "rx_bytes": 0,
+      "tx_bytes": 0
+    }
+  },
+  "network": {
+    "wan": {
+      "up": true,
+      "uptime": 102567,
+      "device": "eth1",
+      "ipv4": {
+        "proto": "dhcp",
+        "address": "192.0.2.50/24",
+        "gateway": "192.0.2.1",
+        "dns": [
+          "192.0.2.1"
+        ],
+        "search": [
+          "example.net"
+        ],
+        "lease": {
+          "server": "192.0.2.1",
+          "time": 864000
+        }
+      },
+      "ipv6": {
+        "proto": "dhcpv6",
+        "addresses": [
+          "2001:db8:1403:600::1dd7/64"
+        ],
+        "prefix": "2001:db8:1403:6fc::/62"
+      }
+    },
+    "lan": {
+      "up": true,
+      "uptime": 102573,
+      "device": "br-lan1v0",
+      "ipv4": {
+        "proto": "static",
+        "address": "192.168.42.1/24"
+      },
+      "ipv6": {
+        "proto": "static",
+        "assigned": [
+          "2001:db8:1403:6fc::1/64",
+          "fd00:db8:1::1/64"
+        ]
+      }
+    }
+  },
+  "event-log": {
+    "log": [
+      {
+        "object": "carrier",
+        "verb": "down",
+        "time": 1786009302,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786009311,
+        "name": "LAN2"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786009332,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.17",
+        "mac": "00:00:5E:00:53:08",
+        "name": "workshop-pc"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786009872,
+        "mac": "00:00:5E:00:53:05",
+        "connected_time": 7610,
+        "rx_bytes": 18300000,
+        "tx_bytes": 2100000,
+        "rx_packets": 20333,
+        "tx_packets": 1909
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786010052,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:05",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
         "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786010056,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.14",
+        "mac": "00:00:5E:00:53:05",
+        "name": "kitchen-speaker"
+      },
+      {
+        "object": "client",
+        "verb": "key-mismatch",
+        "time": 1786010672,
+        "mac": "00:00:5E:00:53:C8",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0"
+      },
+      {
+        "object": "client",
+        "verb": "key-mismatch",
+        "time": 1786010735,
+        "mac": "00:00:5E:00:53:C8",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0"
+      },
+      {
+        "object": "client",
+        "verb": "key-mismatch",
+        "time": 1786010812,
+        "mac": "00:00:5E:00:53:C8",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786011272,
+        "mac": "00:00:5E:00:53:0C",
+        "connected_time": 8950,
+        "rx_bytes": 214000000,
+        "tx_bytes": 31200000,
+        "rx_packets": 237777,
+        "tx_packets": 28363
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786011972,
+        "mac": "00:00:5E:00:53:03",
+        "connected_time": 9740,
+        "rx_bytes": 1240000000,
+        "tx_bytes": 44300000,
+        "rx_packets": 1377777,
+        "tx_packets": 40272
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786012172,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:03",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786012176,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.12",
+        "mac": "00:00:5E:00:53:03",
+        "name": "living-room-tv"
+      },
+      {
+        "object": "wifi",
+        "verb": "stop",
+        "time": 1786012872,
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "wifi",
+        "verb": "start",
+        "time": 1786012884,
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786012972,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:02",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786012976,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.11",
+        "mac": "00:00:5E:00:53:02",
+        "name": "handset"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786013012,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0A",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786013016,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.19",
+        "mac": "00:00:5E:00:53:0A",
+        "name": "doorbell"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786013052,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0C",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786013056,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.21",
+        "mac": "00:00:5E:00:53:0C",
+        "name": "console"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786013772,
+        "mac": "00:00:5E:00:53:01",
+        "connected_time": 11600,
+        "rx_bytes": 806000000,
+        "tx_bytes": 118000000,
+        "rx_packets": 895555,
+        "tx_packets": 107272
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786014672,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:01",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786014676,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.10",
+        "mac": "00:00:5E:00:53:01",
+        "name": "studio-laptop"
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786015272,
+        "msg": "Child connection from 192.168.42.10:52104"
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786015273,
+        "msg": "Auth succeeded for 'root' with key from 192.168.42.10:52104"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786015872,
+        "mac": "00:00:5E:00:53:0A",
+        "connected_time": 2860,
+        "rx_bytes": 4100000,
+        "tx_bytes": 940000,
+        "rx_packets": 4555,
+        "tx_packets": 854
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786016052,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0A",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786016056,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.19",
+        "mac": "00:00:5E:00:53:0A",
+        "name": "doorbell"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786016772,
+        "mac": "00:00:5E:00:53:09",
+        "connected_time": 9296,
+        "rx_bytes": 66000000,
+        "tx_bytes": 9800000,
+        "rx_packets": 73333,
+        "tx_packets": 8909
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786017372,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:09",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786017376,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.18",
+        "mac": "00:00:5E:00:53:09",
+        "name": "tablet"
+      },
+      {
+        "object": "carrier",
+        "verb": "down",
+        "time": 1786017672,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786017681,
+        "name": "LAN2"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786018272,
+        "mac": "00:00:5E:00:53:02",
+        "connected_time": 5300,
+        "rx_bytes": 88000000,
+        "tx_bytes": 14600000,
+        "rx_packets": 97777,
+        "tx_packets": 13272
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786018572,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:02",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786018576,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.11",
+        "mac": "00:00:5E:00:53:02",
+        "name": "handset"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786018872,
+        "mac": "00:00:5E:00:53:05",
+        "connected_time": 8820,
+        "rx_bytes": 21700000,
+        "tx_bytes": 2400000,
+        "rx_packets": 24111,
+        "tx_packets": 2181
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786019172,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:05",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786019176,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.14",
+        "mac": "00:00:5E:00:53:05",
+        "name": "kitchen-speaker"
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786019472,
+        "msg": "Exit (root) from <192.168.42.10:52104>: Disconnect received"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786019652,
+        "mac": "00:00:5E:00:53:0C",
+        "connected_time": 6596,
+        "rx_bytes": 176000000,
+        "tx_bytes": 24800000,
+        "rx_packets": 195555,
+        "tx_packets": 22545
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786019832,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0C",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786019836,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.21",
+        "mac": "00:00:5E:00:53:0C",
+        "name": "console"
+      },
+      {
+        "object": "carrier",
+        "verb": "down",
+        "time": 1786019982,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786019988,
+        "name": "LAN2"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786020012,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.17",
+        "mac": "00:00:5E:00:53:08",
+        "name": "workshop-pc"
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786020042,
+        "msg": "Child connection from 192.168.42.10:52719"
+      },
+      {
+        "object": "wifi",
+        "verb": "start",
+        "time": 1786002072,
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "wifi",
+        "verb": "start",
+        "time": 1786002076,
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786002078,
+        "name": "WAN"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786002080,
+        "name": "LAN1"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786002082,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786002084,
+        "name": "LAN3"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002112,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.20",
+        "mac": "00:00:5E:00:53:0B",
+        "name": "nas"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002124,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.13",
+        "mac": "00:00:5E:00:53:04",
+        "name": "printer"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002142,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.17",
+        "mac": "00:00:5E:00:53:08",
+        "name": "workshop-pc"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002172,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:01",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002176,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.10",
+        "mac": "00:00:5E:00:53:01",
+        "name": "studio-laptop"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002202,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:02",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002206,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.11",
+        "mac": "00:00:5E:00:53:02",
+        "name": "handset"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002232,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:03",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002236,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.12",
+        "mac": "00:00:5E:00:53:03",
+        "name": "living-room-tv"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002262,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:05",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002266,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.14",
+        "mac": "00:00:5E:00:53:05",
+        "name": "kitchen-speaker"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002292,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0A",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002296,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.19",
+        "mac": "00:00:5E:00:53:0A",
+        "name": "doorbell"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002322,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:0C",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002326,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.21",
+        "mac": "00:00:5E:00:53:0C",
+        "name": "console"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786002372,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:09",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G",
+        "rate-limit": 20000
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786002376,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.18",
+        "mac": "00:00:5E:00:53:09",
+        "name": "tablet"
+      },
+      {
+        "object": "wifi",
+        "verb": "channel-switch",
+        "time": 1786003672,
+        "ifname": "phy1-ap0",
         "freq": 5180,
-        "max_power": 23,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 40,
-        "freq": 5200,
-        "max_power": 23,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 44,
-        "freq": 5220,
-        "max_power": 23,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 48,
-        "freq": 5240,
-        "max_power": 23,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 52,
-        "freq": 5260,
-        "max_power": 20,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 56,
-        "freq": 5280,
-        "max_power": 20,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 60,
-        "freq": 5300,
-        "max_power": 20,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 64,
-        "freq": 5320,
-        "max_power": 20,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 100,
-        "freq": 5500,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 104,
-        "freq": 5520,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 108,
-        "freq": 5540,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 112,
-        "freq": 5560,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 116,
-        "freq": 5580,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 120,
-        "freq": 5600,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 124,
-        "freq": 5620,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 128,
-        "freq": 5640,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 132,
-        "freq": 5660,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 136,
-        "freq": 5680,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 140,
-        "freq": 5700,
-        "max_power": 26,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": false,
-        "no_320mhz": true
-       },
-       {
-        "channel": 144,
-        "freq": 5720,
-        "max_power": 13,
-        "dfs": true,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 149,
-        "freq": 5745,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": true,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 153,
-        "freq": 5765,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 157,
-        "freq": 5785,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 161,
-        "freq": 5805,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 165,
-        "freq": 5825,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 169,
-        "freq": 5845,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": false,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       },
-       {
-        "channel": 173,
-        "freq": 5865,
-        "max_power": 13,
-        "dfs": false,
-        "no_ir": false,
-        "no_ht40_minus": false,
-        "no_ht40_plus": true,
-        "no_80mhz": false,
-        "no_160mhz": true,
-        "no_320mhz": true
-       }
-      ],
-      "modes": [
-       "HT20",
-       "HT40",
-       "VHT20",
-       "VHT40",
-       "VHT80",
-       "VHT160",
-       "HE20",
-       "HE40",
-       "HE80",
-       "HE160"
-      ],
-      "widths": [
-       20,
-       40,
-       80,
-       160
-      ],
-      "ht_capa": 2559,
-      "vht_capa": 865827318,
-      "default_channel": 36
-     }
-    },
-    "antenna_rx": 240,
-    "antenna_tx": 240
-   }
-  ]
- },
- "info": {
-  "localtime": 1786020072,
-  "uptime": 1051414,
-  "load": [
-   0,
-   1056,
-   0
-  ],
+        "channel": 36,
+        "bandwidth": 80,
+        "center_freq1": 5210,
+        "sec_chan_offset": 1
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786004872,
+        "msg": "Child connection from 192.168.42.17:41022"
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786004873,
+        "msg": "Auth succeeded for 'root' with key from 192.168.42.17:41022"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786005272,
+        "mac": "00:00:5E:00:53:02",
+        "connected_time": 3070,
+        "rx_bytes": 41200000,
+        "tx_bytes": 8600000,
+        "rx_packets": 45777,
+        "tx_packets": 7818
+      },
+      {
+        "object": "ssh",
+        "verb": "event",
+        "time": 1786005672,
+        "msg": "Exit (root) from <192.168.42.17:41022>: Disconnect received"
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786005972,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:02",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A0",
+        "ifname": "phy0-ap0",
+        "channel": 11,
+        "band": "2G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786005976,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.11",
+        "mac": "00:00:5E:00:53:02",
+        "name": "handset"
+      },
+      {
+        "object": "client",
+        "verb": "leave",
+        "time": 1786006872,
+        "mac": "00:00:5E:00:53:09",
+        "connected_time": 3600,
+        "rx_bytes": 92000000,
+        "tx_bytes": 12400000,
+        "rx_packets": 102222,
+        "tx_packets": 11272
+      },
+      {
+        "object": "client",
+        "verb": "join",
+        "time": 1786007472,
+        "medium": "wireless",
+        "mac": "00:00:5E:00:53:09",
+        "ssid": "uconfig-demo",
+        "bssid": "00:00:5E:00:53:A1",
+        "ifname": "phy1-ap0",
+        "channel": 36,
+        "band": "5G"
+      },
+      {
+        "object": "dhcp",
+        "verb": "ack",
+        "time": 1786007476,
+        "interface": "br-lan1v0",
+        "ip": "192.168.42.18",
+        "mac": "00:00:5E:00:53:09",
+        "name": "tablet"
+      },
+      {
+        "object": "carrier",
+        "verb": "down",
+        "time": 1786008272,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786008278,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "down",
+        "time": 1786008762,
+        "name": "LAN2"
+      },
+      {
+        "object": "carrier",
+        "verb": "up",
+        "time": 1786008770,
+        "name": "LAN2"
+      }
+    ]
+  },
   "memory": {
-   "total": 1032966144,
-   "free": 47046656,
-   "shared": 91566080,
-   "buffered": 16384,
-   "available": 67543040,
-   "cached": 153772032
-  },
-  "root": {
-   "total": 7561920,
-   "free": 7365460,
-   "used": 196460,
-   "avail": 7365460
-  },
-  "tmp": {
-   "total": 504376,
-   "free": 414956,
-   "used": 89420,
-   "avail": 414956
-  },
-  "swap": {
-   "total": 0,
-   "free": 0
-  }
- },
- "devices": {
-  "lan": {
-   "00:00:5E:00:53:01": {
-    "mac": "00:00:5E:00:53:01",
-    "online": true,
-    "ipv4": "192.168.42.10",
-    "fingerprint": {
-     "vendor": "Apple",
-     "class": "laptop",
-     "device_name": "studio-laptop",
-     "device": "MacBook Air"
+    "system": {
+      "total_kb": 1008756,
+      "free_kb": 615416,
+      "available_kb": 665980,
+      "buff_cache_kb": 119356,
+      "swap_total_kb": 0,
+      "swap_free_kb": 0
     },
-    "hostname": "studio-laptop",
-    "dhcp": "dynamic",
-    "bytes": 37000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 800000
-     },
-     "DNS": {
-      "bytes": 4200
-     }
-    },
-    "created": 1779700000,
-    "ignore": false,
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 300000,
-     "tx_bytes": 400000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -52,
-     "host": "main",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:02": {
-    "mac": "00:00:5E:00:53:02",
-    "online": true,
-    "ipv4": "192.168.42.11",
-    "fingerprint": {
-     "vendor": "Google",
-     "class": "phone",
-     "device_name": "handset",
-     "device": "Pixel 8"
-    },
-    "hostname": "handset",
-    "dhcp": "dynamic",
-    "bytes": 74000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 1600000
-     },
-     "DNS": {
-      "bytes": 8400
-     }
-    },
-    "created": 1779700900,
-    "ignore": false,
-    "wifi": {
-     "band": "2G",
-     "freq": 2412,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 301000,
-     "tx_bytes": 401000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -55,
-     "host": "peer1",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:03": {
-    "mac": "00:00:5E:00:53:03",
-    "online": true,
-    "ipv4": "192.168.42.12",
-    "fingerprint": {
-     "vendor": "Samsung",
-     "class": "tv",
-     "device_name": "living-room-tv",
-     "device": "Smart TV"
-    },
-    "hostname": "living-room-tv",
-    "dhcp": "dynamic",
-    "bytes": 111000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 2400000
-     },
-     "DNS": {
-      "bytes": 12600
-     }
-    },
-    "created": 1779701800,
-    "ignore": false,
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 302000,
-     "tx_bytes": 402000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -58,
-     "host": "peer2",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:04": {
-    "mac": "00:00:5E:00:53:04",
-    "online": true,
-    "ipv4": "192.168.42.13",
-    "fingerprint": {
-     "vendor": "HP",
-     "class": "printer",
-     "device_name": "printer",
-     "device": "OfficeJet"
-    },
-    "hostname": "printer",
-    "dhcp": "dynamic",
-    "bytes": 148000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 3200000
-     },
-     "DNS": {
-      "bytes": 16800
-     }
-    },
-    "created": 1779702700,
-    "ignore": false,
-    "ipv6": [
-     "fe80::200:5eff:fe00:5304"
-    ]
-   },
-   "00:00:5E:00:53:05": {
-    "mac": "00:00:5E:00:53:05",
-    "online": true,
-    "ipv4": "192.168.42.14",
-    "fingerprint": {
-     "vendor": "Sonos",
-     "class": "speaker",
-     "device_name": "kitchen-speaker",
-     "device": "One"
-    },
-    "hostname": "kitchen-speaker",
-    "dhcp": "dynamic",
-    "bytes": 185000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 4000000
-     },
-     "DNS": {
-      "bytes": 21000
-     }
-    },
-    "created": 1779703600,
-    "ignore": false,
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 304000,
-     "tx_bytes": 404000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -64,
-     "host": "peer1",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:06": {
-    "mac": "00:00:5E:00:53:06",
-    "online": true,
-    "ipv4": "192.168.42.15",
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "class": "router",
-     "device_name": "peer1"
-    },
-    "hostname": "peer1",
-    "dhcp": "dynamic",
-    "bytes": 222000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 4800000
-     },
-     "DNS": {
-      "bytes": 25200
-     }
-    },
-    "created": 1779704500,
-    "ignore": false,
-    "ipv6": [
-     "fe80::200:5eff:fe00:5306"
-    ]
-   },
-   "00:00:5E:00:53:07": {
-    "mac": "00:00:5E:00:53:07",
-    "online": true,
-    "ipv4": "192.168.42.16",
-    "fingerprint": {
-     "vendor": "OpenWrt",
-     "class": "router",
-     "device_name": "peer2"
-    },
-    "hostname": "peer2",
-    "dhcp": "dynamic",
-    "bytes": 259000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 5600000
-     },
-     "DNS": {
-      "bytes": 29400
-     }
-    },
-    "created": 1779705400,
-    "ignore": false,
-    "ipv6": [
-     "fe80::200:5eff:fe00:5307"
-    ]
-   },
-   "00:00:5E:00:53:08": {
-    "mac": "00:00:5E:00:53:08",
-    "online": true,
-    "ipv4": "192.168.42.17",
-    "fingerprint": {
-     "vendor": "Intel",
-     "class": "desktop",
-     "device_name": "workshop-pc",
-     "device": "NUC"
-    },
-    "hostname": "workshop-pc",
-    "dhcp": "dynamic",
-    "bytes": 296000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 6400000
-     },
-     "DNS": {
-      "bytes": 33600
-     }
-    },
-    "created": 1779706300,
-    "ignore": false,
-    "ipv6": [
-     "fe80::200:5eff:fe00:5308"
-    ]
-   },
-   "00:00:5E:00:53:09": {
-    "mac": "00:00:5E:00:53:09",
-    "online": true,
-    "ipv4": "192.168.42.18",
-    "fingerprint": {
-     "vendor": "Apple",
-     "class": "tablet",
-     "device_name": "tablet",
-     "device": "iPad"
-    },
-    "hostname": "tablet",
-    "dhcp": "dynamic",
-    "bytes": 333000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 7200000
-     },
-     "DNS": {
-      "bytes": 37800
-     }
-    },
-    "created": 1779707200,
-    "ignore": false,
-    "wifi": {
-     "band": "5G",
-     "freq": 5180,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 308000,
-     "tx_bytes": 408000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -76,
-     "host": "peer2",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:0A": {
-    "mac": "00:00:5E:00:53:0A",
-    "online": true,
-    "ipv4": "192.168.42.19",
-    "fingerprint": {
-     "vendor": "Ubiquiti",
-     "class": "camera",
-     "device_name": "doorbell",
-     "device": "G4 Doorbell"
-    },
-    "hostname": "doorbell",
-    "dhcp": "dynamic",
-    "bytes": 370000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 8000000
-     },
-     "DNS": {
-      "bytes": 42000
-     }
-    },
-    "created": 1779708100,
-    "ignore": false,
-    "wifi": {
-     "band": "2G",
-     "freq": 2412,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 309000,
-     "tx_bytes": 409000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -79,
-     "host": "main",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:0B": {
-    "mac": "00:00:5E:00:53:0B",
-    "online": true,
-    "ipv4": "192.168.42.20",
-    "fingerprint": {
-     "vendor": "Synology",
-     "class": "nas",
-     "device_name": "nas",
-     "device": "DS220+"
-    },
-    "hostname": "nas",
-    "dhcp": "dynamic",
-    "bytes": 407000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 8800000
-     },
-     "DNS": {
-      "bytes": 46200
-     }
-    },
-    "created": 1779709000,
-    "ignore": false,
-    "ipv6": [
-     "fe80::200:5eff:fe00:530b"
-    ]
-   },
-   "00:00:5E:00:53:0C": {
-    "mac": "00:00:5E:00:53:0C",
-    "online": true,
-    "ipv4": "192.168.42.21",
-    "fingerprint": {
-     "vendor": "Nintendo",
-     "class": "game-console",
-     "device_name": "console",
-     "device": "Switch"
-    },
-    "hostname": "console",
-    "dhcp": "dynamic",
-    "bytes": 444000000,
-    "traffic": {
-     "HTTPS": {
-      "bytes": 9600000
-     },
-     "DNS": {
-      "bytes": 50400
-     }
-    },
-    "created": 1779709900,
-    "ignore": false,
-    "wifi": {
-     "band": "2G",
-     "freq": 2412,
-     "ssid": "uconfig-demo",
-     "rx_bytes": 311000,
-     "tx_bytes": 411000,
-     "rx_rate": 57640000,
-     "tx_rate": 64850000,
-     "signal": -55,
-     "host": "peer2",
-     "mode": "he"
-    }
-   },
-   "00:00:5E:00:53:C8": {
-    "mac": "00:00:5E:00:53:C8",
-    "fingerprint": {
-     "vendor": "Example Corp",
-     "class": "phone"
-    },
-    "created": 1779000000,
-    "ignore": false
-   },
-   "00:00:5E:00:53:C9": {
-    "mac": "00:00:5E:00:53:C9",
-    "fingerprint": {
-     "vendor": "Example Corp",
-     "class": "laptop"
-    },
-    "created": 1779001000,
-    "ignore": false
-   }
-  }
- },
- "traffic": {
-  "up": [
-   [
-    5934,
-    3195,
-    1851,
-    3054,
-    3914,
-    1270,
-    1126,
-    671,
-    1120,
-    924,
-    274,
-    986
-   ],
-   [
-    143198,
-    10227,
-    10849,
-    5148,
-    14341,
-    12457,
-    6970,
-    7596,
-    17541,
-    15062,
-    4881,
-    5375,
-    5651,
-    3663,
-    160228,
-    126452,
-    8756,
-    191962,
-    162996,
-    40421,
-    46769,
-    34975,
-    138114,
-    75804,
-    113584,
-    40573,
-    138509,
-    104747,
-    88552,
-    273906,
-    143390,
-    221751,
-    67083,
-    71970,
-    67781,
-    72206,
-    54339,
-    99617,
-    92248,
-    43770,
-    85223,
-    65847,
-    37241,
-    141585,
-    43102,
-    35297,
-    52023,
-    234167,
-    59619,
-    52688,
-    51542,
-    38591,
-    38894,
-    35222,
-    72741,
-    36057,
-    36748,
-    268288,
-    19218,
-    5101
-   ],
-   [
-    15854278,
-    6104854,
-    8436305,
-    15463592,
-    6608282,
-    1745335,
-    6115344,
-    6967351,
-    8073060,
-    9496560,
-    3485034,
-    1954374,
-    2182625,
-    1525147,
-    1848270,
-    1844072,
-    2263320,
-    1805584,
-    5655236,
-    3813778,
-    8135308,
-    29273777,
-    2340505,
-    2277950
-   ],
-   [
-    1154908247,
-    1010586698,
-    71302489,
-    45715353,
-    56341511,
-    167762406,
-    283064744
-   ]
-  ],
-  "down": [
-   [
-    3920,
-    2476,
-    3022,
-    2884,
-    2665,
-    2432,
-    3393,
-    1669,
-    2421,
-    2620,
-    1315,
-    1922
-   ],
-   [
-    179464,
-    29455,
-    14596,
-    10354,
-    15807,
-    20614,
-    17079,
-    18638,
-    67491,
-    30161,
-    12792,
-    23767,
-    10870,
-    8645,
-    248366,
-    132805,
-    16485,
-    289177,
-    108747,
-    36390,
-    46265,
-    37011,
-    254241,
-    55705,
-    144943,
-    27115,
-    1016269,
-    82584,
-    75980,
-    209625,
-    91881,
-    278517,
-    74163,
-    70977,
-    65021,
-    99756,
-    86396,
-    132338,
-    80212,
-    43176,
-    110961,
-    85496,
-    22756,
-    177859,
-    33776,
-    22049,
-    59001,
-    289557,
-    53416,
-    32718,
-    57597,
-    42983,
-    29423,
-    20310,
-    51129,
-    20282,
-    20867,
-    446542,
-    17399,
-    13340
-   ],
-   [
-    7476712,
-    6054087,
-    5531328,
-    8552698,
-    9190118,
-    2712139,
-    5899654,
-    7290694,
-    5504699,
-    4823957,
-    7587813,
-    3564595,
-    4246486,
-    2750232,
-    3115850,
-    59191467,
-    9544082,
-    2897687,
-    7811935,
-    6105800,
-    11063943,
-    977770507,
-    8475324,
-    3637238
-   ],
-   [
-    865645906,
-    800895101,
-    912262906,
-    141125124,
-    199449210,
-    241292385,
-    1612512646
-   ]
-  ]
- },
- "modules": [
-  "adguardhome",
-  "batman-adv",
-  "lldp",
-  "mdns",
-  "qosify",
-  "tailscale",
-  "ucoord"
- ],
- "radios": {
-  "2g": {
-   "htmode": "HE20",
-   "channel": "0",
-   "mode": "HE",
-   "bandwidth": "20",
-   "active_channel": "11",
-   "freq": 2462,
-   "utilization": 66,
-   "bandwidths": [
-    "20",
-    "40"
-   ],
-   "channels": {
-    "b20": [
-     "1",
-     "5",
-     "9",
-     "13"
+    "leaking": [
+      {
+        "pid": 5244,
+        "name": "uconfig-state",
+        "cmd": "ucode",
+        "age_s": 113921,
+        "rss_kb": 32740,
+        "rss_startup_kb": 1612,
+        "rss_delta_kb": 31128,
+        "fds": 25,
+        "fds_startup": 19,
+        "fds_delta": 6,
+        "service": "uconfig-state",
+        "instance": "instance1"
+      },
+      {
+        "pid": 4218,
+        "name": "uconfig-event",
+        "cmd": "ucode",
+        "age_s": 113921,
+        "rss_kb": 30448,
+        "rss_startup_kb": 1860,
+        "rss_delta_kb": 28588,
+        "fds": 21,
+        "fds_startup": 19,
+        "fds_delta": 2,
+        "service": "uconfig-event",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5667,
+        "name": "AdGuardHome",
+        "cmd": "/usr/bin/AdGuardHome",
+        "age_s": 104340,
+        "rss_kb": 80228,
+        "rss_startup_kb": 67676,
+        "rss_delta_kb": 12552,
+        "fds": 16,
+        "fds_startup": 17,
+        "fds_delta": -1,
+        "service": "adguardhome",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5675,
+        "name": "ucoord",
+        "cmd": "ucode",
+        "age_s": 104340,
+        "rss_kb": 5956,
+        "rss_startup_kb": 1392,
+        "rss_delta_kb": 4564,
+        "fds": 14,
+        "fds_startup": 14,
+        "fds_delta": 0,
+        "service": "ucoord",
+        "instance": "instance1"
+      },
+      {
+        "pid": 4045,
+        "name": "ratelimit",
+        "cmd": "/usr/bin/ucode",
+        "age_s": 113921,
+        "rss_kb": 1944,
+        "rss_startup_kb": 1748,
+        "rss_delta_kb": 196,
+        "fds": 17,
+        "fds_startup": 17,
+        "fds_delta": 0,
+        "service": "ratelimit",
+        "instance": "instance1"
+      },
+      {
+        "pid": 2096,
+        "name": "hostapd",
+        "cmd": "/usr/sbin/hostapd",
+        "age_s": 113921,
+        "rss_kb": 7804,
+        "rss_startup_kb": 7616,
+        "rss_delta_kb": 188,
+        "fds": 35,
+        "fds_startup": 32,
+        "fds_delta": 3,
+        "service": "wpad",
+        "instance": "hostapd"
+      },
+      {
+        "pid": 4134,
+        "name": "unetmsgd",
+        "cmd": "/usr/bin/ucode",
+        "age_s": 113921,
+        "rss_kb": 2724,
+        "rss_startup_kb": 2552,
+        "rss_delta_kb": 172,
+        "fds": 21,
+        "fds_startup": 20,
+        "fds_delta": 1,
+        "service": "unetmsg",
+        "instance": "instance1"
+      },
+      {
+        "pid": 4375,
+        "name": "umdns",
+        "cmd": "/usr/sbin/umdns",
+        "age_s": 113921,
+        "rss_kb": 1188,
+        "rss_startup_kb": 1048,
+        "rss_delta_kb": 140,
+        "fds": 13,
+        "fds_startup": 13,
+        "fds_delta": 0,
+        "service": "umdns",
+        "instance": "instance1"
+      },
+      {
+        "pid": 1538,
+        "name": "logd",
+        "cmd": "/sbin/logd",
+        "age_s": 113921,
+        "rss_kb": 1116,
+        "rss_startup_kb": 1008,
+        "rss_delta_kb": 108,
+        "fds": 14,
+        "fds_startup": 14,
+        "fds_delta": 0,
+        "service": "log",
+        "instance": "logd"
+      },
+      {
+        "pid": 2043,
+        "name": "unetd",
+        "cmd": "/usr/sbin/unetd",
+        "age_s": 113921,
+        "rss_kb": 1576,
+        "rss_startup_kb": 1488,
+        "rss_delta_kb": 88,
+        "fds": 17,
+        "fds_startup": 17,
+        "fds_delta": 0,
+        "service": "unetd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 1,
+        "name": "procd",
+        "cmd": "/sbin/procd",
+        "age_s": 113921,
+        "rss_kb": 1408,
+        "rss_startup_kb": 1332,
+        "rss_delta_kb": 76,
+        "fds": 24,
+        "fds_startup": 24,
+        "fds_delta": 0
+      },
+      {
+        "pid": 2161,
+        "name": "netifd",
+        "cmd": "/sbin/netifd",
+        "age_s": 113921,
+        "rss_kb": 2540,
+        "rss_startup_kb": 2468,
+        "rss_delta_kb": 72,
+        "fds": 31,
+        "fds_startup": 31,
+        "fds_delta": 0,
+        "service": "network",
+        "instance": "instance1"
+      },
+      {
+        "pid": 798,
+        "name": "ubusd",
+        "cmd": "/sbin/ubusd",
+        "age_s": 113921,
+        "rss_kb": 1056,
+        "rss_startup_kb": 984,
+        "rss_delta_kb": 72,
+        "fds": 44,
+        "fds_startup": 38,
+        "fds_delta": 6,
+        "service": "ubus",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5252,
+        "name": "lldpd",
+        "cmd": "/usr/sbin/lldpd",
+        "age_s": 113921,
+        "rss_kb": 968,
+        "rss_startup_kb": 900,
+        "rss_delta_kb": 68,
+        "fds": 20,
+        "fds_startup": 21,
+        "fds_delta": -1,
+        "service": "lldpd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5450,
+        "name": "umemd",
+        "cmd": "/usr/bin/ucode",
+        "age_s": 113921,
+        "rss_kb": 1496,
+        "rss_startup_kb": 1432,
+        "rss_delta_kb": 64,
+        "fds": 15,
+        "fds_startup": 13,
+        "fds_delta": 2,
+        "service": "umemd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5145,
+        "name": "lldpd",
+        "cmd": "/usr/sbin/lldpd",
+        "age_s": 113921,
+        "rss_kb": 1048,
+        "rss_startup_kb": 1020,
+        "rss_delta_kb": 28,
+        "fds": 7,
+        "fds_startup": 8,
+        "fds_delta": -1,
+        "service": "lldpd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5050,
+        "name": "dnsmasq",
+        "cmd": "/usr/sbin/dnsmasq",
+        "age_s": 113921,
+        "rss_kb": 1240,
+        "rss_startup_kb": 1228,
+        "rss_delta_kb": 12,
+        "fds": 54,
+        "fds_startup": 48,
+        "fds_delta": 6,
+        "service": "dnsmasq",
+        "instance": "cfg01411c"
+      },
+      {
+        "pid": 5394,
+        "name": "ntpd",
+        "cmd": "/usr/sbin/ntpd",
+        "age_s": 113921,
+        "rss_kb": 1000,
+        "rss_startup_kb": 992,
+        "rss_delta_kb": 8,
+        "fds": 5,
+        "fds_startup": 6,
+        "fds_delta": -1,
+        "service": "sysntpd",
+        "instance": "instance1"
+      }
     ],
-    "b40": [
-     "1",
-     "9"
+    "stable": [
+      {
+        "pid": 3980,
+        "name": "tailscaled",
+        "cmd": "/usr/sbin/tailscaled",
+        "age_s": 113921,
+        "rss_kb": 44304,
+        "rss_startup_kb": 56688,
+        "rss_delta_kb": -12384,
+        "fds": 21,
+        "fds_startup": 25,
+        "fds_delta": -4,
+        "service": "tailscale",
+        "instance": "instance1"
+      },
+      {
+        "pid": 2097,
+        "name": "wpa_supplicant",
+        "cmd": "/usr/sbin/wpa_supplicant",
+        "age_s": 113921,
+        "rss_kb": 4600,
+        "rss_startup_kb": 4600,
+        "rss_delta_kb": 0,
+        "fds": 15,
+        "fds_startup": 15,
+        "fds_delta": 0,
+        "service": "wpad",
+        "instance": "supplicant"
+      },
+      {
+        "pid": 4928,
+        "name": "uwsd",
+        "cmd": "/usr/sbin/uwsd",
+        "age_s": 113921,
+        "rss_kb": 3188,
+        "rss_startup_kb": 3188,
+        "rss_delta_kb": 0,
+        "fds": 12,
+        "fds_startup": 12,
+        "fds_delta": 0,
+        "service": "uconfig-ui",
+        "instance": "instance1"
+      },
+      {
+        "pid": 4882,
+        "name": "uwsd",
+        "cmd": "/usr/sbin/uwsd",
+        "age_s": 113921,
+        "rss_kb": 2892,
+        "rss_startup_kb": 2892,
+        "rss_delta_kb": 0,
+        "fds": 11,
+        "fds_startup": 11,
+        "fds_delta": 0,
+        "service": "uconfig-ui",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5674,
+        "name": "wifi-dynamic",
+        "cmd": "ucode",
+        "age_s": 104340,
+        "rss_kb": 2424,
+        "rss_startup_kb": 2424,
+        "rss_delta_kb": 0,
+        "fds": 20,
+        "fds_startup": 20,
+        "fds_delta": 0,
+        "service": "wifi-dynamic",
+        "instance": "instance1"
+      },
+      {
+        "pid": 1996,
+        "name": "qosify",
+        "cmd": "/usr/sbin/qosify",
+        "age_s": 113921,
+        "rss_kb": 1472,
+        "rss_startup_kb": 1472,
+        "rss_delta_kb": 0,
+        "fds": 23,
+        "fds_startup": 23,
+        "fds_delta": 0,
+        "service": "qosify",
+        "instance": "instance1"
+      },
+      {
+        "pid": 3491,
+        "name": "uconfig-rrm",
+        "cmd": "/usr/bin/ucode",
+        "age_s": 113921,
+        "rss_kb": 1460,
+        "rss_startup_kb": 1460,
+        "rss_delta_kb": 0,
+        "fds": 13,
+        "fds_startup": 13,
+        "fds_delta": 0,
+        "service": "uconfig-rrm",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5550,
+        "name": "uconfig-apply",
+        "cmd": "ucode",
+        "age_s": 104340,
+        "rss_kb": 1308,
+        "rss_startup_kb": 1308,
+        "rss_delta_kb": 0,
+        "fds": 14,
+        "fds_startup": 14,
+        "fds_delta": 0
+      },
+      {
+        "pid": 3421,
+        "name": "dbus-daemon",
+        "cmd": "/usr/bin/dbus-daemon",
+        "age_s": 113921,
+        "rss_kb": 1284,
+        "rss_startup_kb": 1284,
+        "rss_delta_kb": 0,
+        "fds": 11,
+        "fds_startup": 11,
+        "fds_delta": 0,
+        "service": "dbus",
+        "instance": "instance1"
+      },
+      {
+        "pid": 17840,
+        "name": "-ash",
+        "cmd": "-ash",
+        "age_s": 1680,
+        "rss_kb": 1140,
+        "rss_startup_kb": 1140,
+        "rss_delta_kb": 0,
+        "fds": 6,
+        "fds_startup": 6,
+        "fds_delta": 0,
+        "service": "dropbear",
+        "instance": "instance1"
+      },
+      {
+        "pid": 2377,
+        "name": "odhcpd",
+        "cmd": "/usr/sbin/odhcpd",
+        "age_s": 113921,
+        "rss_kb": 1112,
+        "rss_startup_kb": 1116,
+        "rss_delta_kb": -4,
+        "fds": 16,
+        "fds_startup": 16,
+        "fds_delta": 0,
+        "service": "odhcpd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 3354,
+        "name": "dbus-daemon",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1076,
+        "rss_startup_kb": 1076,
+        "rss_delta_kb": 0,
+        "fds": 8,
+        "fds_startup": 8,
+        "fds_delta": 0,
+        "service": "dbus",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5341,
+        "name": "ntpd",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1072,
+        "rss_startup_kb": 1072,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "sysntpd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 2093,
+        "name": "hostapd",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1068,
+        "rss_startup_kb": 1068,
+        "rss_delta_kb": 0,
+        "fds": 8,
+        "fds_startup": 8,
+        "fds_delta": 0,
+        "service": "wpad",
+        "instance": "hostapd"
+      },
+      {
+        "pid": 4334,
+        "name": "umdns",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1064,
+        "rss_startup_kb": 1064,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "umdns",
+        "instance": "instance1"
+      },
+      {
+        "pid": 5040,
+        "name": "dnsmasq",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1060,
+        "rss_startup_kb": 1060,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "dnsmasq",
+        "instance": "cfg01411c"
+      },
+      {
+        "pid": 2094,
+        "name": "wpa_supplicant",
+        "cmd": "/sbin/ujail",
+        "age_s": 113921,
+        "rss_kb": 1056,
+        "rss_startup_kb": 1056,
+        "rss_delta_kb": 0,
+        "fds": 8,
+        "fds_startup": 8,
+        "fds_delta": 0,
+        "service": "wpad",
+        "instance": "supplicant"
+      },
+      {
+        "pid": 5642,
+        "name": "lldpd",
+        "cmd": "/sbin/ujail",
+        "age_s": 104340,
+        "rss_kb": 1052,
+        "rss_startup_kb": 1052,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "lldpd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 3018,
+        "name": "nlbwmon",
+        "cmd": "/usr/sbin/nlbwmon",
+        "age_s": 113921,
+        "rss_kb": 992,
+        "rss_startup_kb": 992,
+        "rss_delta_kb": 0,
+        "fds": 13,
+        "fds_startup": 13,
+        "fds_delta": 0,
+        "service": "nlbwmon",
+        "instance": "instance1"
+      },
+      {
+        "pid": 3641,
+        "name": "udhcpc",
+        "cmd": "udhcpc",
+        "age_s": 113921,
+        "rss_kb": 992,
+        "rss_startup_kb": 992,
+        "rss_delta_kb": 0,
+        "fds": 14,
+        "fds_startup": 14,
+        "fds_delta": 0,
+        "service": "network",
+        "instance": "instance1"
+      },
+      {
+        "pid": 17839,
+        "name": "dropbear",
+        "cmd": "/usr/sbin/dropbear",
+        "age_s": 1680,
+        "rss_kb": 952,
+        "rss_startup_kb": 952,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "dropbear",
+        "instance": "instance1"
+      },
+      {
+        "pid": 1886,
+        "name": "dropbear",
+        "cmd": "/usr/sbin/dropbear",
+        "age_s": 113921,
+        "rss_kb": 920,
+        "rss_startup_kb": 920,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "dropbear",
+        "instance": "instance1"
+      },
+      {
+        "pid": 3649,
+        "name": "odhcp6c",
+        "cmd": "odhcp6c",
+        "age_s": 113921,
+        "rss_kb": 904,
+        "rss_startup_kb": 904,
+        "rss_delta_kb": 0,
+        "fds": 20,
+        "fds_startup": 20,
+        "fds_delta": 0,
+        "service": "network",
+        "instance": "instance1"
+      },
+      {
+        "pid": 2432,
+        "name": "udhcpsnoop",
+        "cmd": "/usr/sbin/udhcpsnoop",
+        "age_s": 113921,
+        "rss_kb": 820,
+        "rss_startup_kb": 820,
+        "rss_delta_kb": 0,
+        "fds": 11,
+        "fds_startup": 11,
+        "fds_delta": 0,
+        "service": "udhcpsnoop",
+        "instance": "instance1"
+      },
+      {
+        "pid": 834,
+        "name": "urngd",
+        "cmd": "/sbin/urngd",
+        "age_s": 113921,
+        "rss_kb": 744,
+        "rss_startup_kb": 744,
+        "rss_delta_kb": 0,
+        "fds": 9,
+        "fds_startup": 9,
+        "fds_delta": 0,
+        "service": "urngd",
+        "instance": "instance1"
+      },
+      {
+        "pid": 799,
+        "name": "askfirst",
+        "cmd": "/sbin/askfirst",
+        "age_s": 113921,
+        "rss_kb": 704,
+        "rss_startup_kb": 704,
+        "rss_delta_kb": 0,
+        "fds": 5,
+        "fds_startup": 5,
+        "fds_delta": 0
+      }
     ]
-   }
   },
-  "5g": {
-   "htmode": "HE80",
-   "channel": "36",
-   "mode": "HE",
-   "bandwidth": "80",
-   "active_channel": "36",
-   "freq": 5180,
-   "utilization": 11,
-   "bandwidths": [
-    "20",
-    "40",
-    "80",
-    "160"
-   ],
-   "channels": {
-    "b20": [
-     "36",
-     "40",
-     "44",
-     "48",
-     "52",
-     "56",
-     "60",
-     "64",
-     "100",
-     "104",
-     "108",
-     "112",
-     "116",
-     "120",
-     "124",
-     "128",
-     "132",
-     "136",
-     "140",
-     "144",
-     "149",
-     "153",
-     "157",
-     "161",
-     "165"
-    ],
-    "b40": [
-     "36",
-     "44",
-     "52",
-     "60",
-     "100",
-     "108",
-     "116",
-     "124",
-     "132",
-     "140",
-     "149",
-     "157"
-    ],
-    "b80": [
-     "36",
-     "52",
-     "100",
-     "116",
-     "132",
-     "149"
-    ],
-    "b160": [
-     "36",
-     "100"
-    ]
-   }
-  }
- },
- "ports": {
-  "WAN": {
-   "netdev": "eth1",
-   "index": 0,
-   "carrier": true,
-   "speed": "1000",
-   "macaddr": "00:00:5e:00:53:10",
-   "rx_bytes": 30227177075,
-   "tx_bytes": 4032852192
-  },
-  "LAN1": {
-   "netdev": "lan1",
-   "index": 0,
-   "carrier": false,
-   "speed": null,
-   "macaddr": "00:00:5e:00:53:11",
-   "rx_bytes": 0,
-   "tx_bytes": 0
-  },
-  "LAN2": {
-   "netdev": "lan2",
-   "index": 1,
-   "carrier": true,
-   "speed": "1000",
-   "macaddr": "00:00:5e:00:53:11",
-   "rx_bytes": 4052584209,
-   "tx_bytes": 29962764864
-  },
-  "LAN3": {
-   "netdev": "lan3",
-   "index": 2,
-   "carrier": true,
-   "speed": "1000",
-   "macaddr": "00:00:5e:00:53:11",
-   "rx_bytes": 68141287,
-   "tx_bytes": 437649305
-  },
-  "LAN4": {
-   "netdev": "lan4",
-   "index": 3,
-   "carrier": false,
-   "speed": null,
-   "macaddr": "00:00:5e:00:53:11",
-   "rx_bytes": 0,
-   "tx_bytes": 0
-  },
-  "LAN5": {
-   "netdev": "lan5",
-   "index": 4,
-   "carrier": false,
-   "speed": null,
-   "macaddr": "00:00:5e:00:53:11",
-   "rx_bytes": 0,
-   "tx_bytes": 0
-  }
- },
- "network": {
-  "wan": {
-   "up": true,
-   "uptime": 102567,
-   "device": "eth1",
-   "ipv4": {
-    "proto": "dhcp",
-    "address": "192.0.2.50/24",
-    "gateway": "192.0.2.1",
-    "dns": [
-     "192.0.2.1"
-    ],
-    "search": [
-     "example.net"
-    ],
-    "lease": {
-     "server": "192.0.2.1",
-     "time": 864000
-    }
-   },
-   "ipv6": {
-    "proto": "dhcpv6",
-    "addresses": [
-     "2001:db8:1403:600::1dd7/64"
-    ],
-    "prefix": "2001:db8:1403:6fc::/62"
-   }
-  },
-  "lan": {
-   "up": true,
-   "uptime": 102573,
-   "device": "br-lan1v0",
-   "ipv4": {
-    "proto": "static",
-    "address": "192.168.42.1/24"
-   },
-   "ipv6": {
-    "proto": "static",
-    "assigned": [
-     "2001:db8:1403:6fc::1/64",
-     "fd00:db8:1::1/64"
-    ]
-   }
-  }
- },
- "event-log": {
-  "log": [
-   {"object": "carrier", "verb": "down", "time": 1786009302, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786009311, "name": "LAN2"},
-   {"object": "dhcp", "verb": "ack", "time": 1786009332, "interface": "br-lan1v0", "ip": "192.168.42.17", "mac": "00:00:5E:00:53:08", "name": "workshop-pc"},
-   {"object": "client", "verb": "leave", "time": 1786009872, "mac": "00:00:5E:00:53:05", "connected_time": 7610, "rx_bytes": 18300000, "tx_bytes": 2100000, "rx_packets": 20333, "tx_packets": 1909},
-   {"object": "client", "verb": "join", "time": 1786010052, "medium": "wireless", "mac": "00:00:5E:00:53:05", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786010056, "interface": "br-lan1v0", "ip": "192.168.42.14", "mac": "00:00:5E:00:53:05", "name": "kitchen-speaker"},
-   {"object": "client", "verb": "key-mismatch", "time": 1786010672, "mac": "00:00:5E:00:53:C8", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0"},
-   {"object": "client", "verb": "key-mismatch", "time": 1786010735, "mac": "00:00:5E:00:53:C8", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0"},
-   {"object": "client", "verb": "key-mismatch", "time": 1786010812, "mac": "00:00:5E:00:53:C8", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1"},
-   {"object": "client", "verb": "leave", "time": 1786011272, "mac": "00:00:5E:00:53:0C", "connected_time": 8950, "rx_bytes": 214000000, "tx_bytes": 31200000, "rx_packets": 237777, "tx_packets": 28363},
-   {"object": "client", "verb": "leave", "time": 1786011972, "mac": "00:00:5E:00:53:03", "connected_time": 9740, "rx_bytes": 1240000000, "tx_bytes": 44300000, "rx_packets": 1377777, "tx_packets": 40272},
-   {"object": "client", "verb": "join", "time": 1786012172, "medium": "wireless", "mac": "00:00:5E:00:53:03", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786012176, "interface": "br-lan1v0", "ip": "192.168.42.12", "mac": "00:00:5E:00:53:03", "name": "living-room-tv"},
-   {"object": "wifi", "verb": "stop", "time": 1786012872, "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "channel": 11, "band": "2G"},
-   {"object": "wifi", "verb": "start", "time": 1786012884, "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "channel": 11, "band": "2G"},
-   {"object": "client", "verb": "join", "time": 1786012972, "medium": "wireless", "mac": "00:00:5E:00:53:02", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786012976, "interface": "br-lan1v0", "ip": "192.168.42.11", "mac": "00:00:5E:00:53:02", "name": "handset"},
-   {"object": "client", "verb": "join", "time": 1786013012, "medium": "wireless", "mac": "00:00:5E:00:53:0A", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786013016, "interface": "br-lan1v0", "ip": "192.168.42.19", "mac": "00:00:5E:00:53:0A", "name": "doorbell"},
-   {"object": "client", "verb": "join", "time": 1786013052, "medium": "wireless", "mac": "00:00:5E:00:53:0C", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786013056, "interface": "br-lan1v0", "ip": "192.168.42.21", "mac": "00:00:5E:00:53:0C", "name": "console"},
-   {"object": "client", "verb": "leave", "time": 1786013772, "mac": "00:00:5E:00:53:01", "connected_time": 11600, "rx_bytes": 806000000, "tx_bytes": 118000000, "rx_packets": 895555, "tx_packets": 107272},
-   {"object": "client", "verb": "join", "time": 1786014672, "medium": "wireless", "mac": "00:00:5E:00:53:01", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786014676, "interface": "br-lan1v0", "ip": "192.168.42.10", "mac": "00:00:5E:00:53:01", "name": "studio-laptop"},
-   {"object": "ssh", "verb": "event", "time": 1786015272, "msg": "Child connection from 192.168.42.10:52104"},
-   {"object": "ssh", "verb": "event", "time": 1786015273, "msg": "Auth succeeded for 'root' with key from 192.168.42.10:52104"},
-   {"object": "client", "verb": "leave", "time": 1786015872, "mac": "00:00:5E:00:53:0A", "connected_time": 2860, "rx_bytes": 4100000, "tx_bytes": 940000, "rx_packets": 4555, "tx_packets": 854},
-   {"object": "client", "verb": "join", "time": 1786016052, "medium": "wireless", "mac": "00:00:5E:00:53:0A", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786016056, "interface": "br-lan1v0", "ip": "192.168.42.19", "mac": "00:00:5E:00:53:0A", "name": "doorbell"},
-   {"object": "client", "verb": "leave", "time": 1786016772, "mac": "00:00:5E:00:53:09", "connected_time": 9296, "rx_bytes": 66000000, "tx_bytes": 9800000, "rx_packets": 73333, "tx_packets": 8909},
-   {"object": "client", "verb": "join", "time": 1786017372, "medium": "wireless", "mac": "00:00:5E:00:53:09", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786017376, "interface": "br-lan1v0", "ip": "192.168.42.18", "mac": "00:00:5E:00:53:09", "name": "tablet"},
-   {"object": "carrier", "verb": "down", "time": 1786017672, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786017681, "name": "LAN2"},
-   {"object": "client", "verb": "leave", "time": 1786018272, "mac": "00:00:5E:00:53:02", "connected_time": 5300, "rx_bytes": 88000000, "tx_bytes": 14600000, "rx_packets": 97777, "tx_packets": 13272},
-   {"object": "client", "verb": "join", "time": 1786018572, "medium": "wireless", "mac": "00:00:5E:00:53:02", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786018576, "interface": "br-lan1v0", "ip": "192.168.42.11", "mac": "00:00:5E:00:53:02", "name": "handset"},
-   {"object": "client", "verb": "leave", "time": 1786018872, "mac": "00:00:5E:00:53:05", "connected_time": 8820, "rx_bytes": 21700000, "tx_bytes": 2400000, "rx_packets": 24111, "tx_packets": 2181},
-   {"object": "client", "verb": "join", "time": 1786019172, "medium": "wireless", "mac": "00:00:5E:00:53:05", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786019176, "interface": "br-lan1v0", "ip": "192.168.42.14", "mac": "00:00:5E:00:53:05", "name": "kitchen-speaker"},
-   {"object": "ssh", "verb": "event", "time": 1786019472, "msg": "Exit (root) from <192.168.42.10:52104>: Disconnect received"},
-   {"object": "client", "verb": "leave", "time": 1786019652, "mac": "00:00:5E:00:53:0C", "connected_time": 6596, "rx_bytes": 176000000, "tx_bytes": 24800000, "rx_packets": 195555, "tx_packets": 22545},
-   {"object": "client", "verb": "join", "time": 1786019832, "medium": "wireless", "mac": "00:00:5E:00:53:0C", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786019836, "interface": "br-lan1v0", "ip": "192.168.42.21", "mac": "00:00:5E:00:53:0C", "name": "console"},
-   {"object": "carrier", "verb": "down", "time": 1786019982, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786019988, "name": "LAN2"},
-   {"object": "dhcp", "verb": "ack", "time": 1786020012, "interface": "br-lan1v0", "ip": "192.168.42.17", "mac": "00:00:5E:00:53:08", "name": "workshop-pc"},
-   {"object": "ssh", "verb": "event", "time": 1786020042, "msg": "Child connection from 192.168.42.10:52719"},
-   {"object": "wifi", "verb": "start", "time": 1786002072, "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "channel": 11, "band": "2G"},
-   {"object": "wifi", "verb": "start", "time": 1786002076, "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "channel": 36, "band": "5G"},
-   {"object": "carrier", "verb": "up", "time": 1786002078, "name": "WAN"},
-   {"object": "carrier", "verb": "up", "time": 1786002080, "name": "LAN1"},
-   {"object": "carrier", "verb": "up", "time": 1786002082, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786002084, "name": "LAN3"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002112, "interface": "br-lan1v0", "ip": "192.168.42.20", "mac": "00:00:5E:00:53:0B", "name": "nas"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002124, "interface": "br-lan1v0", "ip": "192.168.42.13", "mac": "00:00:5E:00:53:04", "name": "printer"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002142, "interface": "br-lan1v0", "ip": "192.168.42.17", "mac": "00:00:5E:00:53:08", "name": "workshop-pc"},
-   {"object": "client", "verb": "join", "time": 1786002172, "medium": "wireless", "mac": "00:00:5E:00:53:01", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002176, "interface": "br-lan1v0", "ip": "192.168.42.10", "mac": "00:00:5E:00:53:01", "name": "studio-laptop"},
-   {"object": "client", "verb": "join", "time": 1786002202, "medium": "wireless", "mac": "00:00:5E:00:53:02", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002206, "interface": "br-lan1v0", "ip": "192.168.42.11", "mac": "00:00:5E:00:53:02", "name": "handset"},
-   {"object": "client", "verb": "join", "time": 1786002232, "medium": "wireless", "mac": "00:00:5E:00:53:03", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002236, "interface": "br-lan1v0", "ip": "192.168.42.12", "mac": "00:00:5E:00:53:03", "name": "living-room-tv"},
-   {"object": "client", "verb": "join", "time": 1786002262, "medium": "wireless", "mac": "00:00:5E:00:53:05", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002266, "interface": "br-lan1v0", "ip": "192.168.42.14", "mac": "00:00:5E:00:53:05", "name": "kitchen-speaker"},
-   {"object": "client", "verb": "join", "time": 1786002292, "medium": "wireless", "mac": "00:00:5E:00:53:0A", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002296, "interface": "br-lan1v0", "ip": "192.168.42.19", "mac": "00:00:5E:00:53:0A", "name": "doorbell"},
-   {"object": "client", "verb": "join", "time": 1786002322, "medium": "wireless", "mac": "00:00:5E:00:53:0C", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786002326, "interface": "br-lan1v0", "ip": "192.168.42.21", "mac": "00:00:5E:00:53:0C", "name": "console"},
-   {"object": "client", "verb": "join", "time": 1786002372, "medium": "wireless", "mac": "00:00:5E:00:53:09", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G", "rate-limit": 20000},
-   {"object": "dhcp", "verb": "ack", "time": 1786002376, "interface": "br-lan1v0", "ip": "192.168.42.18", "mac": "00:00:5E:00:53:09", "name": "tablet"},
-   {"object": "wifi", "verb": "channel-switch", "time": 1786003672, "ifname": "phy1-ap0", "freq": 5180, "channel": 36, "bandwidth": 80, "center_freq1": 5210, "sec_chan_offset": 1},
-   {"object": "ssh", "verb": "event", "time": 1786004872, "msg": "Child connection from 192.168.42.17:41022"},
-   {"object": "ssh", "verb": "event", "time": 1786004873, "msg": "Auth succeeded for 'root' with key from 192.168.42.17:41022"},
-   {"object": "client", "verb": "leave", "time": 1786005272, "mac": "00:00:5E:00:53:02", "connected_time": 3070, "rx_bytes": 41200000, "tx_bytes": 8600000, "rx_packets": 45777, "tx_packets": 7818},
-   {"object": "ssh", "verb": "event", "time": 1786005672, "msg": "Exit (root) from <192.168.42.17:41022>: Disconnect received"},
-   {"object": "client", "verb": "join", "time": 1786005972, "medium": "wireless", "mac": "00:00:5E:00:53:02", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A0", "ifname": "phy0-ap0", "channel": 11, "band": "2G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786005976, "interface": "br-lan1v0", "ip": "192.168.42.11", "mac": "00:00:5E:00:53:02", "name": "handset"},
-   {"object": "client", "verb": "leave", "time": 1786006872, "mac": "00:00:5E:00:53:09", "connected_time": 3600, "rx_bytes": 92000000, "tx_bytes": 12400000, "rx_packets": 102222, "tx_packets": 11272},
-   {"object": "client", "verb": "join", "time": 1786007472, "medium": "wireless", "mac": "00:00:5E:00:53:09", "ssid": "uconfig-demo", "bssid": "00:00:5E:00:53:A1", "ifname": "phy1-ap0", "channel": 36, "band": "5G"},
-   {"object": "dhcp", "verb": "ack", "time": 1786007476, "interface": "br-lan1v0", "ip": "192.168.42.18", "mac": "00:00:5E:00:53:09", "name": "tablet"},
-   {"object": "carrier", "verb": "down", "time": 1786008272, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786008278, "name": "LAN2"},
-   {"object": "carrier", "verb": "down", "time": 1786008762, "name": "LAN2"},
-   {"object": "carrier", "verb": "up", "time": 1786008770, "name": "LAN2"}
-  ]
- },
- "memory": {
-  "system": {"total_kb": 1008756, "free_kb": 615416, "available_kb": 665980, "buff_cache_kb": 119356, "swap_total_kb": 0, "swap_free_kb": 0},
-  "leaking": [
-   {"pid": 5244, "cmd": "ucode", "age_s": 113921, "rss_kb": 32740, "rss_startup_kb": 1612, "rss_delta_kb": 31128, "fds": 25, "fds_startup": 19, "fds_delta": 6},
-   {"pid": 4218, "cmd": "ucode", "age_s": 113921, "rss_kb": 30448, "rss_startup_kb": 1860, "rss_delta_kb": 28588, "fds": 21, "fds_startup": 19, "fds_delta": 2},
-   {"pid": 5667, "cmd": "/usr/bin/AdGuardHome", "age_s": 104340, "rss_kb": 80228, "rss_startup_kb": 67676, "rss_delta_kb": 12552, "fds": 16, "fds_startup": 17, "fds_delta": -1},
-   {"pid": 5675, "cmd": "ucode", "age_s": 104340, "rss_kb": 5956, "rss_startup_kb": 1392, "rss_delta_kb": 4564, "fds": 14, "fds_startup": 14, "fds_delta": 0},
-   {"pid": 4045, "cmd": "/usr/bin/ucode", "age_s": 113921, "rss_kb": 1944, "rss_startup_kb": 1748, "rss_delta_kb": 196, "fds": 17, "fds_startup": 17, "fds_delta": 0},
-   {"pid": 2096, "cmd": "/usr/sbin/hostapd", "age_s": 113921, "rss_kb": 7804, "rss_startup_kb": 7616, "rss_delta_kb": 188, "fds": 35, "fds_startup": 32, "fds_delta": 3},
-   {"pid": 4134, "cmd": "/usr/bin/ucode", "age_s": 113921, "rss_kb": 2724, "rss_startup_kb": 2552, "rss_delta_kb": 172, "fds": 21, "fds_startup": 20, "fds_delta": 1},
-   {"pid": 4375, "cmd": "/usr/sbin/umdns", "age_s": 113921, "rss_kb": 1188, "rss_startup_kb": 1048, "rss_delta_kb": 140, "fds": 13, "fds_startup": 13, "fds_delta": 0},
-   {"pid": 1538, "cmd": "/sbin/logd", "age_s": 113921, "rss_kb": 1116, "rss_startup_kb": 1008, "rss_delta_kb": 108, "fds": 14, "fds_startup": 14, "fds_delta": 0},
-   {"pid": 2043, "cmd": "/usr/sbin/unetd", "age_s": 113921, "rss_kb": 1576, "rss_startup_kb": 1488, "rss_delta_kb": 88, "fds": 17, "fds_startup": 17, "fds_delta": 0},
-   {"pid": 1, "cmd": "/sbin/procd", "age_s": 113921, "rss_kb": 1408, "rss_startup_kb": 1332, "rss_delta_kb": 76, "fds": 24, "fds_startup": 24, "fds_delta": 0},
-   {"pid": 2161, "cmd": "/sbin/netifd", "age_s": 113921, "rss_kb": 2540, "rss_startup_kb": 2468, "rss_delta_kb": 72, "fds": 31, "fds_startup": 31, "fds_delta": 0},
-   {"pid": 798, "cmd": "/sbin/ubusd", "age_s": 113921, "rss_kb": 1056, "rss_startup_kb": 984, "rss_delta_kb": 72, "fds": 44, "fds_startup": 38, "fds_delta": 6},
-   {"pid": 5252, "cmd": "/usr/sbin/lldpd", "age_s": 113921, "rss_kb": 968, "rss_startup_kb": 900, "rss_delta_kb": 68, "fds": 20, "fds_startup": 21, "fds_delta": -1},
-   {"pid": 5450, "cmd": "/usr/bin/ucode", "age_s": 113921, "rss_kb": 1496, "rss_startup_kb": 1432, "rss_delta_kb": 64, "fds": 15, "fds_startup": 13, "fds_delta": 2},
-   {"pid": 5145, "cmd": "/usr/sbin/lldpd", "age_s": 113921, "rss_kb": 1048, "rss_startup_kb": 1020, "rss_delta_kb": 28, "fds": 7, "fds_startup": 8, "fds_delta": -1},
-   {"pid": 5050, "cmd": "/usr/sbin/dnsmasq", "age_s": 113921, "rss_kb": 1240, "rss_startup_kb": 1228, "rss_delta_kb": 12, "fds": 54, "fds_startup": 48, "fds_delta": 6},
-   {"pid": 5394, "cmd": "/usr/sbin/ntpd", "age_s": 113921, "rss_kb": 1000, "rss_startup_kb": 992, "rss_delta_kb": 8, "fds": 5, "fds_startup": 6, "fds_delta": -1}
-  ],
-  "stable": [
-   {"pid": 3980, "cmd": "/usr/sbin/tailscaled", "age_s": 113921, "rss_kb": 44304, "rss_startup_kb": 56688, "rss_delta_kb": -12384, "fds": 21, "fds_startup": 25, "fds_delta": -4},
-   {"pid": 2097, "cmd": "/usr/sbin/wpa_supplicant", "age_s": 113921, "rss_kb": 4600, "rss_startup_kb": 4600, "rss_delta_kb": 0, "fds": 15, "fds_startup": 15, "fds_delta": 0},
-   {"pid": 4928, "cmd": "/usr/sbin/uwsd", "age_s": 113921, "rss_kb": 3188, "rss_startup_kb": 3188, "rss_delta_kb": 0, "fds": 12, "fds_startup": 12, "fds_delta": 0},
-   {"pid": 4882, "cmd": "/usr/sbin/uwsd", "age_s": 113921, "rss_kb": 2892, "rss_startup_kb": 2892, "rss_delta_kb": 0, "fds": 11, "fds_startup": 11, "fds_delta": 0},
-   {"pid": 5674, "cmd": "ucode", "age_s": 104340, "rss_kb": 2424, "rss_startup_kb": 2424, "rss_delta_kb": 0, "fds": 20, "fds_startup": 20, "fds_delta": 0},
-   {"pid": 1996, "cmd": "/usr/sbin/qosify", "age_s": 113921, "rss_kb": 1472, "rss_startup_kb": 1472, "rss_delta_kb": 0, "fds": 23, "fds_startup": 23, "fds_delta": 0},
-   {"pid": 3491, "cmd": "/usr/bin/ucode", "age_s": 113921, "rss_kb": 1460, "rss_startup_kb": 1460, "rss_delta_kb": 0, "fds": 13, "fds_startup": 13, "fds_delta": 0},
-   {"pid": 5550, "cmd": "ucode", "age_s": 104340, "rss_kb": 1308, "rss_startup_kb": 1308, "rss_delta_kb": 0, "fds": 14, "fds_startup": 14, "fds_delta": 0},
-   {"pid": 3421, "cmd": "/usr/bin/dbus-daemon", "age_s": 113921, "rss_kb": 1284, "rss_startup_kb": 1284, "rss_delta_kb": 0, "fds": 11, "fds_startup": 11, "fds_delta": 0},
-   {"pid": 17840, "cmd": "-ash", "age_s": 1680, "rss_kb": 1140, "rss_startup_kb": 1140, "rss_delta_kb": 0, "fds": 6, "fds_startup": 6, "fds_delta": 0},
-   {"pid": 2377, "cmd": "/usr/sbin/odhcpd", "age_s": 113921, "rss_kb": 1112, "rss_startup_kb": 1116, "rss_delta_kb": -4, "fds": 16, "fds_startup": 16, "fds_delta": 0},
-   {"pid": 3354, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1076, "rss_startup_kb": 1076, "rss_delta_kb": 0, "fds": 8, "fds_startup": 8, "fds_delta": 0},
-   {"pid": 5341, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1072, "rss_startup_kb": 1072, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 2093, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1068, "rss_startup_kb": 1068, "rss_delta_kb": 0, "fds": 8, "fds_startup": 8, "fds_delta": 0},
-   {"pid": 4334, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1064, "rss_startup_kb": 1064, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 5040, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1060, "rss_startup_kb": 1060, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 2094, "cmd": "/sbin/ujail", "age_s": 113921, "rss_kb": 1056, "rss_startup_kb": 1056, "rss_delta_kb": 0, "fds": 8, "fds_startup": 8, "fds_delta": 0},
-   {"pid": 5642, "cmd": "/sbin/ujail", "age_s": 104340, "rss_kb": 1052, "rss_startup_kb": 1052, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 3018, "cmd": "/usr/sbin/nlbwmon", "age_s": 113921, "rss_kb": 992, "rss_startup_kb": 992, "rss_delta_kb": 0, "fds": 13, "fds_startup": 13, "fds_delta": 0},
-   {"pid": 3641, "cmd": "udhcpc", "age_s": 113921, "rss_kb": 992, "rss_startup_kb": 992, "rss_delta_kb": 0, "fds": 14, "fds_startup": 14, "fds_delta": 0},
-   {"pid": 17839, "cmd": "/usr/sbin/dropbear", "age_s": 1680, "rss_kb": 952, "rss_startup_kb": 952, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 1886, "cmd": "/usr/sbin/dropbear", "age_s": 113921, "rss_kb": 920, "rss_startup_kb": 920, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 3649, "cmd": "odhcp6c", "age_s": 113921, "rss_kb": 904, "rss_startup_kb": 904, "rss_delta_kb": 0, "fds": 20, "fds_startup": 20, "fds_delta": 0},
-   {"pid": 2432, "cmd": "/usr/sbin/udhcpsnoop", "age_s": 113921, "rss_kb": 820, "rss_startup_kb": 820, "rss_delta_kb": 0, "fds": 11, "fds_startup": 11, "fds_delta": 0},
-   {"pid": 834, "cmd": "/sbin/urngd", "age_s": 113921, "rss_kb": 744, "rss_startup_kb": 744, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
-   {"pid": 799, "cmd": "/sbin/askfirst", "age_s": 113921, "rss_kb": 704, "rss_startup_kb": 704, "rss_delta_kb": 0, "fds": 5, "fds_startup": 5, "fds_delta": 0}
-  ]
- },
   "syslog": {
     "log": [
-      { "msg": "procd: - init complete -", "id": 1, "priority": 30, "source": 1, "time": 1786002052000 },
-      { "msg": "netifd: Interface 'wan' is enabled", "id": 2, "priority": 30, "source": 1, "time": 1786002062000 },
-      { "msg": "netifd: wan (1483): udhcpc: started, v1.37.0", "id": 3, "priority": 30, "source": 1, "time": 1786002067000 },
-      { "msg": "netifd: wan (1483): udhcpc: broadcasting discover", "id": 4, "priority": 30, "source": 1, "time": 1786002072000 },
-      { "msg": "netifd: wan (1483): udhcpc: lease of 10.0.0.24 obtained from 10.0.0.1, lease time 43200", "id": 5, "priority": 30, "source": 1, "time": 1786002074000 },
-      { "msg": "netifd: Interface 'wan' is now up", "id": 6, "priority": 30, "source": 1, "time": 1786002082000 },
-      { "msg": "dnsmasq[2104]: started, version 2.90 cachesize 150", "id": 7, "priority": 29, "source": 1, "time": 1786002092000 },
-      { "msg": "dnsmasq[2104]: using nameserver 10.0.0.1#53", "id": 8, "priority": 29, "source": 1, "time": 1786002094000 },
-      { "msg": "hostapd: phy0-ap0: interface state UNINITIALIZED->ENABLED", "id": 9, "priority": 30, "source": 1, "time": 1786002142000 },
-      { "msg": "hostapd: phy0-ap0: AP-ENABLED", "id": 10, "priority": 30, "source": 1, "time": 1786002144000 },
-      { "msg": "hostapd: phy1-ap0: interface state UNINITIALIZED->ENABLED", "id": 11, "priority": 30, "source": 1, "time": 1786002152000 },
-      { "msg": "hostapd: phy1-ap0: AP-ENABLED", "id": 12, "priority": 30, "source": 1, "time": 1786002154000 },
-      { "msg": "kernel: br-lan: received packet on lan1 with own address as source address", "id": 13, "priority": 4, "source": 1, "time": 1786007642000 },
-      { "msg": "dropbear[6621]: Child connection from 10.0.0.66:51214", "id": 14, "priority": 86, "source": 1, "time": 1786010442000 },
-      { "msg": "dropbear[6621]: Password auth succeeded for 'root' from 10.0.0.66:51214", "id": 15, "priority": 85, "source": 1, "time": 1786010444000 },
-      { "msg": "dropbear[7104]: Bad password attempt for 'root' from 10.0.0.91:44118", "id": 16, "priority": 84, "source": 1, "time": 1786012842000 },
-      { "msg": "dropbear[7104]: Exit before auth: Disconnect received", "id": 17, "priority": 84, "source": 1, "time": 1786012844000 },
-      { "msg": "odhcpd[2210]: Failed to send to ff02::1%br-lan: Address not available", "id": 18, "priority": 27, "source": 1, "time": 1786016442000 },
-      { "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: authenticated", "id": 19, "priority": 30, "source": 1, "time": 1786018242000 },
-      { "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: associated (aid 1)", "id": 20, "priority": 30, "source": 1, "time": 1786018244000 },
-      { "msg": "dnsmasq-dhcp[2104]: DHCPACK(br-lan) 192.168.1.147 3c:2e:f5:11:22:33 laptop", "id": 21, "priority": 29, "source": 1, "time": 1786019142000 },
-      { "msg": "netifd: wan (1483): udhcpc: sending renew to 10.0.0.1", "id": 22, "priority": 30, "source": 1, "time": 1786019922000 }
+      {
+        "msg": "procd: - init complete -",
+        "id": 1,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002052000
+      },
+      {
+        "msg": "netifd: Interface 'wan' is enabled",
+        "id": 2,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002062000
+      },
+      {
+        "msg": "netifd: wan (1483): udhcpc: started, v1.37.0",
+        "id": 3,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002067000
+      },
+      {
+        "msg": "netifd: wan (1483): udhcpc: broadcasting discover",
+        "id": 4,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002072000
+      },
+      {
+        "msg": "netifd: wan (1483): udhcpc: lease of 10.0.0.24 obtained from 10.0.0.1, lease time 43200",
+        "id": 5,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002074000
+      },
+      {
+        "msg": "netifd: Interface 'wan' is now up",
+        "id": 6,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002082000
+      },
+      {
+        "msg": "dnsmasq[2104]: started, version 2.90 cachesize 150",
+        "id": 7,
+        "priority": 29,
+        "source": 1,
+        "time": 1786002092000
+      },
+      {
+        "msg": "dnsmasq[2104]: using nameserver 10.0.0.1#53",
+        "id": 8,
+        "priority": 29,
+        "source": 1,
+        "time": 1786002094000
+      },
+      {
+        "msg": "hostapd: phy0-ap0: interface state UNINITIALIZED->ENABLED",
+        "id": 9,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002142000
+      },
+      {
+        "msg": "hostapd: phy0-ap0: AP-ENABLED",
+        "id": 10,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002144000
+      },
+      {
+        "msg": "hostapd: phy1-ap0: interface state UNINITIALIZED->ENABLED",
+        "id": 11,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002152000
+      },
+      {
+        "msg": "hostapd: phy1-ap0: AP-ENABLED",
+        "id": 12,
+        "priority": 30,
+        "source": 1,
+        "time": 1786002154000
+      },
+      {
+        "msg": "kernel: br-lan: received packet on lan1 with own address as source address",
+        "id": 13,
+        "priority": 4,
+        "source": 1,
+        "time": 1786007642000
+      },
+      {
+        "msg": "dropbear[6621]: Child connection from 10.0.0.66:51214",
+        "id": 14,
+        "priority": 86,
+        "source": 1,
+        "time": 1786010442000
+      },
+      {
+        "msg": "dropbear[6621]: Password auth succeeded for 'root' from 10.0.0.66:51214",
+        "id": 15,
+        "priority": 85,
+        "source": 1,
+        "time": 1786010444000
+      },
+      {
+        "msg": "dropbear[7104]: Bad password attempt for 'root' from 10.0.0.91:44118",
+        "id": 16,
+        "priority": 84,
+        "source": 1,
+        "time": 1786012842000
+      },
+      {
+        "msg": "dropbear[7104]: Exit before auth: Disconnect received",
+        "id": 17,
+        "priority": 84,
+        "source": 1,
+        "time": 1786012844000
+      },
+      {
+        "msg": "odhcpd[2210]: Failed to send to ff02::1%br-lan: Address not available",
+        "id": 18,
+        "priority": 27,
+        "source": 1,
+        "time": 1786016442000
+      },
+      {
+        "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: authenticated",
+        "id": 19,
+        "priority": 30,
+        "source": 1,
+        "time": 1786018242000
+      },
+      {
+        "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: associated (aid 1)",
+        "id": 20,
+        "priority": 30,
+        "source": 1,
+        "time": 1786018244000
+      },
+      {
+        "msg": "dnsmasq-dhcp[2104]: DHCPACK(br-lan) 192.168.1.147 3c:2e:f5:11:22:33 laptop",
+        "id": 21,
+        "priority": 29,
+        "source": 1,
+        "time": 1786019142000
+      },
+      {
+        "msg": "netifd: wan (1483): udhcpc: sending renew to 10.0.0.1",
+        "id": 22,
+        "priority": 30,
+        "source": 1,
+        "time": 1786019922000
+      }
     ]
   },
   "dmesg": {
     "log": [
-      { "priority": 6, "time": 1785998442000, "msg": "Booting Linux on physical CPU 0x0000000000 [0x410fd034]" },
-      { "priority": 5, "time": 1785998442000, "msg": "Linux version 6.18.41 (builder@buildhost) (OpenWrt GCC 14.4.0) #0 SMP" },
-      { "priority": 4, "time": 1785998442000, "msg": "KASLR disabled due to lack of seed" },
-      { "priority": 6, "time": 1785998442000, "msg": "Machine model: OpenWrt One" },
-      { "priority": 6, "time": 1785998442041, "msg": "Memory: 986M/1024M available" },
-      { "priority": 6, "time": 1785998442512, "msg": "mtk_soc_eth 15100000.ethernet eth0: PHY [mdio-bus:01] driver [MediaTek MT7531]" },
-      { "priority": 6, "time": 1785998443204, "msg": "mtk_soc_eth 15100000.ethernet: generated random MAC address" },
-      { "priority": 6, "time": 1785998444884, "msg": "mmc0: new HS200 MMC card at address 0001" },
-      { "priority": 6, "time": 1785998445101, "msg": "ubi0: attached mtd4 (name \"ubi\", size 234 MiB)" },
-      { "priority": 6, "time": 1785998446552, "msg": "UBIFS (ubi0:1): mounted UBI device 0, volume 1, name \"rootfs_data\"" },
-      { "priority": 6, "time": 1785998447998, "msg": "br-lan: port 1(lan1) entered blocking state" },
-      { "priority": 6, "time": 1785998448004, "msg": "br-lan: port 1(lan1) entered forwarding state" },
-      { "priority": 4, "time": 1785998450771, "msg": "mt7915e 0000:01:00.0: ASPM is not supported" },
-      { "priority": 6, "time": 1785998451330, "msg": "mt7915e 0000:01:00.0: HW/SW Version: 0x8a108a10" },
-      { "priority": 6, "time": 1785998454556, "msg": "br-wan: port 3(phy0-ap0) entered blocking state" },
-      { "priority": 6, "time": 1785998454560, "msg": "br-wan: port 3(phy0-ap0) entered forwarding state" },
-      { "priority": 3, "time": 1786003262113, "msg": "mt7915e 0000:01:00.0: Message 00020003 (seq 4) timeout" },
-      { "priority": 6, "time": 1786008042771, "msg": "br-lan: port 2(lan2) entered disabled state" },
-      { "priority": 4, "time": 1786012844008, "msg": "nf_conntrack: nf_conntrack: table full, dropping packet" },
-      { "priority": 6, "time": 1786019942443, "msg": "br-lan: port 2(lan2) entered forwarding state" }
+      {
+        "priority": 6,
+        "time": 1785998442000,
+        "msg": "Booting Linux on physical CPU 0x0000000000 [0x410fd034]"
+      },
+      {
+        "priority": 5,
+        "time": 1785998442000,
+        "msg": "Linux version 6.18.41 (builder@buildhost) (OpenWrt GCC 14.4.0) #0 SMP"
+      },
+      {
+        "priority": 4,
+        "time": 1785998442000,
+        "msg": "KASLR disabled due to lack of seed"
+      },
+      {
+        "priority": 6,
+        "time": 1785998442000,
+        "msg": "Machine model: OpenWrt One"
+      },
+      {
+        "priority": 6,
+        "time": 1785998442041,
+        "msg": "Memory: 986M/1024M available"
+      },
+      {
+        "priority": 6,
+        "time": 1785998442512,
+        "msg": "mtk_soc_eth 15100000.ethernet eth0: PHY [mdio-bus:01] driver [MediaTek MT7531]"
+      },
+      {
+        "priority": 6,
+        "time": 1785998443204,
+        "msg": "mtk_soc_eth 15100000.ethernet: generated random MAC address"
+      },
+      {
+        "priority": 6,
+        "time": 1785998444884,
+        "msg": "mmc0: new HS200 MMC card at address 0001"
+      },
+      {
+        "priority": 6,
+        "time": 1785998445101,
+        "msg": "ubi0: attached mtd4 (name \"ubi\", size 234 MiB)"
+      },
+      {
+        "priority": 6,
+        "time": 1785998446552,
+        "msg": "UBIFS (ubi0:1): mounted UBI device 0, volume 1, name \"rootfs_data\""
+      },
+      {
+        "priority": 6,
+        "time": 1785998447998,
+        "msg": "br-lan: port 1(lan1) entered blocking state"
+      },
+      {
+        "priority": 6,
+        "time": 1785998448004,
+        "msg": "br-lan: port 1(lan1) entered forwarding state"
+      },
+      {
+        "priority": 4,
+        "time": 1785998450771,
+        "msg": "mt7915e 0000:01:00.0: ASPM is not supported"
+      },
+      {
+        "priority": 6,
+        "time": 1785998451330,
+        "msg": "mt7915e 0000:01:00.0: HW/SW Version: 0x8a108a10"
+      },
+      {
+        "priority": 6,
+        "time": 1785998454556,
+        "msg": "br-wan: port 3(phy0-ap0) entered blocking state"
+      },
+      {
+        "priority": 6,
+        "time": 1785998454560,
+        "msg": "br-wan: port 3(phy0-ap0) entered forwarding state"
+      },
+      {
+        "priority": 3,
+        "time": 1786003262113,
+        "msg": "mt7915e 0000:01:00.0: Message 00020003 (seq 4) timeout"
+      },
+      {
+        "priority": 6,
+        "time": 1786008042771,
+        "msg": "br-lan: port 2(lan2) entered disabled state"
+      },
+      {
+        "priority": 4,
+        "time": 1786012844008,
+        "msg": "nf_conntrack: nf_conntrack: table full, dropping packet"
+      },
+      {
+        "priority": 6,
+        "time": 1786019942443,
+        "msg": "br-lan: port 2(lan2) entered forwarding state"
+      }
+    ]
+  },
+  "cpu": {
+    "interval_s": 5,
+    "samples": 120,
+    "usage": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      71,
+      79,
+      87,
+      55,
+      63,
+      71,
+      79,
+      87,
+      55,
+      63,
+      71,
+      79,
+      87,
+      55,
+      63,
+      71,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      3
     ]
   }
 }

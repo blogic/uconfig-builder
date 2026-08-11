@@ -24,6 +24,7 @@ import {
   radios_refresh,
   radios_clear
 } from './netstate.svelte.ts'
+import { cpu_refresh, cpu_clear } from './cpu.svelte.ts'
 import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.ts'
 import { traffic_refresh, traffic_clear } from './traffic.svelte.ts'
 import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.ts'
@@ -34,6 +35,10 @@ import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.ts'
 const FEEDS = [
   { key: 'clients', refresh: devices_refresh, clear: devices_clear, every: 5000 },
   { key: 'state', refresh: sysinfo_refresh, clear: sysinfo_clear, every: 5000 },
+  // The device samples CPU every 5s and hands back the whole ten-minute ring, so
+  // polling at the sample rate keeps the newest bucket current without asking
+  // for anything it has not measured yet.
+  { key: 'cpu', refresh: cpu_refresh, clear: cpu_clear, every: 5000 },
   { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 },
   // Device state. Addresses and link state change on an event rather than
   // continuously, so these are slower than the client list; a radio's airtime

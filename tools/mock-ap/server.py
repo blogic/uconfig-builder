@@ -342,6 +342,17 @@ class Session:
     async def m_traffic(self, rid, _params):
         await self.reply(rid, fixtures['traffic'])
 
+    async def m_cpu(self, rid, _params):
+        # The device holds a ten-minute ring sampled every 5s and hands back all
+        # of it. Rotated per call so the newest sample moves, as it does on a
+        # device: a chart that never changes hides a client that never repaints.
+        cpu = fixtures['cpu']
+        usage = cpu['usage']
+        if usage:
+            shift = int(time.time() / cpu['interval_s']) % len(usage)
+            usage = usage[shift:] + usage[:shift]
+        await self.reply(rid, {**cpu, 'usage': usage})
+
     async def m_radios(self, rid, _params):
         await self.reply(rid, fixtures['radios'])
 
@@ -496,6 +507,7 @@ class Session:
             'modules': (self.m_modules, True),
             'devices': (self.m_devices, True),
             'traffic': (self.m_traffic, True),
+            'cpu': (self.m_cpu, True),
             'radios': (self.m_radios, True),
             'ports': (self.m_ports, True),
             'network': (self.m_network, True),
