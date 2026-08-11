@@ -69,7 +69,7 @@ export const unitLayout: LayoutNode[] = [
   { field: 'hostname', describe: 'Device hostname.' },
   { field: 'timezone', widget: 'timezone' },
   { field: 'password', describe: 'Device password (shadow hash).' },
-  { field: 'leds-active', describe: 'Force all LEDs off.' },
+  { field: 'leds-active', describe: 'Keep the device LEDs lit. Turning this off forces them all off.' },
   { field: 'tty-login', describe: 'Require login on serial ports.' }
 ]
 
