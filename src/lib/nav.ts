@@ -75,9 +75,20 @@ export const SERVICE_ENTRIES: NavItem[] = entries_from(SERVICES)
 //
 // `wired` and `airtime` rather than `network` and `wireless`: page keys share
 // one flat namespace and both of those name a section already.
+// A device with no downstream interface bridges every port into the network
+// upstream of it, so it has no local network to report on: the uplink is the
+// network, and the Internet page carries its ports and clients. Hide the page
+// rather than let it explain itself.
+function has_local_network(doc: UconfigDocument): boolean {
+  const ifaces = doc.interfaces as Record<string, Record<string, unknown>> | undefined
+  return Object.values(ifaces ?? {}).some(
+    (i) => iface_enabled(i as { disable?: boolean }) && i.role === 'downstream'
+  )
+}
+
 export const STATUS_ITEMS: NavItem[] = [
   { key: 'internet', label: 'Internet', icon: 'bi-globe' },
-  { key: 'wired', label: 'Network', icon: 'bi-ethernet' },
+  { key: 'wired', label: 'Network', icon: 'bi-ethernet', when: has_local_network },
   { key: 'airtime', label: 'Wireless', icon: 'bi-wifi' },
   { key: 'clients', label: 'Clients', icon: 'bi-people' }
 ]

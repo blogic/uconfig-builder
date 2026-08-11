@@ -39,7 +39,7 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   state: 'What the device is doing right now: how long it has been up, what it is running, how hard it is working, and how much memory and flash it has used.',
   events: 'What the device has done recently. The log lives in memory and holds the last 100 entries, so it starts empty after a restart.',
   memory: 'Where the memory has gone, and which processes have grown since the device last started watching them.',
-  wired: 'Your own network, and the sockets on the back of the device.',
+  wired: 'Your own network, and the ports on the back of the device.',
   airtime: 'What each radio settled on, and how busy the air around it is.',
   ucoord: 'Devices coordinated with this one, grouped by venue. Only the highlighted peer is managed from this session.',
   reboot: 'Restart the device. Clients lose their connection until it comes back up, usually within a minute.',

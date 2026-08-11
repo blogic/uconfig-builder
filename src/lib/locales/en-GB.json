@@ -560,8 +560,6 @@
   "Show fewer": "Show fewer",
   "Shown separately from your own network.": "Shown separately from your own network.",
   "Size": "Size",
-  "Socket": "Socket",
-  "Sockets": "Sockets",
   "software": "software",
   "Speed": "Speed",
   "SSH": "SSH",
@@ -704,6 +702,6 @@
   "Yesterday": "Yesterday",
   "Your device is set up.": "Your device is set up.",
   "Your main Wi-Fi network.": "Your main Wi-Fi network.",
-  "Your own network, and the sockets on the back of the device.": "Your own network, and the sockets on the back of the device.",
+  "Your own network, and the ports on the back of the device.": "Your own network, and the ports on the back of the device.",
   "Your own network: the addresses this device hands out to everything that joins.": "Your own network: the addresses this device hands out to everything that joins."
 }

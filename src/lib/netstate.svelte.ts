@@ -139,10 +139,24 @@ export function local(data: NetworkData | null): [string, InterfaceState][] {
   return Object.entries(data ?? {}).filter(([name]) => name !== up)
 }
 
-// Sockets in the order they sit on the case, with the uplink kept apart: a WAN
-// socket answers a different question from the switch.
+// Ports in the order they sit on the case, with the uplink kept apart: on a
+// router a WAN port answers a different question from the switch.
 export function sorted_ports(data: PortsData | null, wan: boolean): [string, PortState][] {
   return Object.entries(data ?? {})
     .filter(([name]) => name.startsWith('WAN') === wan)
     .sort((a, b) => (a[1].index ?? 0) - (b[1].index ?? 0))
+}
+
+// Every port on the case, uplink first. What a bridging device has to show,
+// since there the WAN port is not a separate question.
+export function all_ports(data: PortsData | null): [string, PortState][] {
+  return [...sorted_ports(data, true), ...sorted_ports(data, false)]
+}
+
+// An access point bridges every port into the uplink, so it has no local
+// network of its own: the uplink is the network, and every port and every
+// client sits on it. Having an uplink at all is what tells this apart from a
+// device whose state has not loaded yet.
+export function bridged(data: NetworkData | null): boolean {
+  return !!uplink(data) && local(data).length === 0
 }

@@ -3,9 +3,11 @@
   // its own: a graph answers nothing without the address and lease beside it.
   import Gauge from './Gauge.svelte'
   import TrafficChart from './TrafficChart.svelte'
-  import { network, ports, uplink, local } from '../netstate.svelte.js'
+  import PortsCard from './PortsCard.svelte'
+  import ClientsCard from './ClientsCard.svelte'
+  import { network, ports, uplink, local, all_ports, sorted_ports, bridged } from '../netstate.svelte.js'
   import { traffic, RESOLUTIONS, rates, current, has_traffic } from '../traffic.svelte.js'
-  import { bytes_format, uptime_format } from '../device-icons.js'
+  import { uptime_format } from '../device-icons.js'
   import { poll_feed } from '../poll.svelte.js'
   import { t } from '../i18n.svelte.js'
 
@@ -24,8 +26,14 @@
   }
 
   const wan = $derived(uplink(network.data)?.[1] ?? null)
-  const wanPort = $derived(
-    Object.entries(ports.data ?? {}).find(([name]) => name.startsWith('WAN'))?.[1] ?? null
+  const wanPort = $derived(sorted_ports(ports.data, true)[0]?.[1] ?? null)
+
+  // Bridged, the uplink is the whole network: every port and every client is on
+  // it, so they belong here rather than on a local-network page that has
+  // nothing of its own to report.
+  const isBridged = $derived(bridged(network.data))
+  const portEntries = $derived(
+    isBridged ? all_ports(ports.data) : sorted_ports(ports.data, true)
   )
 
   const v4 = $derived(wan?.ipv4)
@@ -73,6 +81,7 @@
   $effect(() => poll_feed('network'))
   $effect(() => poll_feed('ports'))
   $effect(() => poll_feed('traffic'))
+  $effect(() => poll_feed('clients'))
 </script>
 
 {#if network.error && !network.data}
@@ -165,29 +174,17 @@
       </dl>
     </div>
 
-    {#if wanPort}
-    <div class="rounded-base border border-zinc-200 bg-surface p-4 sm:col-span-2">
-      <div class="flex items-baseline gap-2">
-        <h3 class="text-sm font-semibold text-zinc-900">{t('Socket')}</h3>
-        <span
-          class="rounded-full px-2 py-0.5 text-[11px] font-semibold {carrier
-            ? 'bg-accent/10 text-accent'
-            : 'bg-zinc-100 text-zinc-500'}"
-        >
-          {carrier ? t('Link up') : t('Link down')}
-        </span>
-      </div>
-      <div class="mt-2 flex items-center gap-3 text-sm {carrier ? 'text-zinc-800' : 'text-zinc-400'}">
-        <span class="w-14 font-semibold">{t('WAN')}</span>
-        <span>
-          {carrier ? t('{speed} Mbit/s', { speed: wanPort?.speed ?? '—' }) : t('No cable')}
-          {#if wanPort?.netdev}<span class="text-zinc-400"> · {wanPort.netdev}</span>{/if}
-        </span>
-        <span class="ml-auto tabular-nums text-zinc-500">
-          ↓ {bytes_format(wanPort?.rx_bytes ?? 0)} &nbsp; ↑ {bytes_format(wanPort?.tx_bytes ?? 0)}
-        </span>
-      </div>
-    </div>
+    {#if isBridged}
+      <ClientsCard />
+    {/if}
+
+    {#if portEntries.length}
+      <PortsCard
+        entries={portEntries}
+        badge={isBridged ? null : carrier ? t('Link up') : t('Link down')}
+        badgeActive={!isBridged && carrier}
+        wide={!isBridged}
+      />
     {/if}
   </div>
   {/if}
