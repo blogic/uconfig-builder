@@ -2,36 +2,48 @@
   import { t } from '../i18n.svelte.js'
 
   interface Props {
-    usage?: number[]
+    values?: number[]
     // Samples the device's ring holds when full, which sets the time axis.
     capacity?: number
+    // Top of the y axis, in the values' own unit. Fixed rather than fitted to
+    // the data: scaled to its own peak, an idle trace wobbling by a tenth would
+    // draw as a full-height mountain and every quiet device would look busy.
+    full?: number
+    // Appended to the peak reading, with its own leading space where the unit
+    // takes one.
+    unit?: string
+    fill?: string
     leftLabel?: string
     rightLabel?: string
   }
 
-  let { usage = [], capacity = 0, leftLabel = '', rightLabel = '' }: Props = $props()
+  let {
+    values = [],
+    capacity = 0,
+    full = 100,
+    unit = '',
+    fill = 'fill-accent/70',
+    leftLabel = '',
+    rightLabel = ''
+  }: Props = $props()
 
   const W = 600
   const H = 120
   const PAD = 2
 
-  // Full scale is fixed. Charted against its own peak, a 2% idle trace would
-  // draw as a full-height mountain and every quiet device would look busy.
-  const FULL = 100
-
-  const peak = $derived(usage.length ? Math.max(...usage) : 0)
+  const peak = $derived(values.length ? Math.max(...values) : 0)
 
   // The axis spans the whole ring, and the trace is anchored to the right, so
   // after a restart it grows in from the newest end instead of stretching two
-  // minutes of history across ten minutes of chart.
-  const step = $derived(W / Math.max(1, Math.max(capacity, usage.length) - 1))
-  const x0 = $derived(W - step * Math.max(0, usage.length - 1))
+  // minutes of history across the full window.
+  const step = $derived(W / Math.max(1, Math.max(capacity, values.length) - 1))
+  const x0 = $derived(W - step * Math.max(0, values.length - 1))
 
-  function area(values: number[]): string {
-    if (!values.length) return ''
+  function area(series: number[]): string {
+    if (!series.length) return ''
     const span = H - PAD * 2
-    const pts = values.map((v, i) => {
-      const y = H - PAD - (Math.min(FULL, Math.max(0, v)) / FULL) * span
+    const pts = series.map((v, i) => {
+      const y = H - PAD - (Math.min(full, Math.max(0, v)) / full) * span
       return `${(x0 + i * step).toFixed(1)},${y.toFixed(1)}`
     })
     return `M ${x0.toFixed(1)},${H} L ${pts.join(' L ')} L ${W},${H} Z`
@@ -39,7 +51,7 @@
 </script>
 
 <div class="mt-2">
-  <div class="mb-1 text-xs text-zinc-500">{t('Peak')} {peak}%</div>
+  <div class="mb-1 text-xs text-zinc-500">{t('Peak')} {peak}{unit}</div>
 
   <svg viewBox="0 0 {W} {H}" preserveAspectRatio="none" class="h-24 w-full">
     <line
@@ -53,7 +65,7 @@
       stroke-dasharray="4 4"
       vector-effect="non-scaling-stroke"
     />
-    <path d={area(usage)} class="fill-accent/70" />
+    <path d={area(values)} class={fill} />
     <line
       x1="0"
       y1={H}

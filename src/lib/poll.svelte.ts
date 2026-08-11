@@ -25,6 +25,7 @@ import {
   radios_clear
 } from './netstate.svelte.ts'
 import { cpu_refresh, cpu_clear } from './cpu.svelte.ts'
+import { thermal_refresh, thermal_clear } from './thermal.svelte.ts'
 import { sysinfo_refresh, sysinfo_clear } from './sysinfo.svelte.ts'
 import { traffic_refresh, traffic_clear } from './traffic.svelte.ts'
 import { ucoord_refresh, ucoord_clear } from './ucoord.svelte.ts'
@@ -39,6 +40,9 @@ const FEEDS = [
   // polling at the sample rate keeps the newest bucket current without asking
   // for anything it has not measured yet.
   { key: 'cpu', refresh: cpu_refresh, clear: cpu_clear, every: 5000 },
+  // Board temperature is sampled every 30s and drifts over minutes, so asking
+  // more often than the device measures would redraw the same series.
+  { key: 'thermal', refresh: thermal_refresh, clear: thermal_clear, every: 30000 },
   { key: 'traffic', refresh: traffic_refresh, clear: traffic_clear, every: 10000 },
   // Device state. Addresses and link state change on an event rather than
   // continuously, so these are slower than the client list; a radio's airtime

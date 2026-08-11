@@ -353,6 +353,19 @@ class Session:
             usage = usage[shift:] + usage[:shift]
         await self.reply(rid, {**cpu, 'usage': usage})
 
+    async def m_thermal(self, rid, _params):
+        # Sensors are per board, so the fixture stands in for one particular
+        # set rather than for anything every device has. Drifted per call for
+        # the same reason the cpu series is rotated.
+        thermal = fixtures['thermal']
+        drift = (int(time.time() / thermal['interval_s']) % 7) / 10.0
+        sensors = [
+            {**s, 'temp_c': round(s['temp_c'] + drift, 1),
+             'history': [round(v + drift, 1) for v in s['history']]}
+            for s in thermal['sensors']
+        ]
+        await self.reply(rid, {**thermal, 'sensors': sensors})
+
     async def m_radios(self, rid, _params):
         await self.reply(rid, fixtures['radios'])
 
@@ -508,6 +521,7 @@ class Session:
             'devices': (self.m_devices, True),
             'traffic': (self.m_traffic, True),
             'cpu': (self.m_cpu, True),
+            'thermal': (self.m_thermal, True),
             'radios': (self.m_radios, True),
             'ports': (self.m_ports, True),
             'network': (self.m_network, True),

@@ -2,7 +2,8 @@
   import { capabilities } from '../capabilities.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import { cpu, cpu_current, cpu_window_s } from '../cpu.svelte.js'
-  import CpuChart from './CpuChart.svelte'
+  import { thermal, thermal_peak, thermal_window_s } from '../thermal.svelte.js'
+  import SeriesChart from './SeriesChart.svelte'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
@@ -27,11 +28,22 @@
   // `system-info` for anyone who wants the run queue.
   const usage = $derived(cpu.data?.usage ?? [])
   const current = $derived(cpu_current())
-  const window_min = $derived(Math.round(cpu_window_s() / 60))
+  const cpu_min = $derived(Math.round(cpu_window_s() / 60))
+
+  // Which sensors exist is the board's business, so the card lists whatever
+  // arrives and charts the warmest of them. No severity colouring: the device
+  // reports no thresholds, and a number invented here would be wrong on the
+  // next board. The axis runs to 120C instead, which covers the critical point
+  // of the parts seen so far without flattering a hot device.
+  const sensors = $derived(thermal.data?.sensors ?? [])
+  const hottest = $derived(thermal_peak())
+  const thermal_min = $derived(Math.round(thermal_window_s() / 60))
+  const TEMP_FULL = 120
 
   // Refresh on arrival, then poll while this page is open.
   $effect(() => poll_feed('state'))
   $effect(() => poll_feed('cpu'))
+  $effect(() => poll_feed('thermal'))
 </script>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.state)}</p>
@@ -61,14 +73,48 @@
       </span>
     </div>
     {#if usage.length}
-      <CpuChart
-        {usage}
+      <SeriesChart
+        values={usage}
         capacity={cpu.data?.samples ?? 0}
-        leftLabel={t('{count} min ago', { count: window_min })}
+        unit="%"
+        leftLabel={t('{count} min ago', { count: cpu_min })}
         rightLabel={t('now')}
       />
     {:else}
       <p class="mt-2 text-sm text-zinc-500">{t('This device does not report CPU usage.')}</p>
+    {/if}
+  </div>
+
+  <div class="rounded-base border border-zinc-200 bg-surface p-4">
+    <div class="flex items-baseline justify-between gap-4">
+      <h3 class="text-sm font-semibold text-zinc-900">{t('Temperature')}</h3>
+      <span class="text-2xl font-bold tabular-nums tracking-tight text-zinc-900">
+        {hottest?.temp_c ?? '—'}<span class="ml-0.5 text-sm font-medium text-zinc-500">°C</span>
+      </span>
+    </div>
+    {#if hottest}
+      <dl class="mt-2 space-y-1 text-sm">
+        {#each sensors as s (s.name)}
+          <div class="flex justify-between gap-4">
+            <dt class="truncate font-mono text-xs text-zinc-500">{s.name}</dt>
+            <dd class="tabular-nums text-zinc-800">{s.temp_c} °C</dd>
+          </div>
+        {/each}
+      </dl>
+      <SeriesChart
+        values={hottest.history}
+        capacity={thermal.data?.samples ?? 0}
+        full={TEMP_FULL}
+        unit=" °C"
+        fill="fill-zinc-400/70"
+        leftLabel={t('{count} min ago', { count: thermal_min })}
+        rightLabel={t('now')}
+      />
+      <p class="mt-1 text-xs text-zinc-500">
+        {t('Charted: {name}, the warmest sensor.', { name: hottest.name })}
+      </p>
+    {:else}
+      <p class="mt-2 text-sm text-zinc-500">{t('This device does not report temperatures.')}</p>
     {/if}
   </div>
 </div>
