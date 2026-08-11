@@ -12,10 +12,10 @@
   const info = $derived(sysinfo.data)
   const error = $derived(sysinfo.error)
 
+  // Memory is not here: the Memory page owns it, and a gauge on each would be
+  // two readings of the same thing sampled at different instants.
   const model = $derived(capabilities.data?.capabilities?.model)
   const board = $derived(sysinfo.board)
-  const mem = $derived(info?.memory)
-  const memUsed = $derived(mem ? mem.total - mem.available : null)
 
   function fmt_bytes(b: number | null | undefined): string {
     if (b == null) return '—'
@@ -68,12 +68,6 @@
   <div class="rounded-base border border-zinc-200 bg-surface p-4 sm:col-span-2">
     <h3 class="text-sm font-semibold text-zinc-900">{t('Usage')}</h3>
     <div class="mt-2 flex flex-wrap items-start gap-12 py-2">
-      <UsageGauge
-        used={memUsed ?? 0}
-        total={mem?.total ?? 0}
-        label="Memory"
-        detail="{fmt_bytes(memUsed)} of {fmt_bytes(mem?.total)}"
-      />
       <UsageGauge
         used={(info?.root?.used ?? 0) * 1024}
         total={(info?.root?.total ?? 0) * 1024}
