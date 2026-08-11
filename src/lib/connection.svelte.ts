@@ -119,9 +119,14 @@ function handle_event(msg: RpcEvent) {
     return
   }
   // An unconfigured device has no password to ask for, so it says so instead
-  // and the wizard runs first.
+  // and the wizard runs first. The wizard then holds the socket for as long as
+  // someone takes to fill in six steps while sending nothing, so the keepalive
+  // has to start here rather than at login: otherwise the device times the
+  // socket out mid-wizard and everything entered so far is lost. Setup mode
+  // answers ping without a login, which is what makes this possible.
   if (msg.method === 'setup-required') {
     connection.setupRequired = true
+    keepalive_start()
     ready_resolve_now()
   }
 }
@@ -277,7 +282,7 @@ export async function login(password: string) {
   // optional package is installed, which is a different claim.
   connection.modules = Array.isArray(result?.modules) ? result.modules : null
   await target_resolve()
-  // ping requires authentication, so the keepalive can only start now.
+  // Restarts the interval if the wizard already began one in setup mode.
   keepalive_start()
   return connection.mode
 }
