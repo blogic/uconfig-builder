@@ -6,6 +6,7 @@
 // device as configured.
 
 import { tz_resolve } from './store.svelte.ts'
+import { GUEST_VLAN, GUEST_SUBNET, radio_bands } from './guest.ts'
 import { GUEST_VLAN_KEY, INCLUDE_NAME, include_declare, ref_attach } from './includes.ts'
 import type { IncludeFragment } from './store.svelte'
 import type { UconfigDocument } from './types/uconfig'
@@ -97,17 +98,6 @@ function ssid_block(name: string, key: string, security: WizardSecurity, radios:
   }
 }
 
-// Bands the device actually has, so the wizard never asks about radios.
-export function radio_bands(capabilities: unknown): string[] {
-  const wiphy = (capabilities as { wiphy?: { bands?: Record<string, unknown> }[] } | null)?.wiphy
-  if (!Array.isArray(wiphy)) return ['2G', '5G']
-  const bands = new Set<string>()
-  for (const phy of wiphy) {
-    for (const band of Object.keys(phy?.bands ?? {})) bands.add(band)
-  }
-  return bands.size ? [...bands] : ['2G', '5G']
-}
-
 // One radio entry per band the hardware reports, so the document matches the
 // device rather than a guess.
 function radios_for(bands: string[]): Record<string, unknown> {
@@ -118,12 +108,6 @@ function radios_for(bands: string[]): Record<string, unknown> {
   return out
 }
 
-// Guest traffic is carried on its own VLAN, so an access point can bridge it
-// to the router that owns the subnet rather than routing it itself. The id has
-// to be the same on every device in the venue, so the document points at the
-// shared include and this is only the value that seeds it.
-export const GUEST_VLAN = 100
-export const GUEST_SUBNET = '192.168.100.1/24'
 
 // The fragments that go up alongside a wizard document. Empty when there is no
 // guest network, because the VLAN is the only thing the include carries and the

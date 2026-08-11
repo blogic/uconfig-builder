@@ -8,6 +8,11 @@ export interface LayoutContext {
   allInterfaces?: Record<string, unknown>
   selfName?: string
   radios?: Record<string, unknown>
+  // Optional packages a connected device reports, narrowing the services on
+  // offer. Passed down rather than read from the connection, so the renderer
+  // and its widgets stay free of the websocket. Null or absent means offer
+  // everything, which is what an offline editor wants.
+  modules?: string[] | null
 }
 
 export interface WhenArg {

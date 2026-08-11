@@ -1,7 +1,6 @@
 <script lang="ts">
   import ChoiceListField from './ChoiceListField.svelte'
   import { interface_services } from '../services.js'
-  import { connection } from '../connection.svelte.js'
   import type { LayoutContext } from '../layouts'
 
   interface Props {
@@ -11,7 +10,10 @@
 
   let { obj, context }: Props = $props()
 
-  const options = $derived(interface_services(context?.role, connection.modules))
+  // `modules` arrives through the layout context. Reading the connection here
+  // would put the websocket behind every schema form, since LayoutRenderer
+  // imports this widget statically.
+  const options = $derived(interface_services(context?.role, context?.modules ?? null))
 
   // The owner writes: a child mutating a prop it does not own is what Svelte
   // reports as ownership_invalid_mutation.

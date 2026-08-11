@@ -1,19 +1,24 @@
 <script lang="ts">
+  // The pending changes, and whatever the surrounding app can do with them.
+  //
+  // Applying is handed in rather than reached for: an app with a device passes
+  // one, an offline editor passes none and ChangesPanel offers download and
+  // save instead. This component is shared, so it must not know that a
+  // websocket exists.
   import ChangesPanel from './ChangesPanel.svelte'
   import Spinner from './Spinner.svelte'
   import { t } from '../i18n.svelte.js'
-  import { payload_export, baseline_reset } from '../store.svelte.js'
-  import { connection, request as ws_request } from '../connection.svelte.js'
   import { view } from '../view.svelte.js'
   import type { ChangeEntry } from '../changes'
 
   interface Props {
     changes: ChangeEntry[]
+    connected?: boolean
+    onApply?: () => Promise<void>
   }
 
-  let { changes }: Props = $props()
+  let { changes, connected = false, onApply }: Props = $props()
 
-  const connected = $derived(connection.status === 'connected')
   // In menu view the Configuration section has no surrounding Card, so the
   // status states supply their own card chrome (cards view already wraps them).
   const panelClass = $derived(view.mode === 'menu' ? 'rounded-base border border-zinc-200 bg-surface px-4' : '')
@@ -22,11 +27,11 @@
   let applyError = $state<string | null>(null)
 
   async function apply() {
+    if (!onApply) return
     applyState = 'applying'
     applyError = null
     try {
-      await ws_request('config-apply', payload_export())
-      baseline_reset()
+      await onApply()
       applyState = 'success'
     } catch (e) {
       applyError = e instanceof Error ? e.message : String(e)

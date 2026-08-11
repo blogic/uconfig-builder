@@ -10,7 +10,7 @@
   import { t } from '../i18n.svelte.js'
   import { store } from '../store.svelte.js'
   import { def_get } from '../schema.js'
-  import { GUEST_VLAN, GUEST_SUBNET, radio_bands } from '../wizard.svelte.js'
+  import { GUEST_VLAN, GUEST_SUBNET, radio_bands } from '../guest.js'
   import { capabilities } from '../capabilities.svelte.js'
   import { GUEST_VLAN_KEY, include_ensure, overlay_get, overlay_set, ref_attach } from '../includes.js'
   import { iface_enabled } from '../interfaces.js'

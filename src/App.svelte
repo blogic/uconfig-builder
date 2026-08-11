@@ -59,7 +59,9 @@
     saved_names,
     doc_export,
     doc_adopt,
-    doc_reset
+    doc_reset,
+    payload_export,
+    baseline_reset
   } from './lib/store.svelte.js'
   import { example_names, example_load } from './lib/examples.js'
   import type { ConfigPayload } from './lib/store.svelte.js'
@@ -147,15 +149,19 @@
   let connState = $state<'idle' | 'connecting' | 'ready' | 'error'>('idle')
 
   // A connected device reports which optional packages it has; without one the
-  // whole set is offered, which is what the offline editor wants.
+  // whole set is offered, which is what the offline editor wants. Null carries
+  // that meaning through to every consumer, including the layout context, so
+  // the widgets never have to reach for the connection themselves.
+  const deviceModules = $derived(deviceSession ? (connection.modules ?? null) : null)
+
   const serviceEntries = $derived(
-    deviceSession ? service_entries(connection.modules ?? null) : SERVICE_ENTRIES
+    deviceSession ? service_entries(deviceModules) : SERVICE_ENTRIES
   )
 
   // Children of every expandable nav group, by the group item's key.
   const navGroups = $derived({
     services: serviceEntries,
-    'system-services': system_service_entries(deviceSession ? (connection.modules ?? null) : null)
+    'system-services': system_service_entries(deviceModules)
   })
   function start_default() {
     section = 'config'
@@ -261,6 +267,15 @@
     view.section = STATUS_ITEMS[0]?.key ?? 'traffic'
     if (IS_DEVICE && dev) await dev.poll.preload()
     screen = 'app'
+  }
+
+  // What "apply" means, handed to ConfigurationPanel. It lives here because
+  // only this app has a device to apply to; the shared panel just drives the
+  // spinner around whatever it is given.
+  async function config_apply() {
+    if (!dev) throw new Error('not connected')
+    await dev.conn.request('config-apply', payload_export())
+    baseline_reset()
   }
 
   function login_back() {
@@ -458,7 +473,8 @@
           role: (iface as { role?: string }).role,
           allInterfaces: store.doc.interfaces,
           selfName: name,
-          radios: store.doc.radios
+          radios: store.doc.radios,
+          modules: deviceModules
         }}
       />
     {/snippet}
@@ -570,7 +586,7 @@
 
 {#snippet changesBody()}
   <p class="page-description">{t(PAGE_DESCRIPTIONS.changes)}</p>
-  <ConfigurationPanel {changes} />
+  <ConfigurationPanel {changes} connected={deviceSession} onApply={deviceSession ? config_apply : undefined} />
 {/snippet}
 
 {#snippet bodyFor(key: string | null)}

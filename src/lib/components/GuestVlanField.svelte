@@ -5,7 +5,7 @@
   // points at it.
   import { GUEST_VLAN_KEY, overlay_get, overlay_set } from '../includes.js'
   import { VLAN_MAX, VLAN_MIN } from '../interfaces.js'
-  import { GUEST_VLAN } from '../wizard.svelte.js'
+  import { GUEST_VLAN } from '../guest.js'
   import { t } from '../i18n.svelte.js'
 
   const fid = $props.id()
