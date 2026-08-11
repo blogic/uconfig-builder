@@ -1,13 +1,14 @@
 <script lang="ts">
-  // Where the memory has gone and which process is growing. The only page that
-  // answers either, since Overview reports the flash it has left and nothing
-  // about memory.
+  // What the device has left and which process is eating it: memory, flash, and
+  // the per-process figures behind the first of those.
   //
-  // Reads `memory` and never `system-info`: both report free memory, in
-  // different units and sampled at different instants, so a page mixing them
-  // would show two totals that disagree.
+  // Memory comes from `memory` and never from `system-info`. Both report free
+  // memory, in different units and sampled at different instants, so a page
+  // mixing them would show two totals that disagree. Flash has no such twin, so
+  // it is read from `system-info` here without that hazard.
   import { memory } from '../diagnostics.svelte.js'
   import type { ProcessState } from '../diagnostics.svelte.js'
+  import { sysinfo } from '../sysinfo.svelte.js'
   import UsageGauge from './UsageGauge.svelte'
   import { bytes_format } from '../device-icons.js'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
@@ -21,6 +22,10 @@
 
   const sys = $derived(memory.data?.system ?? null)
   const used = $derived(sys ? sys.total_kb - sys.available_kb : 0)
+
+  // The memory watcher is an optional package; flash is not. Kept apart from
+  // `sys` so a device without the watcher still reports its disk.
+  const root = $derived(sysinfo.data?.root ?? null)
 
   // The device calls these `leaking` and `stable`, and the page does not. Its
   // whole rule is `rss_delta > 0 || fds_delta > 0`, so any growth at all lands
@@ -40,24 +45,37 @@
   }
 
   $effect(() => poll_feed('memory'))
+  $effect(() => poll_feed('state'))
 </script>
 
 <p class="page-description">{t(PAGE_DESCRIPTIONS.memory)}</p>
+
+{#if sys || root}
+  <div class="mb-6 flex flex-wrap items-start gap-12">
+    {#if sys}
+      <UsageGauge
+        used={used * 1024}
+        total={sys.total_kb * 1024}
+        label="Memory"
+        detail={t('{used} of {total}', { used: kb(used), total: kb(sys.total_kb) })}
+      />
+    {/if}
+    {#if root}
+      <UsageGauge
+        used={root.used * 1024}
+        total={root.total * 1024}
+        label="Flash"
+        detail={t('{used} of {total}', { used: kb(root.used), total: kb(root.total) })}
+      />
+    {/if}
+  </div>
+{/if}
 
 {#if memory.error && !memory.data}
   <div class="rounded-base border border-zinc-200 p-4 text-sm text-red-600">{memory.error}</div>
 {:else if !sys}
   <p class="py-8 text-center text-sm text-zinc-500">{t('This device does not report memory.')}</p>
 {:else}
-  <div class="mb-6 flex">
-    <UsageGauge
-      used={used * 1024}
-      total={sys.total_kb * 1024}
-      label="Memory"
-      detail={t('{used} of {total}', { used: kb(used), total: kb(sys.total_kb) })}
-    />
-  </div>
-
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="rounded-base border border-zinc-200 bg-surface p-4">
       <h3 class="text-sm font-semibold text-zinc-900">{t('System')}</h3>

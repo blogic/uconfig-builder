@@ -3,7 +3,6 @@
   import { sysinfo } from '../sysinfo.svelte.js'
   import { poll_feed } from '../poll.svelte.js'
   import { uptime_format } from '../device-icons.js'
-  import UsageGauge from './UsageGauge.svelte'
   import { PAGE_DESCRIPTIONS } from '../descriptions.js'
   import { t } from '../i18n.svelte.js'
 
@@ -12,22 +11,11 @@
   const info = $derived(sysinfo.data)
   const error = $derived(sysinfo.error)
 
-  // Memory is not here: the Memory page owns it, and a gauge on each would be
-  // two readings of the same thing sampled at different instants.
+  // What the device is and how hard it is working. What it has left, memory and
+  // flash both, is the Memory page: two gauges belong beside each other rather
+  // than one on each page.
   const model = $derived(capabilities.data?.capabilities?.model)
   const board = $derived(sysinfo.board)
-
-  function fmt_bytes(b: number | null | undefined): string {
-    if (b == null) return '—'
-    const u = ['B', 'KB', 'MB', 'GB', 'TB']
-    let i = 0
-    let v = b
-    while (v >= 1024 && i < u.length - 1) {
-      v /= 1024
-      i++
-    }
-    return `${v.toFixed(v < 10 && i > 0 ? 1 : 0)} ${u[i]}`
-  }
 
   // ubus loadavg is fixed-point, scaled by 1<<16.
   const load = $derived((info?.load ?? []).map((v) => (v / 65536).toFixed(2)))
@@ -63,17 +51,5 @@
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('5 min')}</dt><dd class="font-mono text-zinc-800">{load[1] ?? '—'}</dd></div>
       <div class="flex justify-between gap-4"><dt class="text-zinc-500">{t('15 min')}</dt><dd class="font-mono text-zinc-800">{load[2] ?? '—'}</dd></div>
     </dl>
-  </div>
-
-  <div class="rounded-base border border-zinc-200 bg-surface p-4 sm:col-span-2">
-    <h3 class="text-sm font-semibold text-zinc-900">{t('Usage')}</h3>
-    <div class="mt-2 flex flex-wrap items-start gap-12 py-2">
-      <UsageGauge
-        used={(info?.root?.used ?? 0) * 1024}
-        total={(info?.root?.total ?? 0) * 1024}
-        label="Flash"
-        detail="{fmt_bytes((info?.root?.used ?? 0) * 1024)} of {fmt_bytes((info?.root?.total ?? 0) * 1024)}"
-      />
-    </div>
   </div>
 </div>
