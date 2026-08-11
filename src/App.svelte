@@ -361,9 +361,13 @@
   const bottomItems = $derived(
     availableSections
       .filter((s) => s.key === 'status' || s.key === 'ucoord')
-      .flatMap((s) =>
-        s.key === 'ucoord' ? [{ ...s.items[0], label: s.label }] : s.items
-      )
+      .flatMap((s) => {
+        // Through items_for like the sidebar, or the bar keeps offering pages
+        // this document has nothing to say on: a bridging device has no local
+        // network, and its Network entry led nowhere.
+        const items = items_for(s.items, changes.length > 0, store.doc)
+        return s.key === 'ucoord' ? items.slice(0, 1).map((i) => ({ ...i, label: s.label })) : items
+      })
   )
 
   function bottom_select(key: string) {

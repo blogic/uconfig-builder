@@ -37,11 +37,10 @@
     {#each entries as [name, port] (name)}
       <li class="flex items-center gap-3 py-2 text-sm {port.carrier ? 'text-zinc-800' : 'text-zinc-400'}">
         <span class="w-14 flex-shrink-0 font-semibold {port.carrier ? '' : 'text-zinc-500'}">{name}</span>
-        <span>
+        <span class="min-w-0 truncate">
           {port.carrier ? t('{speed} Mbit/s', { speed: port.speed ?? '—' }) : t('No cable')}
-          {#if port.netdev}<span class="text-zinc-400"> · {port.netdev}</span>{/if}
         </span>
-        <span class="ml-auto tabular-nums text-zinc-500">
+        <span class="ml-auto flex-shrink-0 whitespace-nowrap tabular-nums text-zinc-500">
           {#if port.carrier}
             ↓ {bytes_format(port.rx_bytes ?? 0)} &nbsp; ↑ {bytes_format(port.tx_bytes ?? 0)}
           {:else}
