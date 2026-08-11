@@ -10,7 +10,11 @@ import {
   events_refresh,
   events_clear,
   memory_refresh,
-  memory_clear
+  memory_clear,
+  syslog_refresh,
+  syslog_clear,
+  dmesg_refresh,
+  dmesg_clear
 } from './diagnostics.svelte.ts'
 import {
   network_refresh,
@@ -38,6 +42,11 @@ const FEEDS = [
   { key: 'ports', refresh: ports_refresh, clear: ports_clear, every: 10000 },
   { key: 'radios', refresh: radios_refresh, clear: radios_clear, every: 10000 },
   { key: 'events', refresh: events_refresh, clear: events_clear, every: 10000 },
+  // Free text rather than structured events, and both arrive whole: the device
+  // bounds them by buffer size, not by entry count. The kernel log only grows
+  // when something happens to the hardware, so it is asked for less often.
+  { key: 'syslog', refresh: syslog_refresh, clear: syslog_clear, every: 10000 },
+  { key: 'dmesg', refresh: dmesg_refresh, clear: dmesg_clear, every: 30000 },
   // Only the free-memory half of this is live. The per-process figures come
   // from a table the device resamples once an hour, so polling any faster would
   // redraw a frozen list beside a moving gauge.

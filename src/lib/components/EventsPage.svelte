@@ -2,8 +2,9 @@
   // The device's own account of the last few hours. Everything here is
   // otherwise invisible: a client that keeps dropping, a cable that is not
   // seated, someone at the door with last year's passphrase.
-  import { events, events_recent, event_group } from '../diagnostics.svelte.js'
+  import { events, events_ordered, event_group } from '../diagnostics.svelte.js'
   import type { EventEntry } from '../diagnostics.svelte.js'
+  import LogPane from './LogPane.svelte'
   import { deviceStore, clients_all } from '../devices.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import {
@@ -31,6 +32,18 @@
     wifi: 'wi-fi',
     carrier: 'link',
     ssh: 'ssh'
+  }
+
+  // An event carries no severity, so its tag is coloured by subject instead.
+  // Same purpose the log severities serve: the shape of a run of entries should
+  // be readable without reading it. ssh is red because a failed login is the
+  // one thing here worth catching the eye.
+  const TAG_TONES: Record<string, string> = {
+    client: 'text-sky-600',
+    dhcp: 'text-emerald-600',
+    wifi: 'text-violet-600',
+    carrier: 'text-amber-600',
+    ssh: 'text-red-600'
   }
 
   // The log records MACs and people read names. `devices` is the only thing that
@@ -65,7 +78,7 @@
   // The day heading is carried on the row that opens it, so the template does
   // not have to reach backwards and relabel every entry twice.
   const shown = $derived.by(() => {
-    const list = events_recent(events.data).filter(
+    const list = events_ordered(events.data).filter(
       (e) => selected === 'all' || event_group(e) === selected
     )
     let last = ''
@@ -191,23 +204,27 @@
       {/if}
     </div>
   {:else}
-    {#each shown as { e, day }, i (e.time + '/' + e.object + '/' + i)}
-      {#if day}
-        <p class="mt-4 text-[11px] font-semibold uppercase tracking-wide text-zinc-400 first:mt-0">
-          {day}
-        </p>
-      {/if}
-      <div class="flex items-baseline gap-3 border-t border-zinc-100 py-1.5 text-sm first:border-t-0">
-        <span class="w-16 flex-shrink-0 tabular-nums text-zinc-500">{clock_format(e.time)}</span>
-        <span class="w-12 flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
-          {TAGS[e.object] ?? e.object}
-        </span>
-        <span class="min-w-0 text-zinc-700">
-          {#each split(sentence(e)) as p, n (n)}{#if p.b}<b class="font-semibold text-zinc-900"
-              >{p.t}</b
-            >{:else}{p.t}{/if}{/each}
-        </span>
-      </div>
-    {/each}
+    <LogPane revision={selected + '/' + shown.length}>
+      {#snippet children()}
+        {#each shown as { e, day }, i (e.time + '/' + e.object + '/' + i)}
+          {#if day}
+            <p class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-400 first:mt-0">
+              {day}
+            </p>
+          {/if}
+          <div class="flex items-baseline gap-3 py-0.5 text-sm">
+            <span class="w-16 flex-shrink-0 tabular-nums text-zinc-500">{clock_format(e.time)}</span>
+            <span class="w-12 flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide {TAG_TONES[e.object] ?? 'text-zinc-400'}">
+              {TAGS[e.object] ?? e.object}
+            </span>
+            <span class="min-w-0 text-zinc-700">
+              {#each split(sentence(e)) as p, n (n)}{#if p.b}<b class="font-semibold text-zinc-900"
+                  >{p.t}</b
+                >{:else}{p.t}{/if}{/each}
+            </span>
+          </div>
+        {/each}
+      {/snippet}
+    </LogPane>
   {/if}
 {/if}

@@ -156,6 +156,9 @@ export const SYSTEM_ITEMS: NavItem[] = [
   // whole budget. `events` rather than `log`: svc:log already puts a "Log"
   // entry in this sidebar for configuring the log buffer.
   { key: 'events', label: 'Events', icon: 'bi-list-columns-reverse' },
+  // `logs` rather than `log`: svc:log already puts a "Logging" entry in this
+  // same sidebar for sizing the buffer, and page keys share one namespace.
+  { key: 'logs', label: 'Logs', icon: 'bi-card-text' },
   { key: 'memory', label: 'Memory', icon: 'bi-memory' },
   // `time` rather than `ntp`: the page holds the timezone as well, and the
   // editor's raw NTP page keeps that key.

@@ -1690,5 +1690,55 @@
    {"pid": 834, "cmd": "/sbin/urngd", "age_s": 113921, "rss_kb": 744, "rss_startup_kb": 744, "rss_delta_kb": 0, "fds": 9, "fds_startup": 9, "fds_delta": 0},
    {"pid": 799, "cmd": "/sbin/askfirst", "age_s": 113921, "rss_kb": 704, "rss_startup_kb": 704, "rss_delta_kb": 0, "fds": 5, "fds_startup": 5, "fds_delta": 0}
   ]
- }
+ },
+  "syslog": {
+    "log": [
+      { "msg": "procd: - init complete -", "id": 1, "priority": 30, "source": 1, "time": 1786002052000 },
+      { "msg": "netifd: Interface 'wan' is enabled", "id": 2, "priority": 30, "source": 1, "time": 1786002062000 },
+      { "msg": "netifd: wan (1483): udhcpc: started, v1.37.0", "id": 3, "priority": 30, "source": 1, "time": 1786002067000 },
+      { "msg": "netifd: wan (1483): udhcpc: broadcasting discover", "id": 4, "priority": 30, "source": 1, "time": 1786002072000 },
+      { "msg": "netifd: wan (1483): udhcpc: lease of 10.0.0.24 obtained from 10.0.0.1, lease time 43200", "id": 5, "priority": 30, "source": 1, "time": 1786002074000 },
+      { "msg": "netifd: Interface 'wan' is now up", "id": 6, "priority": 30, "source": 1, "time": 1786002082000 },
+      { "msg": "dnsmasq[2104]: started, version 2.90 cachesize 150", "id": 7, "priority": 29, "source": 1, "time": 1786002092000 },
+      { "msg": "dnsmasq[2104]: using nameserver 10.0.0.1#53", "id": 8, "priority": 29, "source": 1, "time": 1786002094000 },
+      { "msg": "hostapd: phy0-ap0: interface state UNINITIALIZED->ENABLED", "id": 9, "priority": 30, "source": 1, "time": 1786002142000 },
+      { "msg": "hostapd: phy0-ap0: AP-ENABLED", "id": 10, "priority": 30, "source": 1, "time": 1786002144000 },
+      { "msg": "hostapd: phy1-ap0: interface state UNINITIALIZED->ENABLED", "id": 11, "priority": 30, "source": 1, "time": 1786002152000 },
+      { "msg": "hostapd: phy1-ap0: AP-ENABLED", "id": 12, "priority": 30, "source": 1, "time": 1786002154000 },
+      { "msg": "kernel: br-lan: received packet on lan1 with own address as source address", "id": 13, "priority": 4, "source": 1, "time": 1786007642000 },
+      { "msg": "dropbear[6621]: Child connection from 10.0.0.66:51214", "id": 14, "priority": 86, "source": 1, "time": 1786010442000 },
+      { "msg": "dropbear[6621]: Password auth succeeded for 'root' from 10.0.0.66:51214", "id": 15, "priority": 85, "source": 1, "time": 1786010444000 },
+      { "msg": "dropbear[7104]: Bad password attempt for 'root' from 10.0.0.91:44118", "id": 16, "priority": 84, "source": 1, "time": 1786012842000 },
+      { "msg": "dropbear[7104]: Exit before auth: Disconnect received", "id": 17, "priority": 84, "source": 1, "time": 1786012844000 },
+      { "msg": "odhcpd[2210]: Failed to send to ff02::1%br-lan: Address not available", "id": 18, "priority": 27, "source": 1, "time": 1786016442000 },
+      { "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: authenticated", "id": 19, "priority": 30, "source": 1, "time": 1786018242000 },
+      { "msg": "hostapd: phy0-ap0: STA 3c:2e:f5:11:22:33 IEEE 802.11: associated (aid 1)", "id": 20, "priority": 30, "source": 1, "time": 1786018244000 },
+      { "msg": "dnsmasq-dhcp[2104]: DHCPACK(br-lan) 192.168.1.147 3c:2e:f5:11:22:33 laptop", "id": 21, "priority": 29, "source": 1, "time": 1786019142000 },
+      { "msg": "netifd: wan (1483): udhcpc: sending renew to 10.0.0.1", "id": 22, "priority": 30, "source": 1, "time": 1786019922000 }
+    ]
+  },
+  "dmesg": {
+    "log": [
+      { "priority": 6, "time": 1785998442000, "msg": "Booting Linux on physical CPU 0x0000000000 [0x410fd034]" },
+      { "priority": 5, "time": 1785998442000, "msg": "Linux version 6.18.41 (builder@buildhost) (OpenWrt GCC 14.4.0) #0 SMP" },
+      { "priority": 4, "time": 1785998442000, "msg": "KASLR disabled due to lack of seed" },
+      { "priority": 6, "time": 1785998442000, "msg": "Machine model: OpenWrt One" },
+      { "priority": 6, "time": 1785998442041, "msg": "Memory: 986M/1024M available" },
+      { "priority": 6, "time": 1785998442512, "msg": "mtk_soc_eth 15100000.ethernet eth0: PHY [mdio-bus:01] driver [MediaTek MT7531]" },
+      { "priority": 6, "time": 1785998443204, "msg": "mtk_soc_eth 15100000.ethernet: generated random MAC address" },
+      { "priority": 6, "time": 1785998444884, "msg": "mmc0: new HS200 MMC card at address 0001" },
+      { "priority": 6, "time": 1785998445101, "msg": "ubi0: attached mtd4 (name \"ubi\", size 234 MiB)" },
+      { "priority": 6, "time": 1785998446552, "msg": "UBIFS (ubi0:1): mounted UBI device 0, volume 1, name \"rootfs_data\"" },
+      { "priority": 6, "time": 1785998447998, "msg": "br-lan: port 1(lan1) entered blocking state" },
+      { "priority": 6, "time": 1785998448004, "msg": "br-lan: port 1(lan1) entered forwarding state" },
+      { "priority": 4, "time": 1785998450771, "msg": "mt7915e 0000:01:00.0: ASPM is not supported" },
+      { "priority": 6, "time": 1785998451330, "msg": "mt7915e 0000:01:00.0: HW/SW Version: 0x8a108a10" },
+      { "priority": 6, "time": 1785998454556, "msg": "br-wan: port 3(phy0-ap0) entered blocking state" },
+      { "priority": 6, "time": 1785998454560, "msg": "br-wan: port 3(phy0-ap0) entered forwarding state" },
+      { "priority": 3, "time": 1786003262113, "msg": "mt7915e 0000:01:00.0: Message 00020003 (seq 4) timeout" },
+      { "priority": 6, "time": 1786008042771, "msg": "br-lan: port 2(lan2) entered disabled state" },
+      { "priority": 4, "time": 1786012844008, "msg": "nf_conntrack: nf_conntrack: table full, dropping packet" },
+      { "priority": 6, "time": 1786019942443, "msg": "br-lan: port 2(lan2) entered forwarding state" }
+    ]
+  }
 }

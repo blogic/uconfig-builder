@@ -598,6 +598,7 @@
     {:else if key === 'state'}<DP.StatePage />
     {:else if key === 'events'}<DP.EventsPage />
     {:else if key === 'memory'}<DP.MemoryPage />
+    {:else if key === 'logs'}<DP.LogsPage />
     {:else if key === 'overview'}<DP.UcoordPage />
     {:else if key === 'reboot' || key === 'firmware' || key === 'factory-reset'}
       <DP.SystemBusy>

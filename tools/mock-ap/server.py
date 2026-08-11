@@ -98,6 +98,7 @@ def log(*parts):
     print('[mock-ap]', *parts, flush=True)
 
 
+
 def config_read():
     """The applied config if one exists, otherwise what the AP ships with.
 
@@ -369,6 +370,16 @@ class Session:
         # lists are resampled hourly, so the two halves are not the same age.
         await self.reply(rid, fixtures['memory'])
 
+    async def m_syslog(self, rid, _params):
+        # The whole buffer, as the device returns it: procd bounds it by
+        # system.log_size rather than by anything the caller asks for.
+        await self.reply(rid, fixtures['syslog'])
+
+    async def m_dmesg(self, rid, _params):
+        # Kernel entries carry no `id` or `source`, and the device has already
+        # converted their monotonic stamps to epoch milliseconds.
+        await self.reply(rid, fixtures['dmesg'])
+
     async def m_state(self, rid, _params):
         # The real daemon has no `state` object registered, and the UI is
         # written to tolerate that; failing here keeps the mock honest.
@@ -490,6 +501,8 @@ class Session:
             'network': (self.m_network, True),
             'event-log': (self.m_event_log, True),
             'memory': (self.m_memory, True),
+            'syslog': (self.m_syslog, True),
+            'dmesg': (self.m_dmesg, True),
             'config-get': (self.m_config_get, True),
             'config-test': (self.m_config_test, True),
             'config-apply': (self.m_config_apply, True),
