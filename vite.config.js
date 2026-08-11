@@ -2,12 +2,20 @@ import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import tailwindcss from '@tailwindcss/vite'
 
-// Build flavour, injected as a compile-time constant so the unused half of the
-// app is tree-shaken away rather than merely hidden:
+// Build flavour, injected as a compile-time constant:
 //   editor - standalone JSON editing, no device connection
-//   device - connect to an AP, no bundled examples
-//   full   - both (the default)
-const flavour = process.env.UCONFIG_FLAVOUR ?? 'full'
+//   device - connect to an AP; no Configure section, no bundled examples
+//   full   - both
+//
+// Defaults to `device`, because that is what this repo is becoming and because
+// `full` meant the dev server showed an app neither audience ever gets: the
+// live pages and the raw Configure section side by side. Build the editor
+// explicitly until the two are separated properly.
+//
+// Note this only ever removed code at one place, the guarded dynamic import in
+// device.svelte.ts. Svelte compiles a template {#if} into a closure that is
+// always constructed, so flavour branches in markup hide rather than drop.
+const flavour = process.env.UCONFIG_FLAVOUR ?? 'device'
 
 export default defineConfig({
   plugins: [svelte(), tailwindcss()],

@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "dev:editor": "UCONFIG_FLAVOUR=editor vite",
     "build:editor": "UCONFIG_FLAVOUR=editor vite build --outDir dist/editor",
-    "build:device": "UCONFIG_FLAVOUR=device vite build --outDir dist/device",
     "preview": "vite preview",
     "mock": "python3 tools/mock-ap/server.py --includes",
     "check": "svelte-check --tsconfig ./tsconfig.json",
