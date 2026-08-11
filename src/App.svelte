@@ -55,14 +55,13 @@
   import { t } from './lib/i18n.svelte.js'
   import {
     store,
-    example_names,
-    example_load,
     config_load,
     saved_names,
     doc_export,
     doc_adopt,
     doc_reset
   } from './lib/store.svelte.js'
+  import { example_names, example_load } from './lib/examples.js'
   import type { ConfigPayload } from './lib/store.svelte.js'
   import { device_load, deviceApi } from './lib/device.svelte.js'
   import type { DeviceMod } from './lib/device.svelte.js'
@@ -632,6 +631,12 @@
           {t('Describe the device and export a uConfig document. Choose how to start:')}
         </p>
         <div class="mt-5 flex flex-col gap-4">
+          <!-- Starting from a default, an example or a saved file is the
+               editor's business. A device build has nowhere to take you: these
+               all open the Configure section, which sections_for() drops when
+               IS_EDITOR is false. Gating the uses is also what lets Rollup drop
+               examples.json, 22 KB the device can never load. -->
+          {#if IS_EDITOR}
           {#if savedConfigs.length}
             <div class="flex items-center gap-2">
               <select class="input" bind:value={welcomeSaved}>
@@ -663,6 +668,7 @@
             </select>
             <Button disabled={!welcomeExample} onclick={start_example}>{t('Start')}</Button>
           </div>
+          {/if}
           {#if IS_DEVICE}
           <div class="flex items-center gap-2">
             <span class="h-px flex-1 bg-zinc-200"></span>

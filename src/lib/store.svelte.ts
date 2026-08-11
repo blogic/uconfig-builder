@@ -1,15 +1,9 @@
 import type { UconfigDocument } from './types/uconfig'
-import examplesJson from './data/examples.json'
 import timezones from './data/timezones.json'
 import { def_get, schema_at, ref_resolve } from './schema.ts'
 import { is_secret_key } from './secrets.ts'
 import { SERVICE_CONFIG_KEYS } from './services.ts'
 import { settings } from './settings.svelte.ts'
-
-// The example documents are full uconfig documents keyed by name; the JSON
-// import itself is inferred from the literal file contents rather than the
-// generated schema types.
-export const examples = examplesJson as unknown as Record<string, UconfigDocument>
 
 export const tz_keys = Object.keys(timezones).sort()
 
@@ -320,10 +314,11 @@ export function doc_reset() {
   baseline_snapshot()
 }
 
-export function example_load(name: string) {
-  const src = examples[name]
-  if (!src) return
-  store.doc = structuredClone(src)
+// Seed the document from a whole document someone else produced: a bundled
+// example, a saved config. Shared so the two callers cannot drift apart, and so
+// the examples themselves can live outside this module.
+export function doc_load(src: UconfigDocument, name: string | null) {
+  store.doc = structuredClone($state.snapshot(src)) as UconfigDocument
   ensure_sections()
   unit_defaults(store.doc)
   service_defaults(store.doc)
@@ -369,13 +364,7 @@ export function config_save(name: string) {
 
 export function config_load(name: string) {
   const saved = settings.configs?.[name]
-  if (!saved) return
-  store.doc = structuredClone($state.snapshot(saved)) as UconfigDocument
-  ensure_sections()
-  unit_defaults(store.doc)
-  service_defaults(store.doc)
-  store.loadedFrom = name
-  baseline_snapshot()
+  if (saved) doc_load(saved, name)
 }
 
 export function config_delete(name: string) {
@@ -448,5 +437,3 @@ function prune(value: unknown): unknown {
   }
   return value
 }
-
-export const example_names = Object.keys(examples).sort()
