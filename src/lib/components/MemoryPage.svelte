@@ -6,7 +6,7 @@
   // memory, in different units and sampled at different instants, so a page
   // mixing them would show two totals that disagree. Flash has no such twin, so
   // it is read from `system-info` here without that hazard.
-  import { memory } from '../diagnostics.svelte.js'
+  import { memory, process_name, process_service } from '../diagnostics.svelte.js'
   import type { ProcessState } from '../diagnostics.svelte.js'
   import { sysinfo } from '../sysinfo.svelte.js'
   import UsageGauge from './UsageGauge.svelte'
@@ -100,7 +100,7 @@
           <div class="flex justify-between gap-4">
             <dt class="text-zinc-500">{t('Largest growth')}</dt>
             <dd class="truncate text-zinc-800">
-              {grown[0].cmd.split('/').pop()}, +{kb(grown[0].rss_delta_kb)}
+              {process_name(grown[0])}, +{kb(grown[0].rss_delta_kb)}
             </dd>
           </div>
         {/if}
@@ -111,7 +111,7 @@
 
   {#snippet table(rows: ProcessState[], expanded: boolean, growth: boolean)}
     <div class="flex gap-3 border-b border-zinc-200 pb-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
-      <span class="min-w-0 flex-1">{t('Command')}</span>
+      <span class="min-w-0 flex-1">{t('Process')}</span>
       <span class="w-12 text-right">{t('PID')}</span>
       <span class="w-20 text-right">{t('RSS')}</span>
       <span class="w-20 text-right">{growth ? t('Growth') : ''}</span>
@@ -119,7 +119,12 @@
     </div>
     {#each expanded ? rows : rows.slice(0, HEAD) as p (p.pid)}
       <div class="flex gap-3 border-t border-zinc-100 py-1 text-sm tabular-nums first:border-t-0">
-        <span class="min-w-0 flex-1 truncate font-semibold text-zinc-900">{p.cmd.split('/').pop()}</span>
+        <span class="flex min-w-0 flex-1 items-baseline gap-1.5 truncate">
+          <span class="truncate font-semibold text-zinc-900">{process_name(p)}</span>
+          {#if process_service(p)}
+            <span class="truncate text-xs font-normal text-zinc-400">{process_service(p)}</span>
+          {/if}
+        </span>
         <span class="w-12 text-right text-zinc-400">{p.pid}</span>
         <span class="w-20 text-right text-zinc-700">{kb(p.rss_kb)}</span>
         <span class="w-20 text-right {growth ? tone(p) : 'text-zinc-400'}"

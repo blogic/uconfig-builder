@@ -24,7 +24,17 @@ export interface EventLogData {
 
 export interface ProcessState {
   pid: number
+  // What the process actually is, resolved by the device against procd's
+  // service list: a daemon behind ujail or a ucode shebang reports itself here
+  // rather than as its wrapper. Optional because umemd ships as its own package
+  // and an older one on the device sends only `cmd`.
+  name?: string
+  // argv[0], verbatim, which is the wrapper for anything launched through one.
   cmd: string
+  // The procd service this process belongs to, inherited from an ancestor for
+  // jailed daemons and forked workers. Absent for anything procd does not own.
+  service?: string
+  instance?: string
   // How long umemd has watched it, not how long it has run.
   age_s: number
   rss_kb: number
@@ -140,6 +150,21 @@ export function dmesg_clear() {
 export function memory_clear() {
   memory.data = null
   memory.error = null
+}
+
+// What to call a process. The device resolves this properly, against procd
+// rather than against argv[0]; the basename fallback is for an older umemd,
+// which sends no `name` and so reports wrapped daemons as "ucode" or "ujail".
+export function process_name(p: ProcessState): string {
+  return p.name || p.cmd.split('/').pop() || String(p.pid)
+}
+
+// The owning service, joined the way WEBUI.md specifies: procd names a lone
+// instance `instance1`, which says nothing, so only a name it was actually
+// given is worth showing.
+export function process_service(p: ProcessState): string | null {
+  if (!p.service) return null
+  return p.instance && p.instance !== 'instance1' ? `${p.service}.${p.instance}` : p.service
 }
 
 // The device returns its ring buffer in slot order, so once it has wrapped the
